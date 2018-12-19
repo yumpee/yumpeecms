@@ -33,6 +33,8 @@ frontend
     widgets
     web
  uploads
+ hosts
+ db
  ```
 
 
