@@ -1,6 +1,6 @@
 <p align="center">
-    <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
+    <a href="http://www.yumpeecms.com" target="_blank">
+        <img src="http://www.yumpeecms.com/uploads/223evp6ir0ll0gabvnnvqsubu1/15185238825a82d5ead96e01-68510255.png" height="100px">
     </a>
     <h1 align="center">YumpeeCMS Project</h1>
     <br>
