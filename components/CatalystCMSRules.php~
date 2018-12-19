@@ -1,0 +1,43 @@
+<?php
+namespace app\components;
+use yii\web\UrlRuleInterface;
+use yii\base\Object;
+
+
+class CatalystCMSRules extends Object implements URLRuleInterface
+
+{
+	
+	public function createUrl($manager, $route, $params){
+		
+		if ($route === 'teambuilding-events/event-categories') {
+				
+					return 'teambuilding-events/index';
+				
+		}
+			return false; // this rule does not apply
+	}
+		
+	public function parseRequest($manager, $request){
+			$pathInfo = $request->getPathInfo();
+			if (preg_match('%^([^\/]*)\/([^\/]*)$%', $pathInfo, $matches)) {
+				if($matches[2] == 'event-categories'){
+						//$params = [ 'title' => $matches[2]];
+						return ['teambuilding-events/event-categories', $params];
+				}else{
+				      return false;
+				}
+			}
+return false; // this rule does not apply
+
+	}
+	
+	
+	
+	
+	
+	
+	
+}
+
+

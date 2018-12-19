@@ -1,0 +1,31 @@
+/*************************************BACKGROUND COLOR START*************************************/
+#banner, .banner-outer .caption .holder form button[type="submit"]:hover, .browse-job-section, .user-option-col a.login-round, .user-option-col .dropdown-menu > li > a:hover, .user-option-col .dropdown-menu > li > a:focus, .user-option-col a.btn-login, .theme-style-1 a.btn-style-1, .popular-categories .box:hover, .popular-categories .box:hover, .btn-color-2, .sidebar .box .text-box a.btn-apply, .call-action-section, .price-table .box strong.amount:before, .price-table .box strong.amount:after, #footer form input[type="submit"], #cp_side-menu, .banner-2, #wrapper .header-2.cp_sticky, .process-section .icon-box, .btn-bg-color-1, .header-4, #inner-banner, .pagination-box .pager li > a:hover, .pagination-box .pager li > a:focus, .pagination-box .pager li.active a, .post-box .owl-next:hover, .post-box .owl-prev:hover, .post-section .comment-form form input[type="submit"], .signup-section .holder input[type="submit"], .upload-box .btn-file, .signup-section .holder b, .contact-form input[type="Submit"], .address-box address .fa, .candidates-search-bar form, .btn-row a.resume, .btn-row a.login, .summary-box  .col:before, .progress-box .progress-bar span, .alphabets-row .col span, .alphabets-row .col:before, .icon-colo-1, .resum-form .accordion_cp, .resum-form input[type="submit"], .navbar-toggle {
+	background-color:#1b8af3;
+}
+
+/*************************************BACKGROUND COLOR END*************************************/
+
+
+
+/*************************************TEXT COLOR START*************************************/
+#nav li:hover > a, .banner-outer .caption .holder form button[type="submit"], .banner-outer .caption .holder .btn-row a .fa, .cp_side-menu a .fa, .user-option-col a .fa, #content-area .box .text-col a.text .fa, #content-area .box strong.price .fa, .sidebar .box .text-box h4 a, .sidebar .box .text-box a.text .fa, .sidebar .box .text-box strong.price .fa, #content-area a.load-more .fa, .price-table .box h4, .price-table .box strong.amount sub, .testimonials-section .owl-prev:hover:before, .testimonials-section .owl-next:hover:before, .post-box .text-box strong.date .fa, .post-box .text-box strong.name, .post-box .text-box:hover h4 a, #footer .box ul li a, .bottom-row strong.copyrights a:hover, #content-area .box:hover h4 a, #popular-job-slider .owl-next:before, #popular-job-slider .owl-prev:before, .sidebar-jobs ul li a, .sidebar-jobs ul li span .fa, .pagination-box .pager li > a, .pagination-box .pager li > span, .sidebar .box .recent-post .text-box a .fa, .sidebar .box .recent-post .text-area a .fa, .sidebar .box .recent-post ul li:hover strong a, .sidebar .box .archives-box ul li a:hover, .post-box blockquote p, .testimonials-style-3 .box p, .testimonials-style-3 .col p, .input-box .fa, .check-box strong a:hover, .signup-section .holder em, .signup-section .holder em a, .signup-section .holder a.login, .candidates-search-bar form button[type="submit"], .resumes-section .box .text-box h4, .resumes-content .box .text-box strong .fa, .resumes-content .box .text-box span.price .fa, .tags a, .resumes-section a.load-more .fa, .related-people .text-box strong.name a, .related-people .text-box span .fa, .summary-box strong.title, .popular-companies .owl-next:before, .popular-companies .owl-prev:before, .alphabets-row a:hover, .alphabets a:hover, .theme-style-1 .account-option a.btn-style-1 .fa, #content-area .box .text-col p em, .job-detail ul li .fa{
+	color:#1b8af3;
+}
+/*************************************TEXT COLOR END*************************************/
+
+
+
+/*************************************BORDER COLOR START*************************************/
+#nav li a:before,#nav li a:after, .testimonials-section .owl-prev:hover:before, .testimonials-section .owl-next:hover:before, .summary-box  .col, .resume-process .option-box .icon-colo-1:before{
+	border-color:#1b8af3;
+}
+.btn-bg-color-1:before{
+	border-color: transparent transparent #1b8af3 transparent;
+}
+.signup-section .holder span:before{
+	border-color: #1b8af3 transparent transparent transparent;
+}
+.progress-box .progress-bar span:before{
+	border-color: transparent #1b8af3 transparent transparent;
+}
+/*************************************BORDER COLOR END*************************************/

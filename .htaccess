@@ -1,0 +1,16 @@
+RewriteEngine off
+# For Backend
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^/yii2-app/admin
+RewriteRule ^admin(/.+)?$ /yumpeecms/backend/web/$1 [L,PT]
+
+# If a directory or a file exists, use it directly
+
+#RewriteCond %{REQUEST_URI} !index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# Otherwise forward it to index.php
+RewriteRule . /myhouse/frontend/web/$1
+RewriteRule index.php /yumpeecms/frontend/web/index.php
+

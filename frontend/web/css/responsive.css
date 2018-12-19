@@ -1,0 +1,934 @@
+
+/*===========================================================================*/
+							/*480px CSS*/
+/*===========================================================================*/
+@media (max-width: 480px) {
+#header.header-2 .cp_side-menu {
+	display: none;
+}
+.cp_side-menu{
+	display:none;
+}
+#header.header-2{
+	background:#000;
+	position:static;
+}
+#header.header-2 #nav li{
+	display:block;
+}
+#wrapper .header-2.cp_sticky{
+	position:static;
+}
+.banner-2 img{
+	display:none;
+}
+.banner-2.banner-outer .caption{
+	top:0;
+}
+#header {
+	padding: 10px 0;
+}
+.user-option-col {
+	position: static;
+	padding: 0 10px;
+}
+strong.logo {
+	margin: 20px 0 0 0;
+	width: 100%;
+	text-align: center;
+}
+.dropdown-box .dropdown-menu {
+	left: 0;
+}
+#nav li {
+	float: none;
+	display: block;
+	padding: 0 0 25px 0;
+}
+.navigation-col .navbar-collapse {
+	float: left;
+	width: 100%;
+}
+#nav li ul li > ul, #nav li ul {
+	position: static;
+}
+.banner-outer .caption .holder {
+	width: 100%;
+}
+.banner-outer .caption .holder h1 {
+	font-size: 24px;
+	line-height: 30px;
+}
+.banner-outer .caption .holder form input[type="text"] {
+	margin: 0 0 20px 0;
+}
+.browse-job-section .holder {
+	width: 100%;
+	margin: 20px 0;
+	float: left;
+}
+.kenburnsy {
+	height: 700px;
+}
+.banner-menu ul li a {
+	font-size: 12px;
+}
+.popular-categories {
+	padding: 30px 10px;
+}
+.theme-style-1 h2 {
+	font-size: 20px;
+	line-height: 20px;
+	margin-bottom: 20px;
+}
+.padd-tb {
+	padding: 30px 0;
+}
+#content-area .box .thumb {
+	margin: 0 0 20px 0;
+}
+.recent-row .col-md-3 {
+	clear: both;
+}
+#content-area .box .text-col h4 {
+	font-size: 15px;
+}
+#content-area .box .text-col a.text {
+	padding: 0 0 10px 0;
+}
+#loadMore {
+	margin-bottom: 20px;
+}
+.call-action-section .text-box h2 {
+	font-size: 20px;
+	line-height: 30px;
+}
+.call-action-section .text-box p {
+	font-size: 15px;
+}
+.price-table .box, .client-logo-row .holder, #footer .box {
+	width: 100%;
+}
+.theme-style-1 .price-table .box-colo-2 {
+	transform: scale(1);
+	-moz-transform: scale(1);
+	-webkit-transform: scale(1);
+	margin: 75px 0 30px 0;
+}
+.price-table {
+	padding: 30px 0;
+}
+.testimonials-section .holder {
+	padding: 0;
+}
+.testimonials-section .holder .thumb::before {
+	display: none;
+}
+.testimonials-section .holder .thumb {
+	margin: 0 0 30px 0;
+}
+.testimonials-section .owl-next, .testimonials-section .owl-prev {
+	top: 100%;
+}
+.client-logo-row .holder {
+	padding: 0 10px;
+}
+.client-logo-row ul {
+	display: block;
+	text-align: center;
+}
+.client-logo-row ul li {
+	float: none;
+	display: inline-block;
+}
+.post-box, .price-table .box, .client-logo-row .holder, #footer .box {
+	margin: 0 0 20px 0;
+}
+#footer {
+	padding: 30px 10px;
+}
+#footer form, #content-area .box .text-col {
+	float: left;
+	width: 100%;
+}
+.bottom-row strong.copyrights {
+	text-align: center;
+	margin-bottom: 20px;
+	line-height: 22px;
+}
+.footer-social {
+	float: left;
+	width: 100%;
+}
+.footer-social ul {
+	text-align: center;
+	display: block;
+}
+.footer-social ul li {
+	display: inline-block;
+	float: none;
+	padding: 0 5px;
+}
+.banner-2 {
+	height: 500px;
+}
+.popular-job-caregries .holder{
+	width:100%;
+}
+.process-section{
+	padding:80px 0 20px 0;
+}
+.facts-box a.facts-btn{
+	margin-bottom:30px;
+}
+.facts-box .col-md-3{
+	overflow:hidden;
+}
+.process-section .col-md-4{
+	margin-bottom:20px;
+}
+.header-4 #nav li{
+	display:block;
+}
+.video-section .video-frame .modal-dialog{
+	width:100%;
+	padding:0 10px;
+}
+.video-section .video-frame{
+	width:100%;
+	background-size:100%;
+	margin:0;
+	height:270px;
+}
+.video-section .text-box{
+	margin:250px 0 0 0;
+}
+.post-box blockquote{
+	margin:0 0 20px 0;
+}
+.post-box blockquote:before{
+	display:none;
+}
+.post-box a.btn-style-1{
+	float:left;
+	clear:both;
+	margin:20px 0 0 0;
+}
+.post-box .thumb iframe{
+	height:173px !important;
+}
+.pagination-box .pager li{
+	margin:0 -2px;
+}
+.blog-medium .post-box .frame{
+	margin:0;
+	width:100%;
+}
+.blog-medium .post-box .text-box{
+	padding:30px 16px 21px 16px;
+	float:left;
+}
+.resumes-content .box .frame{
+	margin:0 0 20px 0;
+}
+.resumes-content .box .text-box{
+	float:left;
+}
+.btn-row a.resume, .btn-row a.contact{
+	margin:0 10px 10px 0;
+}
+.resumes-section .col-md-3{
+	clear:both;
+}
+.progress-box strong.title, .progress-box .progress{
+	width:100%;
+}
+.progress-box strong.title{
+	padding:0 0 20px 0;
+}
+.skills-box{
+	margin-bottom:20px;
+}
+.tags a{
+	display:block;
+	float:none;
+	margin:5px 0;
+}
+.candidates-search-bar form{
+	width:100%;
+}
+.candidates-search-bar form input[type="text"]{
+	margin:0 0 20px 0;
+}
+.check-filter ul{
+	display:block;
+	text-align:center;
+}
+.check-filter ul li{
+	float:none;
+	display:inline-block;
+	padding:0 4px;
+}
+.check-filter ul li:first-child{
+	padding:0 4px;
+}
+.alphabets{
+	margin-bottom:30px;
+}
+.alphabets a:first-child{
+	padding:0 0 10px 21px;
+}
+.alphabets a{
+	padding:0 0 10px 21px;
+}
+.contact-section .map-box .map_canvas{
+	height:300px;
+}
+.contact-form form{
+	margin:0 0 20px 0;
+}
+.account-option .inner-box, .account-option .inner-box .text-box{
+	width:100%;
+}
+.account-option .inner-box .text-box{
+	margin-bottom:20px;
+}
+.resum-form input[type="submit"]{
+	width:100%;
+	padding:20px 0;
+}
+#content-area .box .text-col a.text{
+	padding:0 10px 10px 0;
+}
+.job-detail .btn-freelance{
+	margin:0 10px 10px 0;
+}
+.theme-style-1 a.btn-style-1{
+	font-size:13px;
+}
+#content-area .box{
+	margin-bottom:20px;
+}
+.accordion-style-1 .col-md-4{
+	clear:both;
+}
+.cp_aaccordion-row{
+	margin-bottom:10px;
+	float:left;
+	width:100%;
+}
+.signup-section .holder{
+	width:100%;
+}
+.signup-section .holder em{
+	padding:10px 0 0 0;
+}
+.testimonials .inner-col{
+	width:100%;
+}
+}
+
+
+
+/*===========================================================================*/
+							/*767px CSS*/
+/*===========================================================================*/
+@media (max-width: 767px) {
+#header.header-2 .cp_side-menu {
+	display: none;
+}
+#header {
+	padding: 10px 0;
+}
+.user-option-col {
+	position: static;
+	padding: 0 10px;
+}
+#header.header-2 #nav li{
+	display:block;
+}
+#header.header-2 #nav{
+	text-align:left;
+	background:#333;
+}
+#wrapper .header-2.cp_sticky{
+	position:static;
+}
+#header.header-2 #nav li ul li > ul{
+	position:static;
+}
+.banner-2 img{
+	display:none;
+}
+.popular-job-caregries .holder{
+	width:100%;
+}
+.cp_side-menu{
+	display:none;
+}
+.dropdown-box .dropdown-menu {
+	left: 0;
+}
+#nav li {
+	float: none;
+	display: block;
+	padding: 0 0 20px 0;
+}
+.navigation-col .navbar-collapse {
+	float: left;
+	width: 100%;
+}
+#nav li ul {
+	position: static;
+}
+.banner-outer .caption .holder {
+	width: 100%;
+	float: left;
+}
+.banner-outer .caption .holder h1 {
+	font-size: 35px;
+	line-height: 40px;
+}
+.banner-outer .caption .holder form input[type="text"] {
+	margin: 0 0 20px 0;
+}
+.kenburnsy {
+	height: 700px;
+}
+.browse-job-section .holder {
+	width: 100%;
+}
+.browse-job-section strong.title {
+	float: left;
+	font-size: 12px;
+}
+#loadMore {
+	margin-bottom: 30px;
+}
+.call-action-section .text-box {
+	max-width: 100%;
+}
+.price-table .box {
+	width: 100%;
+}
+.theme-style-1 .price-table .box-colo-2 {
+	margin: 80px 0 30px 0;
+	transform: scale(1);
+}
+.testimonials-section .holder {
+	padding: 0 0 0 80px;
+}
+.testimonials-section .owl-next, .testimonials-section .owl-prev {
+	top: 100%;
+}
+.client-logo-row .holder {
+	padding: 10px;
+	width: 100%;
+}
+.post-box {
+	margin-bottom: 30px;
+}
+.padd-tb {
+	padding: 30px 0;
+}
+#footer .box {
+	width: 100%;
+	margin-bottom: 30px;
+}
+#footer form {
+	float: left;
+	width: 100%;
+}
+.bottom-row strong.copyrights {
+	text-align: center;
+	padding: 10px 0;
+	float: none;
+	display: block;
+}
+.footer-social {
+	float: left;
+	width: 100%;
+}
+.footer-social ul {
+	display: block;
+	text-align: center;
+}
+.footer-social ul li {
+	float: none;
+	display: inline-block;
+}
+.banner-2{
+	height:625px;
+}
+.facts-box a.facts-btn{
+	margin-bottom:30px;
+}
+.process-section{
+	padding:70px 0 20px 0;
+}
+.process-section .col-md-4, .facts-box .col-md-3{
+	overflow:hidden;
+}
+.process-section .col-md-4{
+	margin-bottom:20px;
+}
+.header-4 #nav li{
+	display:block;
+}
+.header-4 #nav{
+	text-align:left;
+}
+.header-4 #nav li ul li > ul{
+	position:static;
+}
+.header-4 strong.logo{
+	margin:0 0 0 20px;
+}
+.video-section .video-frame{
+	width:100%;
+	background-size:100%;
+	margin:0;
+}
+.video-section .text-box{
+	margin:400px 0 0 0;
+}
+.video-section .video-frame .modal-dialog{
+	width:100%;
+	padding:0 20px;
+}
+.post-box .thumb iframe{
+	height:353px !important;
+}
+.blog-medium .post-box .frame{
+	margin:0;
+	width:100%;
+}
+.blog-medium .post-box .text-box{
+	padding:30px 16px 21px 16px;
+	float:left;
+}
+.resumes-section .col-md-3{
+	clear:both;
+}
+.tags a{
+	float:none;
+	display:block;
+	margin:4px 0;
+}
+.btn-row a.login{
+	margin:10px 0 0 0;
+}
+.progress-box strong.title{
+	font-size:14px;
+}
+.skills-box{
+	margin-bottom:20px;
+}
+.candidates-search-bar form{
+	width:100%;
+}
+.candidates-search-bar form input[type="text"]{
+	margin:0 0 20px 0;
+}
+.check-filter ul{
+	display:block;
+	text-align:center;
+}
+.check-filter ul li{
+	float:none;
+	display:inline-block;
+	padding:0 4px;
+}
+.check-filter ul li:first-child{
+	padding:0 4px;
+}
+.alphabets{
+	margin-bottom:30px;
+}
+.alphabets a:first-child{
+	padding:0 0 10px 21px;
+}
+.alphabets a{
+	padding:0 0 10px 21px;
+}
+.contact-section .map-box .map_canvas{
+	height:300px;
+}
+.contact-form form{
+	margin:0 0 20px 0;
+}
+.account-option .inner-box, .account-option .inner-box .text-box{
+	width:100%;
+}
+.account-option .inner-box .text-box{
+	margin-bottom:20px;
+}
+.resum-form input[type="submit"]{
+	width:100%;
+	padding:20px 0;
+}
+.accordion-style-1 .col-md-4{
+	clear:both;
+}
+.cp_aaccordion-row{
+	margin-bottom:10px;
+	float:left;
+	width:100%;
+}
+.testimonials .inner-col{
+	width:100%;
+}
+.companies-section ul li{
+	width:193px;
+}
+}
+
+
+/*===========================================================================*/
+						/*768px And 992px CSS*/
+/*===========================================================================*/
+@media (min-width: 768px) and (max-width: 992px) {
+#nav li ul li > ul {
+	left: inherit;
+	right: 0;
+}
+.banner-outer .caption .holder {
+	float: left;
+	width: 100%;
+}
+.banner-menu ul li {
+	padding: 0 14px;
+}
+.banner-menu ul li a {
+	font-size: 14px;
+}
+.browse-job-section .holder {
+	width: 100%;
+}
+.kenburnsy {
+	height: 450px;
+}
+.browse-job-section strong.title {
+	float: left;
+}
+.call-action-section .text-box {
+	max-width: 100%;
+}
+.call-action-section .text-box h2 {
+	font-size: 34px;
+}
+.price-table .box {
+	width: 240px;
+}
+.price-table .box ul li {
+	font-size: 13px;
+}
+.testimonials-section .holder {
+	padding: 0 0 0 100px;
+}
+.client-logo-row .holder {
+	padding: 10px;
+	width: 100%;
+}
+.client-logo-row ul {
+	display: block;
+	text-align: center;
+}
+.client-logo-row ul li {
+	display: inline-block;
+	float: none;
+}
+.post-box .text-box h4 {
+	font-size: 14px;
+}
+#footer .box {
+	width: 100%;
+	margin: 0 0 30px 0;
+}
+#footer form {
+	width: 100%;
+}
+.bottom-row strong.copyrights {
+	float: none;
+	display: block;
+	text-align: center;
+	padding: 10px 0;
+}
+.footer-social {
+	float: left;
+	width: 100%;
+}
+.footer-social ul {
+	display: block;
+	text-align: center;
+}
+.footer-social ul li {
+	float: none;
+	display: inline-block;
+	padding: 0 5px;
+}
+#footer {
+	padding: 30px 10px;
+}
+.user-option-col{
+	position:static;
+	padding:0 10px;
+}
+#header.header-2{
+	position:static;
+	background:#222;
+}
+#header.header-2 strong.logo{
+	margin:0;
+}
+#header.header-2 .navigation-col{
+	float:left;
+	width:100%;
+}
+.dropdown-box .dropdown-menu{
+	left:0;
+}
+.banner-outer .caption .holder form input[type="text"]{
+	margin:0 0 20px 0;
+}
+.banner-2 img{
+	display:none;
+}
+.banner-2{
+	height:500px;
+}
+.banner-2.banner-outer .caption{
+	top:0;
+}
+.popular-job-caregries .holder{
+	width:100%;
+}
+#header.header-2 .navigation-col .navbar-collapse{
+	margin:0;
+}
+.process-section .col-md-4{
+	overflow:hidden;
+	margin:20px 0;
+}
+.banner-2.banner-3 .caption .holder form{
+	padding:20px 0 0 0;
+}
+.facts-box .col-md-3.col-sm-6{
+	margin-bottom:20px;
+}
+.header-4 .navigation-col{
+	float:left;
+}
+.video-section .video-frame{
+	width:100%;
+	background-size:100%;
+	height:250px;
+}
+.video-section .video-frame .modal-dialog{
+	width:100%;
+	padding:0 20px;
+}
+.post-box blockquote{
+	margin:0 74px 28px 65px;
+}
+.post-box .thumb iframe{
+	height:274px !important;
+}
+.blog-medium .post-box .frame{
+	margin:0;
+	width:100%;
+}
+.blog-medium .post-box .text-box{
+	padding:30px 16px 21px 16px;
+	float:left;
+}
+.resumes-content .box .text-box{
+	float:left;
+}
+.resumes-content .box .frame{
+	margin:0 0 20px 0;
+}
+.btn-row a.resume{
+	margin:0 20px 20px 0;
+}
+.tags a{
+	float:none;
+	display:block;
+	margin:4px 0;
+}
+.progress-box strong.title{
+	font-size:14px;
+}
+.candidates-search-bar form{
+	width:100%;
+}
+.candidates-search-bar form input[type="text"]{
+	margin:0 0 20px 0;
+}
+.check-filter ul{
+	display:block;
+	text-align:center;
+}
+.check-filter ul li{
+	float:none;
+	display:inline-block;
+	padding:0 4px;
+}
+.check-filter ul li:first-child{
+	padding:0 4px;
+}
+.alphabets{
+	margin-bottom:30px;
+}
+.alphabets a:first-child{
+	padding:0 0 10px 21px;
+}
+.alphabets a{
+	padding:0 0 10px 21px;
+}
+.address-box address strong, .address-box address a{
+	font-size:14px;
+}
+.account-option .inner-box, .account-option .inner-box .text-box{
+	width:100%;
+}
+#content-area .box .thumb{
+	margin:0 0 10px 0;
+}
+.cp_aaccordion-row{
+	margin-bottom:10px;
+	float:left;
+	width:100%;
+}
+.testimonials .inner-col{
+	width:100%;
+}
+}
+
+
+
+/*===========================================================================*/
+							/*1200px CSS*/
+/*===========================================================================*/
+@media (min-width: 1200px) {
+#nav li ul li > ul {
+	right: inherit;
+	left: 100%;
+}
+.banner-outer .caption .holder {
+	width: 1200px;
+}
+.price-table .box {
+	width: 370px;
+}
+.client-logo-row .holder {
+	width: 1200px;
+	padding: 20px 0 20px 30px;
+}
+.client-logo-row ul li {
+	width: auto;
+}
+strong.logo {
+	margin: 0 150px 0 0;
+}
+.cp_side-menu {
+	margin: 12px 0 0 50px;
+}
+.sidebar .box .text-box a.btn-apply {
+	font: 900 14px/14px 'Roboto', sans-serif;
+}
+#footer form {
+	float: right;
+}
+#header.header-2 .cp_side-menu {
+	margin: 12px 50px 0 50px;
+}
+strong.logo {
+	margin:0 0 0 65px;
+}
+.user-option-col {
+	position: absolute;
+	padding:0;
+}
+.banner-2 {
+	padding:0;
+}
+.popular-job-caregries .holder {
+	width: 1200px;
+}
+#header.header-3 .navigation-col{
+	width:auto;
+	float:none;
+}
+.header-4 .navigation-col {
+	float: none;
+}
+.dropdown-box .dropdown-menu {
+	left: inherit;
+}
+.video-section .video-frame {
+	background: url(../images/video-frame.png) no-repeat left top;
+	width: 689px;
+	height: 456px;
+}
+.video-section .video-frame .modal-dialog {
+	width: 1000px;
+	padding:0;
+}
+.btn-row a.login {
+	margin: 0 20px 0 0;
+}
+.check-filter ul li {
+	padding: 0 0 0 38px;
+}
+.candidates-search-bar form {
+	width: 1200px;
+}
+.alphabets a {
+	padding: 0 0 0 21px;
+}
+.alphabets a:first-child {
+	padding: 0;
+}
+.address-box address strong {
+	font: 500 18px/22px 'Roboto', sans-serif;
+}
+.address-box address a {
+	font: 500 18px/18px 'Roboto', sans-serif;
+}
+}
+
+
+
+/*===========================================================================*/
+							/*1400px CSS*/
+/*===========================================================================*/
+@media (max-width: 1480px) {
+.cp_side-menu {
+	margin: 10px 0 0 10px;
+}
+strong.logo {
+	margin: 0;
+}
+.bottom-row {
+	margin: 30px 0 0 0;
+}
+.banner-2{
+	padding:50px 0;
+}
+
+.navigation-col .navbar-collapse {float:left;}
+
+#footer .text-box, #footer .box {width:15%; margin:0 20px 0 0}
+#footer form {width:16%;}
+
+
+}
+
+
+@media (max-width: 1900px) {
+	
+	
+#footer .text-box, #footer .box {width:15%; margin:0 20px 0 0}
+#footer form {width:16%;}
+}

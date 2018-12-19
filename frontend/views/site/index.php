@@ -1,0 +1,1 @@
+If you are seeing this Page, it means that YumpeeCMS has been successfully deployed for this domain. To set up your website properly, log into your Administrator's account and set the Home Page.
