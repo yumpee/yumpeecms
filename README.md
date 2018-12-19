@@ -81,14 +81,14 @@ environments/            contains environment-based overrides
 
 SUMMARY
 
-**What is Yumpee CMS**
+**What is Yumpee CMS**<br>
 Yumpee CMS is a Content Management and Application Development System. It is a framework that aids the development and deployment of websites, web applications and web services.
 
-**What can be done with Yumpee CMS**
-Blog Sites
-Classified Ads Sites
-E-commerce sites
-Business Process Applications
+**What can be done with Yumpee CMS**<br>
+Blog Sites<br>
+Classified Ads Sites<br>
+E-commerce sites<br>
+Business Process Applications<br>
 
 **Where has it been used**<br>
 http://www.yumpee.com.ng <br>
@@ -100,8 +100,7 @@ http://www.yumpeecms.com (Development Site)
 
 You  will require PHP 7.0 and MySQL /Maria DB. There is a future to support other databases.
 
-To Install check the default README.txt file on the projects files directory.
 
 **Documentation**
-
+<br>
 There is a start up User Guide attached to this project. You can get some more information on http://www.yumpeecms.com/userdoc It is not in any way exhaustive but will be upgraded in due time. There is also a Developer's Handbook to get developers building applications on Yumpee started. This isn't exhaustive either but will be updated hopefully every week. Feel free to drop a note or raise a ticket if you have any questions. 
