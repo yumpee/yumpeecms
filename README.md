@@ -84,8 +84,9 @@ environments/            contains environment-based overrides
 SUMMARY
 
 **What is Yumpee CMS**<br>
-Yumpee CMS is a Content Management and Application Development System. It is a framework that aids the development and deployment of websites, web applications and web services.
-
+Yumpee CMS is an OpenSource Content Management and Application Development System. It is a framework that aids the development and deployment of websites, web applications and web services.
+<br>You can get more information about this application on http://www.yumpeecms.com
+<br>
 **What can be done with Yumpee CMS**<br>
 Blog Sites<br>
 Classified Ads Sites<br>
