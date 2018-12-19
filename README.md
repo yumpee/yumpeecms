@@ -2,12 +2,38 @@
     <a href="https://github.com/yiisoft" target="_blank">
         <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
     </a>
-    <h1 align="center">Yii 2 Advanced Project Template</h1>
+    <h1 align="center">YumpeeCMS Project</h1>
     <br>
 </p>
 
-Yii 2 Advanced Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
-developing complex Web applications with multiple tiers.
+This project is an application built using  Yii 2 Advanced Project Template. Efforts will be made to apply the latest updates of Yii2 but follow instructions below to do it directly from Yii2 resources. The folder in this project that have been customised for this project include. 
+```
+common
+    config
+    components
+    mail
+    models
+frontend
+    components
+    config
+    controllers
+    models
+    themes
+    views
+    web
+    widgets
+    .htaccess
+ backend
+    assets
+    behaviours
+    components
+    controllers
+    models
+    views
+    widgets
+    web
+ uploads
+ ```
 
 The template includes three tiers: front end, back end, and console, each of which
 is a separate Yii application.
