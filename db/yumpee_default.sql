@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 29, 2018 at 12:12 AM
+-- Generation Time: Feb 04, 2019 at 04:09 AM
 -- Server version: 5.7.14
 -- PHP Version: 7.0.10
 
@@ -90,18 +90,20 @@ CREATE TABLE `tbl_articles` (
   `usrname` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `require_login` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
   `disable_comments` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
-  `rating` float NOT NULL,
-  `no_of_views` int(11) NOT NULL
+  `rating` float DEFAULT NULL,
+  `no_of_views` int(11) DEFAULT NULL,
+  `sort_order` int(11) DEFAULT NULL,
+  `permissions` text COLLATE utf8_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `tbl_articles`
 --
 
-INSERT INTO `tbl_articles` (`id`, `url`, `title`, `article_type`, `lead_content`, `body_content`, `featured_media`, `render_template`, `feedback`, `date`, `archive`, `display_image_id`, `thumbnail_image_id`, `master_content`, `published`, `updated`, `alternate_header_content`, `show_header_image`, `published_by_stat`, `usrname`, `require_login`, `disable_comments`, `rating`, `no_of_views`) VALUES
-('4188c92e74d51fe8ac01e6f7d6051e7a', 'cms-article', 'CMS Article', 1, '<p>The US Centers for Medicare&nbsp;</p>', '<p>The US Centers for Medicare &amp; Medicaid Services (CMS) has released an online tool that enables consumers to compare Medicare payments and copayments for 114 procedures that are performed in both hospital outpatient departments (HOPDs) and ambulatory surgical centers (ASCs).</p>\r\n<p>Required by the 21st Century Cures Act, the Procedure Price Lookup tool displays national averages of the amounts Medicare pays hospitals and ASCs and the national average copayment a Medicare beneficiary with no Medigap insurance would pay.</p>\r\n<p>For example, a Medicare patient might want to know how much CMS would pay a hospital and an ASC and what part of that he\'d have to pay, on average, for electroremoval of the prostate through bladder canal (urethra) with control of bleeding using an endoscope. The person would enter "prostate" into the tool, select this procedure from a drop-down list, and see the average Medicare cost and the average patient cost in both care settings. For this particular procedure, the patient would pay $351 in an ASC and $741 in an HOPD. The cost to Medicare would be more than twice as high in the HOPD as in the ASC.</p>\r\n<p>In a blog post, CMS Administrator Seema Verma said, "Procedure Price Lookup will help patients with Medicare consider potential cost differences when choosing among safe and clinically appropriate settings to get the care that best meets their needs."</p>\r\n<p>The Procedure Price Lookup is needed, she said, because the CMS is required by law to pay HOPDs differently than it pays ASCs. As a result, the CMS and Medicare beneficiaries pay "vastly different amounts for the same service, depending on the site of care." She noted that although it would take Congress to change the law, CMS can now provide some transparency to patients under the 21st Century Cures Act.</p>\r\n<p><strong>Impact on Physicians</strong></p>\r\n<p>Depending on how many consumers use Procedure Price Lookup and whether the price differential prompts more of them to select ASCs, this new online tool could affect physicians in at least two ways. First, patients might ask about the price comparison when they discuss elective surgery with their physicians. Second, physicians who co-own ACSs might benefit if more patients choose to have their procedures performed in ASCs.</p>\r\n<p>A few years ago, hospitals had an incentive to acquire surgical practices in order to capture the higher payments for procedures in HOPDs. But in 2016, CMS stopped classifying certain employed physicians with off-campus ambulatory practices as part of an HOPD. At the same time, it began requiring "site-neutral" Medicare payments to ambulatory care practices owned by hospitals. As a result, hospitals received lower payments for those doctors\' services than before, because the physicians were paid under the Medicare fee schedule.</p>\r\n<p>Procedure Price Lookup is the latest in a series of patient-oriented transparency tools from CMS. For example, CMS recently overhauled its drug pricing and spending dashboards, vastly increasing the number of medications that patients can look up. The agency has also enhanced its interactive online decision support feature to help people better understand and evaluate their Medicare coverage options. And CMS now offers a mobile-optimized out-of-pocket cost calculator to provide beneficiaries with information on overall plan and drug costs.</p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-11-29', 112018, '7f93f664be067f94f6f662222c9f5cf39069', '', 1, 1, '2018-11-29 00:03:23', NULL, 1, 0, 'admin', 'N', 'N', 0, 6),
-('b660a897d58b8fb82249ecbf94c9c3e1', 'cms-launches-tool-that-prices-surgeries-for-patien', 'CMS launches tool', 1, '<p>The Centers for Medicare and Medicaid Services</p>', '<p>Nov. 27 (UPI) -- The Centers for Medicare and Medicaid Services, or CMS, on Tuesday unveiled a new online tool that gives consumers the power to compare Medicare payouts for various hospital procedures.</p>\r\n<p>The Procedure Price Lookup tool allows users to see the national averages for what Medicare pays to hospitals or ambulatory surgical centers, along with the national average copayment amounts that beneficiaries without Medicare supplemental insurance would pay the provider.</p>\r\n<p>"We must do something about rising cost, and a key pillar is to empower patients with the information they need to drive cost and quality by making our healthcare system evolve to one that competes for patients," Seema Verma, administrator of CMS, wrote in a blog post.</p>\r\n<p>The launch of the lookup tool comes almost two years after the passage of the 21st Century Cures Act to help sort out the difference in what Medicare patients and CMS pay for the same service.</p>\r\n<p>The rollout of the law is a part of CMS\' eMedicare initiative, designed to bring more overall price transparency to consumers who in need of prescription drugs and medical services.</p>\r\n<p>Included in the initiative are optimized drug pricing and spending dashboards, and a cost estimator for drugs and services not covered by Medicare.</p>\r\n<p>In the same spirit of transparency, President Trump also signed two bills into law in October removing "gag orders" that kept pharmacists from giving tips to customers on how to purchase cheaper prescription drugs. Later that month he floated a proposal to require pharmaceutical companies to disclose drug costs in television ads.</p>\r\n<p>"While the work we have done to empower patients by increasing the transparency of the Medicare program is unprecedented, we are just getting started as we work to increase price transparency throughout the healthcare system," Verma said.</p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-11-29', 112018, '7f93f664be067f94f6f662222c9f5cf31835', '', 1, 1, '2018-11-29 00:06:26', NULL, 1, 1, 'admin', 'N', 'N', 0, 1),
-('dbfd606e6930a2512bff571b83a70f65', 'sample-article', 'Sample Article', 1, '<p>Sample Article with YumpeeCMS</p>', '<p>This is a sample article. Hope you have some fun building with Yumpee CMS.</p>\r\n<p>There are 13 different types of Page Template types in YumpeeCMS. A page template indicates how a<br />particular request will be routed and also how the information will be displayed. Every template type is<br />mapped to a specific route within the Yumpee framework.</p>\r\n<p><br />Within YumpeeCMS, you are also able to setup child templates from any of the core parent templates.<br />When a child template is setup, the system will route the URL call the same way it would have routed<br />the parent template but you now have the option of presenting the data in a different way. This means<br />that the same data can be presented in multiple page layouts using child templates. More of this will<br />be discussed in Chapter 12 &ndash; Extending Your Application</p>\r\n<p><em>An excerpt from Yumpee System Administrator Guide</em></p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-09-20', 92018, 'cf98487258357fddf6ceae69cd852a9c6359', '', 1, 1, '2018-11-22 23:08:52', NULL, 1, 1, 'admin', 'N', 'N', 0, 77);
+INSERT INTO `tbl_articles` (`id`, `url`, `title`, `article_type`, `lead_content`, `body_content`, `featured_media`, `render_template`, `feedback`, `date`, `archive`, `display_image_id`, `thumbnail_image_id`, `master_content`, `published`, `updated`, `alternate_header_content`, `show_header_image`, `published_by_stat`, `usrname`, `require_login`, `disable_comments`, `rating`, `no_of_views`, `sort_order`, `permissions`) VALUES
+('4188c92e74d51fe8ac01e6f7d6051e7a', 'cms-article', 'CMS Article', 1, '<p>The US Centers for Medicare&nbsp;</p>', '<p>The US Centers for Medicare &amp; Medicaid Services (CMS) has released an online tool that enables consumers to compare Medicare payments and copayments for 114 procedures that are performed in both hospital outpatient departments (HOPDs) and ambulatory surgical centers (ASCs).</p>\r\n<p>Required by the 21st Century Cures Act, the Procedure Price Lookup tool displays national averages of the amounts Medicare pays hospitals and ASCs and the national average copayment a Medicare beneficiary with no Medigap insurance would pay.</p>\r\n<p>For example, a Medicare patient might want to know how much CMS would pay a hospital and an ASC and what part of that he\'d have to pay, on average, for electroremoval of the prostate through bladder canal (urethra) with control of bleeding using an endoscope. The person would enter "prostate" into the tool, select this procedure from a drop-down list, and see the average Medicare cost and the average patient cost in both care settings. For this particular procedure, the patient would pay $351 in an ASC and $741 in an HOPD. The cost to Medicare would be more than twice as high in the HOPD as in the ASC.</p>\r\n<p>In a blog post, CMS Administrator Seema Verma said, "Procedure Price Lookup will help patients with Medicare consider potential cost differences when choosing among safe and clinically appropriate settings to get the care that best meets their needs."</p>\r\n<p>The Procedure Price Lookup is needed, she said, because the CMS is required by law to pay HOPDs differently than it pays ASCs. As a result, the CMS and Medicare beneficiaries pay "vastly different amounts for the same service, depending on the site of care." She noted that although it would take Congress to change the law, CMS can now provide some transparency to patients under the 21st Century Cures Act.</p>\r\n<p><strong>Impact on Physicians</strong></p>\r\n<p>Depending on how many consumers use Procedure Price Lookup and whether the price differential prompts more of them to select ASCs, this new online tool could affect physicians in at least two ways. First, patients might ask about the price comparison when they discuss elective surgery with their physicians. Second, physicians who co-own ACSs might benefit if more patients choose to have their procedures performed in ASCs.</p>\r\n<p>A few years ago, hospitals had an incentive to acquire surgical practices in order to capture the higher payments for procedures in HOPDs. But in 2016, CMS stopped classifying certain employed physicians with off-campus ambulatory practices as part of an HOPD. At the same time, it began requiring "site-neutral" Medicare payments to ambulatory care practices owned by hospitals. As a result, hospitals received lower payments for those doctors\' services than before, because the physicians were paid under the Medicare fee schedule.</p>\r\n<p>Procedure Price Lookup is the latest in a series of patient-oriented transparency tools from CMS. For example, CMS recently overhauled its drug pricing and spending dashboards, vastly increasing the number of medications that patients can look up. The agency has also enhanced its interactive online decision support feature to help people better understand and evaluate their Medicare coverage options. And CMS now offers a mobile-optimized out-of-pocket cost calculator to provide beneficiaries with information on overall plan and drug costs.</p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-11-29', 112018, '7f93f664be067f94f6f662222c9f5cf39069', '', 1, 1, '2018-11-29 00:03:23', NULL, 1, 0, 'admin', 'N', 'N', 0, 20, NULL, NULL),
+('b660a897d58b8fb82249ecbf94c9c3e1', 'cms-launches-tool-that-prices-surgeries-for-patien', 'CMS launches tool', 1, '<p>The Centers for Medicare and Medicaid Services</p>', '<p>Nov. 27 (UPI) -- The Centers for Medicare and Medicaid Services, or CMS, on Tuesday unveiled a new online tool that gives consumers the power to compare Medicare payouts for various hospital procedures.</p>\r\n<p>The Procedure Price Lookup tool allows users to see the national averages for what Medicare pays to hospitals or ambulatory surgical centers, along with the national average copayment amounts that beneficiaries without Medicare supplemental insurance would pay the provider.</p>\r\n<p>"We must do something about rising cost, and a key pillar is to empower patients with the information they need to drive cost and quality by making our healthcare system evolve to one that competes for patients," Seema Verma, administrator of CMS, wrote in a blog post.</p>\r\n<p>The launch of the lookup tool comes almost two years after the passage of the 21st Century Cures Act to help sort out the difference in what Medicare patients and CMS pay for the same service.</p>\r\n<p>The rollout of the law is a part of CMS\' eMedicare initiative, designed to bring more overall price transparency to consumers who in need of prescription drugs and medical services.</p>\r\n<p>Included in the initiative are optimized drug pricing and spending dashboards, and a cost estimator for drugs and services not covered by Medicare.</p>\r\n<p>In the same spirit of transparency, President Trump also signed two bills into law in October removing "gag orders" that kept pharmacists from giving tips to customers on how to purchase cheaper prescription drugs. Later that month he floated a proposal to require pharmaceutical companies to disclose drug costs in television ads.</p>\r\n<p>"While the work we have done to empower patients by increasing the transparency of the Medicare program is unprecedented, we are just getting started as we work to increase price transparency throughout the healthcare system," Verma said.</p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-11-29', 112018, '7f93f664be067f94f6f662222c9f5cf31835', '', 1, 1, '2018-11-29 00:06:26', NULL, 1, 1, 'admin', 'N', 'N', 0, 6, NULL, NULL),
+('dbfd606e6930a2512bff571b83a70f65', 'sample-article', 'Sample Article', 1, '<p>Sample Article with YumpeeCMS</p>', '<p>This is a sample article. Hope you have some fun building with Yumpee CMS.</p>\r\n<p>There are 13 different types of Page Template types in YumpeeCMS. A page template indicates how a<br />particular request will be routed and also how the information will be displayed. Every template type is<br />mapped to a specific route within the Yumpee framework.</p>\r\n<p><br />Within YumpeeCMS, you are also able to setup child templates from any of the core parent templates.<br />When a child template is setup, the system will route the URL call the same way it would have routed<br />the parent template but you now have the option of presenting the data in a different way. This means<br />that the same data can be presented in multiple page layouts using child templates. More of this will<br />be discussed in Chapter 12 &ndash; Extending Your Application</p>\r\n<p><em>An excerpt from Yumpee System Administrator Guide</em></p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-09-20', 92018, 'cf98487258357fddf6ceae69cd852a9c6359', '', 1, 1, '2018-11-22 23:08:52', NULL, 1, 1, 'admin', 'N', 'N', 0, 81, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -137,15 +139,16 @@ CREATE TABLE `tbl_articles_category` (
   `display_order` int(10) UNSIGNED NOT NULL DEFAULT '100',
   `published` tinyint(1) NOT NULL DEFAULT '0',
   `display_image_id` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
-  `master_content` tinyint(1) UNSIGNED NOT NULL DEFAULT '0'
+  `master_content` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `icon` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `tbl_articles_category`
 --
 
-INSERT INTO `tbl_articles_category` (`id`, `name`, `url`, `description`, `display_order`, `published`, `display_image_id`, `master_content`) VALUES
-('74280b9c3df37aa3a19d544de4f4f182', 'News', 'news', '', 1, 1, '', 1);
+INSERT INTO `tbl_articles_category` (`id`, `name`, `url`, `description`, `display_order`, `published`, `display_image_id`, `master_content`, `icon`) VALUES
+('74280b9c3df37aa3a19d544de4f4f182', 'News', 'news', '', 1, 1, '', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -314,6 +317,7 @@ INSERT INTO `tbl_backend_menu` (`id`, `label`, `icon`, `url`, `parent_id`, `prio
 ('328261b83f5a4c39290c8c7ec219dbe7', 'Relationships', 'fa fa-sitemap', '/relationships/index', 'd60949991b5706c87032ce94551e09f2', 5, 'N', '', ''),
 ('2afecb06173de7f714ebaff034ef0a24', 'Translation', 'fa fa-language', '/translation/index', '36a7174121fc69513bafc88a7a2ef96a', 10, 'N', '', ''),
 ('b2d80a7911b9ef4c84a4f23b105ec865', 'Language', 'fa fa-language', '/language/index', 'd8edeb960e5b05e127354f2e0e15f5d3', 10, 'N', '', ''),
+('32090ed63354d1ad42a179a7c82dca11', 'Theme Settings', 'fa fa-cog', '/themes/settings', 'd60949991b5706c87032ce94551e09f2', 6, 'N', NULL, NULL),
 ('2a461f42cdfd9d2a06502e2f5208a3fc', 'Reports', 'fa fa-bar-chart', '#', '', 7, 'N', 'Reports', NULL),
 ('4977b9d38f0270452a0bcd7d61483f3f', 'Setup', 'fa fa-cog', '/reports/setup', '2a461f42cdfd9d2a06502e2f5208a3fc', 1, 'N', 'Setup', NULL),
 ('81f3596e5693b235edf1bc0e662a10c2', 'Report List', 'fa fa-list', '/reports/list', '2a461f42cdfd9d2a06502e2f5208a3fc', 2, 'N', 'Report List', NULL),
@@ -324,7 +328,8 @@ INSERT INTO `tbl_backend_menu` (`id`, `label`, `icon`, `url`, `parent_id`, `prio
 ('7f517d19c08181212ab0d0ada28deb55', 'Outgoing', 'fa fa-sign-out', '/services/outgoing', '96a4d6a5dcffc19319d236c22656e5f6', 2, 'N', 'Outgoing', NULL),
 ('aec7d628c10ca4c4053c73a4c0b837ed', 'Resource Profile', 'fa fa-database', '/services/resource', '19749cd88d6cd37514c5fa76924d315b', 2, 'N', 'Resource Profile', NULL),
 ('a497028c7b51e3a1b2d8434637475023', 'Emulator', 'fa fa-rss', '/services/emulator', '19749cd88d6cd37514c5fa76924d315b', 3, 'N', 'Emulator', NULL),
-('b41e79f0292332e1a1112560720bac72', 'Logs', 'fa fa-history', '/services/logs', '19749cd88d6cd37514c5fa76924d315b', 4, 'N', 'Logs', NULL);
+('b41e79f0292332e1a1112560720bac72', 'Logs', 'fa fa-history', '/services/logs', '19749cd88d6cd37514c5fa76924d315b', 4, 'N', 'Logs', NULL),
+('7053f1edec9c57d4aa0eb56c3bbc5b0f', 'Domains', 'fa fa-globe', '/domains/index', 'd8edeb960e5b05e127354f2e0e15f5d3', 5, 'N', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -408,6 +413,7 @@ CREATE TABLE `tbl_block` (
   `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `content` text COLLATE utf8_unicode_ci NOT NULL,
   `position` varchar(20) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'left',
+  `widget` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
   `sort_order` int(3) UNSIGNED NOT NULL DEFAULT '100',
   `show_title` tinyint(1) NOT NULL DEFAULT '0',
   `title_level` int(1) UNSIGNED NOT NULL DEFAULT '2',
@@ -416,16 +422,18 @@ CREATE TABLE `tbl_block` (
   `content_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `title_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `published` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
-  `editable` int(1) DEFAULT '1'
+  `editable` int(1) DEFAULT '1',
+  `permissions` text COLLATE utf8_unicode_ci,
+  `require_login` char(1) COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `tbl_block`
 --
 
-INSERT INTO `tbl_block` (`id`, `master_content`, `name`, `title`, `content`, `position`, `sort_order`, `show_title`, `title_level`, `content_class`, `title_class`, `content_id`, `title_id`, `published`, `editable`) VALUES
-('82808175071416b980a3b7d429d90c9f', 1, 'Block-Bottom-Left', 'Block Left', '<p>This is a FREE Blog Extension based on YumpeeCMS framework. Use for advertising your goods and services. To make changes to this text, go to the Web-&gt;Blocks section of your Admin Panel.</p>', 'after_left', 100, 1, 1, NULL, NULL, NULL, NULL, 1, 1),
-('d6dcf609cea16be319bc3197bc0eaef4', 1, 'Home-Page-Slider', 'Home Page Slider', '<div class="slider-section">\r\n<div id="demo" class="carousel slide" data-ride="carousel">\r\n<div class="carousel-inner">\r\n<div class="carousel-item active">\r\n<div class="overlay">&nbsp;</div>\r\n<img src="{yumpee_setting}website_image_url{/yumpee_setting}/mp6d6l4466n1udeh5ue7ns3nf1/15434463725bff1f64aae875-39042587.jpeg" alt="slide1" />\r\n<div class="carousel-caption">\r\n<h1 class="animated wow fadeInDown hero-heading animated" data-wow-delay=".4s">Welcome to YumpeeCMS Blog</h1>\r\n<p class="animated fadeInUp wow hero-sub-heading animated" data-wow-delay=".6s">Post and Share articles in an organised form</p>\r\n</div>\r\n</div>\r\n<div class="carousel-item">\r\n<div class="overlay">&nbsp;</div>\r\n<img src="{yumpee_setting}website_image_url{/yumpee_setting}/mp6d6l4466n1udeh5ue7ns3nf1/15434463725bff1f64bbc136-05482540.jpeg" alt="slide3" />\r\n<div class="carousel-caption">\r\n<h1 class="animated wow fadeInLeft hero-heading animated" data-wow-delay=".7s">Get People to respond to you post</h1>\r\n<p class="animated wow fadeInRight hero-sub-heading animated" data-wow-delay=".9s">Share your posts with your social media. Include your custom forms to get more custom responses</p>\r\n</div>\r\n</div>\r\n<div class="carousel-item"><img src="{yumpee_setting}website_image_url{/yumpee_setting}/mp6d6l4466n1udeh5ue7ns3nf1/15434463725bff1f64ca6764-16565506.jpeg" alt="slide3" />\r\n<div class="carousel-caption">\r\n<h1 class="animated wow fadeInDown hero-heading animated" data-wow-delay=".6s">Yes it is completely responsive</h1>\r\n<p class="animated fadeInUp wow hero-sub-heading animated" data-wow-delay=".8s">No additional work needed to have it display on all devices.</p>\r\n</div>\r\n</div>\r\n</div>\r\n<a id="qq" class="carousel-control-prev" href="#demo" data-slide="prev"> <span id="car1" class="carousel-control-prev-icon"></span> </a> <a id="bb" class="carousel-control-next" href="#demo" data-slide="next"> <span id="car2" class="carousel-control-next-icon"></span></a></div>\r\n</div>', 'before_content', 100, 1, 1, NULL, NULL, NULL, NULL, 1, 1);
+INSERT INTO `tbl_block` (`id`, `master_content`, `name`, `title`, `content`, `position`, `widget`, `sort_order`, `show_title`, `title_level`, `content_class`, `title_class`, `content_id`, `title_id`, `published`, `editable`, `permissions`, `require_login`) VALUES
+('82808175071416b980a3b7d429d90c9f', 1, 'Block-Bottom-Left', 'Block Left', '<p>This is a FREE Blog Extension based on YumpeeCMS framework. Use for advertising your goods and services. To make changes to this text, go to the Web-&gt;Blocks section of your Admin Panel.</p>', 'after_left', NULL, 100, 1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
+('d6dcf609cea16be319bc3197bc0eaef4', 1, 'Home-Page-Slider', 'Home Page Slider', '<div class="slider-section">\r\n<div id="demo" class="carousel slide" data-ride="carousel">\r\n<div class="carousel-inner">\r\n<div class="carousel-item active">\r\n<div class="overlay">&nbsp;</div>\r\n<img src="{yumpee_setting}website_image_url{/yumpee_setting}/mp6d6l4466n1udeh5ue7ns3nf1/15434463725bff1f64aae875-39042587.jpeg" alt="slide1" />\r\n<div class="carousel-caption">\r\n<h1 class="animated wow fadeInDown hero-heading animated" data-wow-delay=".4s">Welcome to YumpeeCMS Blog</h1>\r\n<p class="animated fadeInUp wow hero-sub-heading animated" data-wow-delay=".6s">Post and Share articles in an organised form</p>\r\n</div>\r\n</div>\r\n<div class="carousel-item">\r\n<div class="overlay">&nbsp;</div>\r\n<img src="{yumpee_setting}website_image_url{/yumpee_setting}/mp6d6l4466n1udeh5ue7ns3nf1/15434463725bff1f64bbc136-05482540.jpeg" alt="slide3" />\r\n<div class="carousel-caption">\r\n<h1 class="animated wow fadeInLeft hero-heading animated" data-wow-delay=".7s">Get People to respond to you post</h1>\r\n<p class="animated wow fadeInRight hero-sub-heading animated" data-wow-delay=".9s">Share your posts with your social media. Include your custom forms to get more custom responses</p>\r\n</div>\r\n</div>\r\n<div class="carousel-item"><img src="{yumpee_setting}website_image_url{/yumpee_setting}/mp6d6l4466n1udeh5ue7ns3nf1/15434463725bff1f64ca6764-16565506.jpeg" alt="slide3" />\r\n<div class="carousel-caption">\r\n<h1 class="animated wow fadeInDown hero-heading animated" data-wow-delay=".6s">Yes it is completely responsive</h1>\r\n<p class="animated fadeInUp wow hero-sub-heading animated" data-wow-delay=".8s">No additional work needed to have it display on all devices.</p>\r\n</div>\r\n</div>\r\n</div>\r\n<a id="qq" class="carousel-control-prev" href="#demo" data-slide="prev"> <span id="car1" class="carousel-control-prev-icon"></span> </a> <a id="bb" class="carousel-control-next" href="#demo" data-slide="next"> <span id="car2" class="carousel-control-next-icon"></span></a></div>\r\n</div>', 'before_content', NULL, 100, 1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -598,8 +606,17 @@ CREATE TABLE `tbl_comments` (
   `status` char(1) NOT NULL DEFAULT 'N',
   `ip_address` varchar(20) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
-  `website` varchar(100) DEFAULT NULL
+  `website` varchar(100) DEFAULT NULL,
+  `parent_id` int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `tbl_comments`
+--
+
+INSERT INTO `tbl_comments` (`id`, `target_id`, `comment_type`, `author`, `commentor`, `comment`, `date_commented`, `status`, `ip_address`, `email`, `website`, `parent_id`) VALUES
+(13, '4188c92e74d51fe8ac01e6f7d6051e7a', 'article', 'admin', 'Admin', 'test', '2019-01-16 23:19:41', 'Y', '127.0.0.1', 'peter@audmaster.com', '', NULL),
+(12, 'dbfd606e6930a2512bff571b83a70f65', 'article', NULL, 'test', 'This is a test comment', '2019-01-16 23:17:55', 'N', '127.0.0.1', 'peter@audmaster.com', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -624,18 +641,19 @@ CREATE TABLE `tbl_custom_settings` (
   `id` varchar(40) NOT NULL,
   `setting_name` varchar(250) NOT NULL,
   `setting_value` text NOT NULL,
-  `description` text NOT NULL
+  `description` text NOT NULL,
+  `theme_id` int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tbl_custom_settings`
 --
 
-INSERT INTO `tbl_custom_settings` (`id`, `setting_name`, `setting_value`, `description`) VALUES
-('d0e6720b5ea66391e0184a1d525d2b4f', 'custom_contact_address', '12 LaVista Place, QLD', ''),
-('ea4271d691fc151ad6620b6efe4b58ad', 'custom_support_phone_number', '12345', ''),
-('a2b36fae60b474a723092858ae7772b2', 'custom_support_email', 'support@mywebsite.com', ''),
-('bd8789b5c0a97503f1cfe55aa593e9dd', 'custom_copyright', 'Copyright 2017-2018 by YumpeeCMS', '');
+INSERT INTO `tbl_custom_settings` (`id`, `setting_name`, `setting_value`, `description`, `theme_id`) VALUES
+('d0e6720b5ea66391e0184a1d525d2b4f', 'custom_contact_address', '12 LaVista Place, QLD', '', NULL),
+('ea4271d691fc151ad6620b6efe4b58ad', 'custom_support_phone_number', '12345', '', NULL),
+('a2b36fae60b474a723092858ae7772b2', 'custom_support_email', 'support@mywebsite.com', '', NULL),
+('bd8789b5c0a97503f1cfe55aa593e9dd', 'custom_copyright', 'Copyright 2017-2018 by YumpeeCMS', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -647,7 +665,24 @@ CREATE TABLE `tbl_custom_widget` (
   `id` varchar(40) NOT NULL,
   `name` varchar(100) NOT NULL,
   `title` varchar(100) NOT NULL,
-  `form_id` varchar(40) NOT NULL
+  `form_id` varchar(40) NOT NULL,
+  `permissions` text,
+  `require_login` char(1) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_domains`
+--
+
+CREATE TABLE `tbl_domains` (
+  `id` varchar(40) NOT NULL,
+  `name` varchar(250) DEFAULT NULL,
+  `domain_url` varchar(250) DEFAULT NULL,
+  `theme_id` int(11) DEFAULT NULL,
+  `menu_id` int(11) DEFAULT NULL,
+  `description` text
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -664,7 +699,8 @@ CREATE TABLE `tbl_feedback` (
   `target_id` varchar(40) DEFAULT NULL,
   `date_submitted` datetime DEFAULT NULL,
   `ip_address` varchar(20) DEFAULT NULL,
-  `usrname` varchar(255) DEFAULT NULL
+  `usrname` varchar(255) DEFAULT NULL,
+  `status` char(1) NOT NULL DEFAULT 'N'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -804,8 +840,8 @@ CREATE TABLE `tbl_form_submit` (
   `ip_address` varchar(30) NOT NULL,
   `url` varchar(200) NOT NULL,
   `published` char(1) NOT NULL,
-  `rating` float NOT NULL,
-  `no_of_views` int(11) NOT NULL
+  `rating` int(11) NOT NULL DEFAULT '0',
+  `no_of_views` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -892,6 +928,13 @@ CREATE TABLE `tbl_menu` (
   `description` text
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `tbl_menu`
+--
+
+INSERT INTO `tbl_menu` (`id`, `name`, `description`) VALUES
+(6, 'Custom', '');
+
 -- --------------------------------------------------------
 
 --
@@ -950,33 +993,36 @@ CREATE TABLE `tbl_page` (
   `show_in_footer_menu` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `sidebar` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `sort_order` int(3) UNSIGNED NOT NULL DEFAULT '0',
+  `permissions` text COLLATE utf8_unicode_ci,
   `master_content` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `sort_order_footer` int(3) DEFAULT '0',
   `editable` int(1) DEFAULT '1',
   `updated` datetime DEFAULT NULL,
   `show_header_image` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
+  `show_footer_image` tinyint(1) DEFAULT NULL,
   `alternate_header_content` text COLLATE utf8_unicode_ci,
   `tab_menu_title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `tag_id` varchar(36) COLLATE utf8_unicode_ci DEFAULT '0',
   `hideon_login` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
   `require_login` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
-  `renderer` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL
+  `renderer` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `no_of_views` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `tbl_page`
 --
 
-INSERT INTO `tbl_page` (`id`, `title`, `menu_title`, `breadcrumb_title`, `url`, `description`, `meta_description`, `robots`, `parent_id`, `display_image_id`, `layout`, `template`, `form_id`, `role_id`, `css`, `menu_profile`, `published`, `show_in_menu`, `show_in_footer_menu`, `sidebar`, `sort_order`, `master_content`, `sort_order_footer`, `editable`, `updated`, `show_header_image`, `alternate_header_content`, `tab_menu_title`, `tag_id`, `hideon_login`, `require_login`, `renderer`) VALUES
-('1cededebf55c6f73069ff7a2e8621eab', 'Log Out', 'Log Out', '', 'logout', '<p>Thank you for using our system</p>', '', '', '', '', 'column1', 'b67c34b7887bf859242897740c736222', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 30, 1, 0, NULL, '2018-02-23 00:32:36', 1, NULL, NULL, '', 'N', 'Y', NULL),
-('5e455ec9f9c9d21609d9d5345f2b890f', 'Login', 'Login', '', 'login', '<p>Please log into your account</p>\r\n<p>&nbsp;</p>\r\n<center></center>', '', '', '', '', 'column1', '9f67a476255de2c0afcff03b957ff146', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 40, 0, NULL, NULL, '2018-02-22 23:50:01', 0, NULL, NULL, '', 'Y', 'N', NULL),
-('9d78bca98209b62fb94ae6cf2ea01090', '', 'Home Page', 'Home', 'intro', '<div class="Service section">\r\n<div style="padding: 60px 0 50px 0; background-color: #cdd1d1; width: 100%; height: auto;">\r\n<div class="container">\r\n<div class="row">\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText">\r\n<h4>Training &amp; Development</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText ">\r\n<h4>Research &amp; Development</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText ">\r\n<h4>Consultancy</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry..</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>', '', '', '', '', 'column1', '9efe43a6a77017df40ba28c6a13368c3', '', '', NULL, NULL, 1, 1, 0, NULL, 20, 1, 0, NULL, '2018-11-28 23:36:01', 1, NULL, NULL, '', 'N', 'N', ''),
-('a5ca6c34-db38-11e3-a2bd-52540079a862', 'Contact', 'Contact Us', 'Contact', 'contact-us', '<p>We would love to hear from you. Feel free to contact us with our contact information below</p>', '', 'INDEX FOLLOW', '', '150405157359a6017525c4d1-46832884', 'column1', '6e5c2c526e55c91f84958c5eba109b6b', '', '', NULL, NULL, 1, 1, 0, NULL, 40, 1, 0, NULL, '2018-11-28 22:45:35', 1, NULL, NULL, '', 'N', 'N', ''),
-('bd22a42ed957ffd7a171501aa7886b48', 'Sign Up', 'Sign Up', 'Sign Up', 'signup', '', '', '', '', '', 'column1', 'de55671b11eac389d54450ae24b71653', '', '', NULL, NULL, 1, 0, 0, NULL, 50, 1, 0, NULL, '2018-11-19 23:13:11', 1, NULL, NULL, '', 'Y', 'N', ''),
-('d5f3d315b4ba211f11c5a06752898d1b', 'Blog Directory', 'Blog Listing', 'Blog Listing', 'blog-directory', '', '', '', '', '', 'column1', '0323a8564428391de276193808b48f45', '', '', NULL, NULL, 1, 0, 0, NULL, 20, 1, 0, NULL, '2018-11-22 22:57:08', 1, NULL, NULL, '', 'N', 'N', ''),
-('dc5f6b778e4d259ba74892c76acc63dd', 'Forgot Password', 'Forgot Password', 'Forgot Password', 'forgot-password', '<p>If you have forgotten your password, fill in the form below to change your password</p>', '', '', '', '', 'column1', '63aaa01fb0126e490547923279cbcf3f', '', '', NULL, NULL, 1, 0, 0, NULL, 70, 1, 0, NULL, '2018-04-16 14:10:16', 1, NULL, NULL, '', 'Y', 'N', NULL),
-('f0769958b0fba394ae53a0d261b445b9', 'Successful Registration', 'Success', '', 'registration-success', '<p>Thank you for registering to the church website. Please log into your account to post articles of testimonies and articles.</p>', '', '', '', '', 'column1', 'e5a63fe92ede5dceadd0e88930567573', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 80, 1, 0, NULL, '2018-02-20 20:38:05', 1, NULL, NULL, 'Yii::$app->request->post("tag_id")', 'N', 'N', NULL),
-('fe43812374f05721712180a04eea8e42', 'Sample Blog Index', 'Blog', 'Blog', 'blogs', '', '', '', '', '', 'column1', 'a7c49fad2de03424add30b0a31451377', '', '', NULL, NULL, 1, 1, 1, NULL, 30, 1, 0, NULL, '2018-11-22 23:11:37', 1, NULL, NULL, '', 'N', 'N', '');
+INSERT INTO `tbl_page` (`id`, `title`, `menu_title`, `breadcrumb_title`, `url`, `description`, `meta_description`, `robots`, `parent_id`, `display_image_id`, `layout`, `template`, `form_id`, `role_id`, `css`, `menu_profile`, `published`, `show_in_menu`, `show_in_footer_menu`, `sidebar`, `sort_order`, `permissions`, `master_content`, `sort_order_footer`, `editable`, `updated`, `show_header_image`, `show_footer_image`, `alternate_header_content`, `tab_menu_title`, `tag_id`, `hideon_login`, `require_login`, `renderer`, `no_of_views`) VALUES
+('1cededebf55c6f73069ff7a2e8621eab', 'Log Out', 'Log Out', '', 'logout', '<p>Thank you for using our system</p>', '', '', '', '', 'column1', 'b67c34b7887bf859242897740c736222', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 30, NULL, 1, 0, NULL, '2018-02-23 00:32:36', 1, NULL, NULL, NULL, '', 'N', 'Y', NULL, NULL),
+('5e455ec9f9c9d21609d9d5345f2b890f', 'Login', 'Login', '', 'login', '<p>Please log into your account</p>\r\n<p>&nbsp;</p>\r\n<center></center>', '', '', '', '', 'column1', '9f67a476255de2c0afcff03b957ff146', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 40, NULL, 0, NULL, NULL, '2018-02-22 23:50:01', 1, NULL, NULL, NULL, '', 'Y', 'N', NULL, NULL),
+('9d78bca98209b62fb94ae6cf2ea01090', '', 'Home Page', 'Home', 'intro', '<div class="Service section">\r\n<div style="padding: 60px 0 50px 0; background-color: #cdd1d1; width: 100%; height: auto;">\r\n<div class="container">\r\n<div class="row">\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText">\r\n<h4>Training &amp; Development</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText ">\r\n<h4>Research &amp; Development</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText ">\r\n<h4>Consultancy</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry..</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>', '', '', '', '', 'column1', '9efe43a6a77017df40ba28c6a13368c3', '', '', NULL, NULL, 1, 1, 0, NULL, 20, NULL, 1, 0, NULL, '2018-11-28 23:36:01', 1, NULL, NULL, NULL, '', 'N', 'N', '', 17),
+('a5ca6c34-db38-11e3-a2bd-52540079a862', 'Contact', 'Contact Us', 'Contact', 'contact-us', '<p>We would love to hear from you. Feel free to contact us with our contact information below</p>', '', 'INDEX FOLLOW', '', '150405157359a6017525c4d1-46832884', 'column1', '6e5c2c526e55c91f84958c5eba109b6b', '', '', NULL, NULL, 1, 1, 0, NULL, 40, NULL, 1, 0, NULL, '2018-11-28 22:45:35', 1, NULL, NULL, NULL, '', 'N', 'N', '', 2),
+('bd22a42ed957ffd7a171501aa7886b48', 'Sign Up', 'Sign Up', 'Sign Up', 'signup', '', '', '', '', '', 'column1', 'de55671b11eac389d54450ae24b71653', '', '', NULL, NULL, 1, 0, 0, NULL, 50, NULL, 1, 0, NULL, '2018-11-19 23:13:11', 1, NULL, NULL, NULL, '', 'Y', 'N', '', NULL),
+('d5f3d315b4ba211f11c5a06752898d1b', 'Blog Directory', 'Blog Listing', 'Blog Listing', 'blog-directory', '', '', '', '', '', 'column1', '0323a8564428391de276193808b48f45', '', '', NULL, NULL, 1, 0, 0, NULL, 20, NULL, 1, 0, NULL, '2018-11-22 22:57:08', 1, NULL, NULL, NULL, '', 'N', 'N', '', NULL),
+('dc5f6b778e4d259ba74892c76acc63dd', 'Forgot Password', 'Forgot Password', 'Forgot Password', 'forgot-password', '<p>If you have forgotten your password, fill in the form below to change your password</p>', '', '', '', '', 'column1', '63aaa01fb0126e490547923279cbcf3f', '', '', NULL, NULL, 1, 0, 0, NULL, 70, NULL, 1, 0, NULL, '2018-04-16 14:10:16', 1, NULL, NULL, NULL, '', 'Y', 'N', NULL, NULL),
+('f0769958b0fba394ae53a0d261b445b9', 'Successful Registration', 'Success', '', 'registration-success', '<p>Thank you for registering to the church website. Please log into your account to post articles of testimonies and articles.</p>', '', '', '', '', 'column1', 'e5a63fe92ede5dceadd0e88930567573', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 80, NULL, 1, 0, NULL, '2018-02-20 20:38:05', 1, NULL, NULL, NULL, 'Yii::$app->request->post("tag_id")', 'N', 'N', NULL, NULL),
+('fe43812374f05721712180a04eea8e42', 'Sample Blog Index', 'Blog', 'Blog', 'blogs', '', '', '', '', '', 'column1', 'a7c49fad2de03424add30b0a31451377', '', '', NULL, NULL, 1, 1, 1, NULL, 30, NULL, 1, 0, NULL, '2018-11-22 23:11:37', 1, NULL, NULL, NULL, '', 'N', 'N', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -1126,16 +1172,17 @@ CREATE TABLE `tbl_roles` (
   `description` text CHARACTER SET utf8 COLLATE utf8_unicode_ci,
   `access_type` char(1) NOT NULL DEFAULT 'F',
   `menu_id` tinyint(4) NOT NULL,
-  `parent_role_id` varchar(30) DEFAULT NULL
+  `parent_role_id` varchar(30) DEFAULT NULL,
+  `permissions` text
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tbl_roles`
 --
 
-INSERT INTO `tbl_roles` (`id`, `name`, `description`, `access_type`, `menu_id`, `parent_role_id`) VALUES
-('996fcbfa34a4a905f49670b9689579', 'Users', '', 'F', 3, 'f2d16e5cedb1c39a8630b775974565'),
-('f2d16e5cedb1c39a8630b775974565', 'Administrator', 'This is the administrators side', 'B', 0, NULL);
+INSERT INTO `tbl_roles` (`id`, `name`, `description`, `access_type`, `menu_id`, `parent_role_id`, `permissions`) VALUES
+('996fcbfa34a4a905f49670b9689579', 'Users', '', 'F', 3, 'f2d16e5cedb1c39a8630b775974565', NULL),
+('f2d16e5cedb1c39a8630b775974565', 'Administrator', 'This is the administrators side', 'B', 0, '', NULL);
 
 -- --------------------------------------------------------
 
@@ -1178,7 +1225,7 @@ CREATE TABLE `tbl_services_outgoing` (
 CREATE TABLE `tbl_settings` (
   `id` int(11) NOT NULL,
   `setting_name` varchar(50) NOT NULL,
-  `setting_value` varchar(100) NOT NULL
+  `setting_value` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -1227,7 +1274,9 @@ INSERT INTO `tbl_settings` (`id`, `setting_name`, `setting_value`) VALUES
 (41, 'minify_css', 'off'),
 (42, 'minify_twig', 'off'),
 (43, 'use_custom_backend_menus', 'on'),
-(44, 'seo_meta_tags', '<meta name="description" content="YumpeeCMS - An application development framework"/>\r\n');
+(44, 'seo_meta_tags', '<meta name="description" content="YumpeeCMS - An application development framework"/>\r\n'),
+(45, 'backend_home_page', ''),
+(46, 'allow_multiple_domains', 'No');
 
 -- --------------------------------------------------------
 
@@ -1239,7 +1288,7 @@ CREATE TABLE `tbl_sliders` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `title` varchar(200) DEFAULT NULL,
-  `description` text NOT NULL,
+  `description` text,
   `transition_type` char(1) NOT NULL,
   `duration` int(11) NOT NULL,
   `default_height` int(11) NOT NULL,
@@ -1267,7 +1316,20 @@ CREATE TABLE `tbl_slider_image` (
 CREATE TABLE `tbl_subscriptions` (
   `id` int(11) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
-  `email` varchar(100) NOT NULL
+  `email` varchar(100) NOT NULL,
+  `category_id` varchar(40) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_subscription_categories`
+--
+
+CREATE TABLE `tbl_subscription_categories` (
+  `id` varchar(40) NOT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `description` text
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -1363,7 +1425,7 @@ CREATE TABLE `tbl_template_widget` (
   `widget` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `display_order` int(11) NOT NULL,
   `position` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `settings` text COLLATE utf8_unicode_ci NOT NULL
+  `settings` text COLLATE utf8_unicode_ci
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -1424,7 +1486,8 @@ INSERT INTO `tbl_template_widget` (`id`, `page_id`, `widget`, `display_order`, `
 (259, '67397c01e4912722824d93df8d107c64', 'widget_blog_article', 1, 'side', ''),
 (260, 'e6a5f5a177c08dd8c6335c7293372bea', 'widget_articles', 1, 'side', ''),
 (261, 'e6a5f5a177c08dd8c6335c7293372bea', 'widget_blog_article', 2, 'side', ''),
-(262, 'f3610c044653d7a63274cc3a3966b895', 'widget_articles', 2, 'side', '{"widget_limit":"3","widget_title":"News Articles","widget_name":"widget_articles","widget_page_id":"f3610c044653d7a63274cc3a3966b895","id":"262"}');
+(262, 'f3610c044653d7a63274cc3a3966b895', 'widget_articles', 2, 'side', '{"widget_limit":"3","widget_title":"News Articles","widget_name":"widget_articles","widget_page_id":"f3610c044653d7a63274cc3a3966b895","id":"262"}'),
+(269, '83ebb876a836e3e9ca2ecdf74b236809', 'widget_comment', 4, 'bottom', '{"widget_limit":"10","widget_title":"Comments","widget_name":"widget_comment","widget_page_id":"83ebb876a836e3e9ca2ecdf74b236809","id":"269"}');
 
 -- --------------------------------------------------------
 
@@ -1457,16 +1520,16 @@ CREATE TABLE `tbl_themes` (
   `description` text,
   `header` text,
   `footer` text,
-  `custom_styles` text
+  `custom_styles` text,
+  `settings_file` text
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tbl_themes`
 --
 
-INSERT INTO `tbl_themes` (`id`, `folder`, `name`, `stylesheet`, `javascript`, `is_default`, `description`, `header`, `footer`, `custom_styles`) VALUES
-(1, 'bootstrap', 'Bootstrap Business', 'vendor/bootstrap/css/bootstrap.min.css;css/modern-business.css', 'vendor/jquery/jquery.min.js;vendor/bootstrap/js/bootstrap.bundle.min.js', 1, NULL, '', '', ''),
-(10, 'default2018', 'Yumpe Default Blog', 'css/bootstrap.min.css;css/owl.carousel.min.css;css/owl.theme.default.css;editor/summernote-bs4.css;css/style.css;css/slicknav.css', 'js/popper.min.js;js/bootstrap.min.js;editor/summernote.bs4.js;js/owl.carousel.min.js;js/owl.carousel.js;js/wow.js;js/jquery.slicknav.js;js/main.js', 1, NULL, '', '', '');
+INSERT INTO `tbl_themes` (`id`, `folder`, `name`, `stylesheet`, `javascript`, `is_default`, `description`, `header`, `footer`, `custom_styles`, `settings_file`) VALUES
+(10, 'default2018', 'Yumpe Default Blog', 'css/bootstrap.min.css;css/owl.carousel.min.css;css/owl.theme.default.css;editor/summernote-bs4.css;css/style.css;css/slicknav.css', 'js/popper.min.js;js/bootstrap.min.js;editor/summernote.bs4.js;js/owl.carousel.min.js;js/owl.carousel.js;js/wow.js;js/jquery.slicknav.js;js/main.js', 1, NULL, '', '', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -1595,41 +1658,44 @@ CREATE TABLE `tbl_widgets` (
   `short_name` varchar(50) NOT NULL,
   `setting_value` text NOT NULL,
   `template_type` char(1) DEFAULT NULL,
-  `parent_id` int(11) DEFAULT NULL
+  `parent_id` int(11) DEFAULT NULL,
+  `permissions` text,
+  `require_login` char(1) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tbl_widgets`
 --
 
-INSERT INTO `tbl_widgets` (`id`, `name`, `short_name`, `setting_value`, `template_type`, `parent_id`) VALUES
-(1, 'Categories', 'widget_category', '', 'S', 0),
-(2, 'Tag Cloud', 'widget_tag_cloud', '', 'S', 0),
-(3, 'Most Recent Article', 'widget_recent_article', '', 'S', 0),
-(6, 'Social Media', 'widget_social', '', 'S', 0),
-(7, 'Search Website', 'widget_search', '', 'S', 0),
-(8, 'Subscription', 'widget_subscription', '', 'S', 0),
-(9, 'Contact Form', 'widget_contact', '', 'S', 0),
-(10, 'Articles', 'widget_articles', '', 'S', 0),
-(11, 'Comment', 'widget_comment', '', 'S', 0),
-(12, 'Google Maps', 'widget_google_maps', '', 'S', 0),
-(13, 'Social Count', 'widget_social_count', '', 'S', 0),
-(14, 'Image Widget', 'widget_image', '', 'S', 0),
-(15, 'Archives', 'widget_archives', '', 'S', 0),
-(16, 'Youtube Channel Gallery', 'widget_youtube', '', 'S', NULL),
-(17, 'Login', 'widget_login', '', 'S', 0),
-(18, 'Testimonials', 'widget_testimonials', '', 'S', 0),
-(19, 'Random Posts', 'widget_random_post', '', 'S', 0),
-(20, 'Feature Page', 'widget_feature_page', '', 'S', 0),
-(21, 'Slider Widget', 'widget_slider', '', 'S', 0),
-(23, 'HTML', 'widget_html', '', 'S', 0),
-(24, 'Menu', 'widget_menu', '', 'S', 0),
-(25, 'Blog Index Article', 'widget_blog_article', '', 'S', 0),
-(27, 'Rating', 'widget_rating', '', 'S', 0),
-(30, 'Video', 'widget_video', '', 'S', NULL),
-(31, 'Audio', 'widget_audio', '', 'S', NULL),
-(32, 'ReCAPTCHA', 'widget_recaptcha', '', 'S', NULL),
-(33, 'Gallery', 'widget_gallery', '', 'S', 0);
+INSERT INTO `tbl_widgets` (`id`, `name`, `short_name`, `setting_value`, `template_type`, `parent_id`, `permissions`, `require_login`) VALUES
+(1, 'Categories', 'widget_category', '', 'S', 0, NULL, NULL),
+(2, 'Tag Cloud', 'widget_tag_cloud', '', 'S', 0, NULL, NULL),
+(3, 'Most Recent Article', 'widget_recent_article', '', 'S', 0, NULL, NULL),
+(6, 'Social Media', 'widget_social', '', 'S', 0, NULL, NULL),
+(7, 'Search Website', 'widget_search', '', 'S', 0, NULL, NULL),
+(8, 'Subscription', 'widget_subscription', '', 'S', 0, NULL, NULL),
+(9, 'Contact Form', 'widget_contact', '', 'S', 0, NULL, NULL),
+(10, 'Articles', 'widget_articles', '', 'S', 0, NULL, NULL),
+(11, 'Comment', 'widget_comment', '', 'S', 0, NULL, NULL),
+(12, 'Google Maps', 'widget_google_maps', '', 'S', 0, NULL, NULL),
+(13, 'Social Count', 'widget_social_count', '', 'S', 0, NULL, NULL),
+(14, 'Image Widget', 'widget_image', '', 'S', 0, NULL, NULL),
+(15, 'Archives', 'widget_archives', '', 'S', 0, NULL, NULL),
+(16, 'Youtube Channel Gallery', 'widget_youtube', '', 'S', NULL, NULL, NULL),
+(17, 'Login', 'widget_login', '', 'S', 0, NULL, NULL),
+(18, 'Testimonials', 'widget_testimonials', '', 'S', 0, NULL, NULL),
+(19, 'Random Posts', 'widget_random_post', '', 'S', 0, NULL, NULL),
+(20, 'Feature Page', 'widget_feature_page', '', 'S', 0, NULL, NULL),
+(21, 'Slider Widget', 'widget_slider', '', 'S', 0, NULL, NULL),
+(23, 'HTML', 'widget_html', '', 'S', 0, NULL, NULL),
+(24, 'Menu', 'widget_menu', '', 'S', 0, NULL, NULL),
+(25, 'Blog Index Article', 'widget_blog_article', '', 'S', 0, NULL, NULL),
+(27, 'Rating', 'widget_rating', '', 'S', 0, NULL, NULL),
+(30, 'Video', 'widget_video', '', 'S', NULL, NULL, NULL),
+(31, 'Audio', 'widget_audio', '', 'S', NULL, NULL, NULL),
+(32, 'ReCAPTCHA', 'widget_recaptcha', '', 'S', NULL, NULL, NULL),
+(33, 'Gallery', 'widget_gallery', '', 'S', 0, NULL, NULL),
+(36, 'Breadcrumbs', 'widget_breadcrumbs', '', 'S', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1638,7 +1704,7 @@ INSERT INTO `tbl_widgets` (`id`, `name`, `short_name`, `setting_value`, `templat
 --
 
 CREATE TABLE `tbl_widget_position` (
-  `id` varchar(40) DEFAULT NULL,
+  `id` varchar(40) NOT NULL,
   `title` varchar(50) DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
   `description` text
@@ -1649,9 +1715,9 @@ CREATE TABLE `tbl_widget_position` (
 --
 
 INSERT INTO `tbl_widget_position` (`id`, `title`, `name`, `description`) VALUES
-('56b611df8ff777bde6a68cc650559ee4', 'Hero Position', 'yumpee_pos_hero-position', ''),
-('e8345e8592667510c79ae44b0147e7af', 'Page Slider', 'yumpee_pos_home-page-slider', ''),
-('6bf71aa4affe007d20618dfcc34926e6', 'Home Page Blog', 'yumpee_pos_blog_articles', '');
+('56', 'Hero Position', 'yumpee_pos_hero-position', ''),
+('ew3444', 'Page Slider', 'yumpee_pos_home-page-slider', ''),
+('6', 'Home Page Blog', 'yumpee_pos_blog_articles', '');
 
 --
 -- Indexes for dumped tables
@@ -1834,6 +1900,12 @@ ALTER TABLE `tbl_custom_settings`
 -- Indexes for table `tbl_custom_widget`
 --
 ALTER TABLE `tbl_custom_widget`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tbl_domains`
+--
+ALTER TABLE `tbl_domains`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -2050,6 +2122,12 @@ ALTER TABLE `tbl_subscriptions`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `tbl_subscription_categories`
+--
+ALTER TABLE `tbl_subscription_categories`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `tbl_tags`
 --
 ALTER TABLE `tbl_tags`
@@ -2128,6 +2206,12 @@ ALTER TABLE `tbl_widgets`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `tbl_widget_position`
+--
+ALTER TABLE `tbl_widget_position`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -2160,7 +2244,7 @@ ALTER TABLE `tbl_categories`
 -- AUTO_INCREMENT for table `tbl_comments`
 --
 ALTER TABLE `tbl_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 --
 -- AUTO_INCREMENT for table `tbl_css`
 --
@@ -2205,7 +2289,7 @@ ALTER TABLE `tbl_form_submit`
 -- AUTO_INCREMENT for table `tbl_menu`
 --
 ALTER TABLE `tbl_menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT for table `tbl_menu_page`
 --
@@ -2230,7 +2314,7 @@ ALTER TABLE `tbl_rating_profile_details`
 -- AUTO_INCREMENT for table `tbl_settings`
 --
 ALTER TABLE `tbl_settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 --
 -- AUTO_INCREMENT for table `tbl_sliders`
 --
@@ -2250,7 +2334,7 @@ ALTER TABLE `tbl_subscriptions`
 -- AUTO_INCREMENT for table `tbl_template_widget`
 --
 ALTER TABLE `tbl_template_widget`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=269;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=270;
 --
 -- AUTO_INCREMENT for table `tbl_testimonials`
 --
@@ -2285,7 +2369,7 @@ ALTER TABLE `tbl_web_hook_email`
 -- AUTO_INCREMENT for table `tbl_widgets`
 --
 ALTER TABLE `tbl_widgets`
-  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 --
 -- Constraints for dumped tables
 --
