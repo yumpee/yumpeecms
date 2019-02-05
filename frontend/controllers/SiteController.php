@@ -15,6 +15,7 @@ use frontend\models\ContactForm;
 use frontend\components\ContentBuilder;
 use backend\models\Pages;
 use backend\models\Settings;
+use  yii\web\Session;
 /**
  * Site controller
  */
@@ -74,6 +75,25 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        //we check processing preview of templates here
+        if((Yii::$app->request->get("yumpee_template_preview")=="on") && (Yii::$app->request->get("theme_id")!=null)):            
+            $session = Yii::$app->session;
+            $session->open(); // open a session
+            if(Yii::$app->request->get("theme_id")=="0"):
+                //this means just use default theme
+                //$curr_theme = Settings::find()->where(['setting_name'=>'current_theme'])->one();
+                //$session->set('yumpee_preview_theme', $curr_theme->setting_value);
+                $session->remove('yumpee_preview_theme');
+            else:
+                $session->set('yumpee_preview_theme', Yii::$app->request->get("theme_id"));
+            endif;
+            
+            $session->close();  // close a session
+            //exit;
+            $my_home_page = Settings::find()->where(['setting_name'=>'website_home_page'])->one();
+            $my_home_page_object = Pages::find()->where(['id'=>$my_home_page->setting_value])->one();
+            return $this->redirect($my_home_page_object->url);
+        endif;
         
         $my_home_page = Settings::find()->where(['setting_name'=>'website_home_page'])->one();
         $my_home_page_object = Pages::find()->where(['id'=>$my_home_page->setting_value])->one();

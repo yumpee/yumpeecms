@@ -1,15 +1,21 @@
 <?php
 use yii\helpers\Html;
 use backend\models\Settings;
+use backend\models\Feedback;
 
 $my_header_home_url = Settings::find()->where(['setting_name'=>'home_url'])->one();
+$contact_count = Feedback::find()->where(['feedback_type'=>'contact'])->andWhere('status="N"')->count();
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-Yii::$app->name='Yumpee CMS';
+Yii::$app->name='YumpeeCMS';
 //if not logged in then shouldn't have access to here
 if(Yii::$app->user->identity==null):
     return ['site/index'];
+endif;
+$display_image_path="";
+if(isset(Yii::$app->user->identity->displayImage->path)):
+    $display_image_path=Yii::$app->user->identity->displayImage->path;
 endif;
 ?>
 <link href="http://www.yumpeecms.com/yp-admin/css/jquery.dataTables.min.css" rel="stylesheet">
@@ -26,136 +32,14 @@ endif;
         <div class="navbar-custom-menu">
 
             <ul class="nav navbar-nav">
-                <li><input type="button" class="btn btn-default" value="Visit Website" onClick="javascript:window.open('<?=$my_header_home_url['setting_value']?>','_blank')" />
+                <li><input type="button" class="btn btn-default" value="Visit Website" onClick="javascript:window.open('<?=$my_header_home_url['setting_value']?>?yumpee_template_preview=on&theme_id=0','_blank')" />
                 <!-- Messages: style can be found in dropdown.less-->
-                <li class="dropdown messages-menu">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-envelope-o"></i>
-                        <span class="label label-success">4</span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li class="header">You have 4 messages</li>
-                        <li>
-                            <!-- inner menu: contains the actual data -->
-                            <ul class="menu">
-                                <li><!-- start message -->
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle"
-                                                 alt="User Image"/>
-                                        </div>
-                                        <h4>
-                                            Support Team
-                                            <small><i class="fa fa-clock-o"></i> 5 mins</small>
-                                        </h4>
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
-                                <!-- end message -->
-                                <li>
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <img src="<?= $directoryAsset ?>/img/user3-128x128.jpg" class="img-circle"
-                                                 alt="user image"/>
-                                        </div>
-                                        <h4>
-                                            AdminLTE Design Team
-                                            <small><i class="fa fa-clock-o"></i> 2 hours</small>
-                                        </h4>
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <img src="<?= $directoryAsset ?>/img/user4-128x128.jpg" class="img-circle"
-                                                 alt="user image"/>
-                                        </div>
-                                        <h4>
-                                            Developers
-                                            <small><i class="fa fa-clock-o"></i> Today</small>
-                                        </h4>
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <img src="<?= $directoryAsset ?>/img/user3-128x128.jpg" class="img-circle"
-                                                 alt="user image"/>
-                                        </div>
-                                        <h4>
-                                            Sales Department
-                                            <small><i class="fa fa-clock-o"></i> Yesterday</small>
-                                        </h4>
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <img src="<?= $directoryAsset ?>/img/user4-128x128.jpg" class="img-circle"
-                                                 alt="user image"/>
-                                        </div>
-                                        <h4>
-                                            Reviewers
-                                            <small><i class="fa fa-clock-o"></i> 2 days</small>
-                                        </h4>
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="footer"><a href="#">See All Messages</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown notifications-menu">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-bell-o"></i>
-                        <span class="label label-warning">10</span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li class="header">You have 10 notifications</li>
-                        <li>
-                            <!-- inner menu: contains the actual data -->
-                            <ul class="menu">
-                                <li>
-                                    <a href="#">
-                                        <i class="fa fa-users text-aqua"></i> 5 new members joined today
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i class="fa fa-warning text-yellow"></i> Very long description here that may
-                                        not fit into the page and may cause design problems
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i class="fa fa-users text-red"></i> 5 new members joined
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a href="#">
-                                        <i class="fa fa-shopping-cart text-green"></i> 25 sales made
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i class="fa fa-user text-red"></i> You changed your username
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="footer"><a href="#">View all</a></li>
-                    </ul>
-                </li>
+                
                 <!-- Tasks: style can be found in dropdown.less -->
                 <li class="dropdown tasks-menu">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-flag-o"></i>
-                        <span class="label label-danger">9</span>
+                    <a href="?r=install/index" class="dropdown-toggle"  title="Install Templates">
+                        <i class="fa fa-download"></i>
+                        <!--<span class="label label-danger">9</span>-->
                     </a>
                     <ul class="dropdown-menu">
                         <li class="header">You have 9 tasks</li>
@@ -233,17 +117,37 @@ endif;
                         </li>
                     </ul>
                 </li>
+                 <li class="dropdown notifications-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-bell-o"></i>
+                        <span class="label label-warning"><?=$contact_count?></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="header">You have <?=$contact_count?> notification(s)</li>
+                        <li>
+                            <!-- inner menu: contains the actual data -->
+                            <ul class="menu">                                
+                                <li>
+                                    <a href="#">
+                                        <i class="fa fa-user text-red"></i> Click link below to view 
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="footer"><a href="?r=feedback%2Findex">View all</a></li>
+                    </ul>
+                </li>
                 <!-- User Account: style can be found in dropdown.less -->
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="user-image" alt="User Image"/>
+                        <img src="<?=Yii::getAlias("@image_dir")?>/<?=$display_image_path?>" class="user-image" alt="User Image"/>
                         <span class="hidden-xs"><?=Yii::$app->user->identity->first_name." ".Yii::$app->user->identity->last_name?></span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- User image -->
                         <li class="user-header">
-                            <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle"
+                            <img src="<?=Yii::getAlias("@image_dir")?>/<?=$display_image_path?>" class="img-circle"
                                  alt="User Image"/>
 
                             <p>
@@ -266,7 +170,7 @@ endif;
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <div class="pull-left">
-                                <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                <a href="?r=users/profile" class="btn btn-default btn-flat">Profile</a>
                             </div>
                             <div class="pull-right">
                                 <?= Html::a(

@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 namespace backend\controllers;
 
@@ -15,6 +32,8 @@ use backend\models\Blocks;
 use backend\models\BlockGroup;
 use backend\models\BlockGroupList;
 use backend\models\Pages;
+use backend\models\Roles;
+use backend\models\WidgetPosition;
 use fedemotta\datatables\DataTables;
 
 class BlocksController extends Controller{
@@ -28,7 +47,9 @@ public function actionIndex()
         $page['rsg']=[];
         $title_level="";
         $position="";
+        $wposition="";
         $page_arr="";
+        $perm_arr="";
         
         $page['id'] = Yii::$app->request->get('id',null);
         
@@ -38,9 +59,11 @@ public function actionIndex()
             if(count($page['rs']) > 0):
             $title_level = $page['rs']['title_level'];
             $position = $page['rs']['position'];
+            $wposition = $page['rs']['widget'];
             endif;
             $c = $page['rs']->blockPages;
             $page_arr =  yii\helpers\ArrayHelper::getColumn($c, 'page_id');
+            $perm_arr = explode(" ",$page['rs']['permissions']);
         }else{
             $page['rs'] = Blocks::find()->where(['id' => "0"])->one();
         }
@@ -73,9 +96,14 @@ public function actionIndex()
         }else{
             $page['editable'] = \yii\helpers\Html::checkbox("editable");
         }
+        
         $pages = Pages::find()->orderBy('menu_title')->all();
         $page_map =  yii\helpers\ArrayHelper::map($pages, 'id', 'menu_title');
         $page['pages'] = \yii\helpers\Html::checkboxList("pages",$page_arr,$page_map);
+        
+        $pages = Roles::find()->orderBy('name')->all();
+        $page_map =  yii\helpers\ArrayHelper::map($pages, 'id', 'name');
+        $page['permissions'] = \yii\helpers\Html::checkboxList("permissions",$perm_arr,$page_map);
         
         $blocks = Blocks::find()->orderBy('name')->all();
         $group_id = Yii::$app->request->get('group_id',null);
@@ -84,9 +112,11 @@ public function actionIndex()
         $page_arr =  yii\helpers\ArrayHelper::getColumn($c, 'block_id');
         $page['blocks'] = \yii\helpers\Html::checkboxList("blocks",$page_arr,$page_map);
         
-        $page['title_level'] = \yii\helpers\Html::dropDownList("title_level",$title_level,['1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5']);
+        $page['title_level'] = \yii\helpers\Html::dropDownList("title_level",$title_level,['1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5'],["class"=>"form-control"]);
         $page['position'] = \yii\helpers\Html::dropDownList("position",$position,['before_left'=>'Before Widget Left','after_left'=>'After Widget Left','before_right'=>'Before Widget Right','after_right'=>'After Widget Right','before_header'=>'Before Header','after_header'=>'After Header','before_content'=>'Before Content','after_content'=>'After Content','before_footer'=>'Before Footer','after_footer'=>'After Footer'],["class"=>"form-control"]);
-        
+        $widget_position = WidgetPosition::find()->orderBy('title')->all();
+        $wp_arr = yii\helpers\ArrayHelper::map($widget_position, 'name', 'title');
+        $page['custom_position']= \yii\helpers\Html::dropDownList("widget",$wposition,$wp_arr,["class"=>"form-control","prompt"=>"Select a Widget Position"]);
         
         $page['records'] = Blocks::find()->orderBy('name')->all();
         $page['group_records'] = BlockGroup::find()->all();

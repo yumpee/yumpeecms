@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 namespace backend\models;
@@ -103,7 +120,7 @@ class Menus extends \yii\db\ActiveRecord
         for($i=0;$i < count($arr_act_menu);$i++){
             $order_count= $order_count + 10;
             Yii::$app->db->createCommand()->update('tbl_page',[  
-               'sort_order'=>$order_count,
+               
                 'show_in_footer_menu'=>'1'
            ],'menu_title="'.$arr_act_menu[$i].'"')->execute();
         }
@@ -112,7 +129,7 @@ class Menus extends \yii\db\ActiveRecord
         for($i=0;$i < count($arr_inact_menu);$i++){
             $order_count+=10;
             Yii::$app->db->createCommand()->update('tbl_page',[  
-               'sort_order'=>$order_count,
+               
                 'show_in_footer_menu'=>'0'
            ],'menu_title="'.$arr_inact_menu[$i].'"')->execute();
         }

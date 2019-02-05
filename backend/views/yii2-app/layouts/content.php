@@ -10,6 +10,7 @@ endif;
         <?php if (isset($this->blocks['content-header'])) { ?>
             <h1><?= $this->blocks['content-header'] ?></h1>
         <?php } else { ?>
+            
             <h1>
                 <?php
                 if ($this->title !== null) {
@@ -32,8 +33,8 @@ endif;
     </section>
 
     <section class="content">
-        <?= Alert::widget() ?>
-        <?= $content ?>
+        <?= Alert::widget() ?>        
+        <?= $content ?>        
     </section>
 </div>
 
@@ -41,7 +42,7 @@ endif;
     <div class="pull-right hidden-xs">
         <b>Version</b> 2.0
     </div>
-    <strong>Copyright &copy; 2017-2018 <a href="http://www.yumpeecms.com">Yumpee CMS</a>.</strong> All rights
+    <strong>Copyright &copy; 2017-2019 <a href="http://www.yumpeecms.com">YumpeeCMS</a>.</strong> All rights
     reserved.
 </footer>
 

@@ -1,12 +1,31 @@
 <?php
+/* 
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ */
+
 use dosamigos\datepicker\DatePicker;
 
 $this->title = 'Articles';
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 $saveURL = \Yii::$app->getUrlManager()->createUrl('articles/save');
 $duplicateURL = \Yii::$app->getUrlManager()->createUrl('articles/duplicate');
 $deleteURL = \Yii::$app->getUrlManager()->createUrl('articles/delete');
@@ -320,7 +339,9 @@ endif;
         <tr><td valign='top'>Category<td><?=$category?>
         <tr><td valign='top'>Blog Index<td><?=$blog_index?>
         <tr><td>Renderer Template<td><?=$renderer?>
+        <tr><td>Sort Order<td><input name="sort_order" id="sort_order" value="<?=$rs['sort_order']?>" class="form-control"type="text" /> 
         <tr><td>Require Login to view<td><?=\yii\helpers\Html::dropDownList("require_login",$rs['require_login'],['N'=>'No','Y'=>'Yes'],['class'=>'form-control'])?></td>
+        <tr><td>Role Permission<td><?=$permissions?>    
         <tr><td>Disable comments on Article<td><?=\yii\helpers\Html::dropDownList("disable_comments",$rs['disable_comments'],['N'=>'No','Y'=>'Yes'],['class'=>'form-control'])?></td>    
         <tr><td>Attach Feedback Form<td><?=$feedback?>
         <tr><td>Tags<td>Type to drop down tags. Remember to save form if you delete tags.
@@ -369,15 +390,20 @@ endif;
 
 <div class="box tab-pane fade" id="article_list">
 <div class="box-body">
-    <table id="datalisting" class="table table-bordered table-striped"><thead><tr><th>Display Image</th><th>Date Published</th><th>Title Tag / On-page Title</th><th>URL<th>Categories<th>Author<th>Views</th><th>Published</th><th>Actions</th></thead>
+    <table id="datalisting" class="table table-bordered table-striped"><thead><tr><th>Display Image</th><th>Date Published</th><th>Title Tag / On-page Title</th><th>URL<th>Categories<th>Author<th>Order<th>Views</th><th>Published</th><th>Actions</th></thead>
         <tbody>
 <?php
 
 foreach ($records as $rec):
-    if($rec['published']):
+                if($rec['published']):
                     $published="Yes";
                 else:
                     $published="No";
+                endif;
+                if($rec['require_login']=="Y"):
+                    $lock="<sup><font color='red'><span class='fa fa-lock'></span></font></sup>";
+                else:
+                    $lock="";
                 endif;
                 
                 if($rec['master_content']):
@@ -390,12 +416,13 @@ foreach ($records as $rec):
                 if(isset($rec->displayImage->path)):
                         $display_image_path=$rec->displayImage->path;
                 endif;
+                
                 $categories="";
                 foreach($rec->articleCategories as $category):
                     $categories.=$category->name.", ";
                 endforeach;
 ?>
-    <tr id="tr<?=$rec["id"]?>"><td><img src='<?=$image_home?>/<?=$display_image_path?>' width='80px' class="thumbnail"></img><td><?=$rec['date']?></td><td><?=$rec['title']?></td><td><?=$rec['url']?><td><?=$categories?></td><td><?=$rec['author']['first_name']." ".$rec['author']['last_name']?></td><td><?=$rec['no_of_views']?></td><td><?=$published?></td><td><a href='?actions=edit&id=<?=$rec['id']?>&r=articles/index' title="Edit"><small><i class="glyphicon glyphicon-pencil"></i></small></a> <a href='?actions=edit&id=<?=$rec['id']?>&r=articles/index' title="Attachment"><small><i class="glyphicon glyphicon-paperclip"></i></small></a> <a href="#" onClick="javascript:window.open('<?=$home_url['setting_value']."/".$rec['indexURL']."/".$rec['url']?>','_blank')" title="Preview" id='<?=$rec['id']?>' class="preview_event"><small><i class="fa fa-eye"></i></small></a> <a href='#' class='delete_event' id='<?=$rec['id']?>' title="Delete" event_name='<?=$rec['title']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a></td>
+            <tr id="tr<?=$rec["id"]?>"><td><img src='<?=$image_home?>/<?=$display_image_path?>' width='80px' class="thumbnail"></img><td><?=$rec['date']?></td><td><?=$rec['title']?><?=$lock?></td><td><?=$rec['url']?><td><?=$categories?></td><td><?=$rec['author']['first_name']." ".$rec['author']['last_name']?></td><td><?=$rec['sort_order']?></td><td><?=$rec['no_of_views']?></td><td><?=$published?></td><td><a href='?actions=edit&id=<?=$rec['id']?>&r=articles/index' title="Edit"><small><i class="glyphicon glyphicon-pencil"></i></small></a> <a href='?actions=edit&id=<?=$rec['id']?>&r=articles/index' title="Attachment"><small><i class="glyphicon glyphicon-paperclip"></i></small></a> <a href="#" onClick="javascript:window.open('<?=$home_url['setting_value']."/".$rec['indexURL']."/".$rec['url']?>','_blank')" title="Preview" id='<?=$rec['id']?>' class="preview_event"><small><i class="fa fa-eye"></i></small></a> <a href='#' class='delete_event' id='<?=$rec['id']?>' title="Delete" event_name='<?=$rec['title']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a> <a href='?r=comment/index&article_id=<?=$rec['id']?>' title="Comments"><span class="badge label label-primary"><?=count($rec['comments'])?></span></a></td>
 <?php
 endforeach;
 ?>

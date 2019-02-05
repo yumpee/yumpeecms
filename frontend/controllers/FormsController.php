@@ -1,9 +1,26 @@
 <?php
 
-/*
+/* 
  * Author : Peter Odon
- * Author : peter@audmaster.com
- * Each line should be prefixed with  * 
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 namespace frontend\controllers;
@@ -329,24 +346,55 @@ class FormsController extends Controller{
         //apply filter for order
         if(Yii::$app->request->get('order')!=null):
                                 $order=Yii::$app->request->get('order');
+                                $order_arr= explode(" ",$order);
+                                $ordering="";
+                                $order_sorted=0;
+                                if(sizeof($order_arr) > 1):
+                                    $ordering = $order_arr[1];
+                                    $order=$order_arr[0];
+                                endif;
                                 if($order=="random"):
                                     $query->orderBy(new Expression('rand()'));
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="last"):
                                     $query->orderBy(['date_stamp'=>SORT_DESC]);
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="first"):
                                     $query->orderBy(['date_stamp'=>SORT_ASC]);
+                                    $order_sorted=1;
                                 endif;
-                                if($order=="views"):
+                                if($order=="views"):                                    
                                     $query->orderBy(['no_of_views'=>SORT_DESC]);
+                                    if($ordering=="ASC"):
+                                        $query->orderBy(['no_of_views'=>SORT_ASC]);
+                                    endif;
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="user"):
                                     $query->orderBy(['usrname'=>SORT_ASC]);
+                                    if($ordering=="DESC"):
+                                        $query->orderBy(['no_of_views'=>SORT_DESC]);
+                                    endif;
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="rating"):
                                     $query->orderBy(['rating'=>SORT_DESC]);
-                                endif;                                
+                                    if($ordering=="ASC"):
+                                        $query->orderBy(['rating'=>SORT_ASC]);
+                                    endif;
+                                    $order_sorted=1;
+                                endif; 
+                                if($order_sorted==0):                   
+                                    if(trim($ordering)=="DESC"):
+                                        $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_DESC])->asArray()->column();
+                                    else:
+                                        $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_ASC])->asArray()->column();  
+                                    endif;
+                                    $query->andWhere(['in','id',$submit_arr])->orderBy(new Expression('FIND_IN_SET (id,:form_submit_id)'))->addParams([':form_submit_id'=>implode(",",$submit_arr)]);
+                                    
+                                endif;
         endif;
         //apply filter on random fetch
         if(Yii::$app->request->get('random')=="true"):
@@ -369,6 +417,7 @@ class FormsController extends Controller{
             $search_params=explode("|",urldecode(Yii::$app->request->get('search-field')));
             foreach($search_params as $param):
                 list($p,$v)=explode("=",$param);
+                
                 //this is used to search based on submit id
                 if($p=="form_submit_id"):
                         $data_query->orWhere('form_submit_id="'.$v.'"');
@@ -376,11 +425,27 @@ class FormsController extends Controller{
                 endif;
                 
                 if(count($search_params)==1):
-                    $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v])->andFilterCompare('param_val',$v);
-                else:
-                    $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v]);
+                        $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v])->andFilterCompare('param_val',$v);
+                else:                    
+                        $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v]);                    
                 endif;
             endforeach;
+            $search_params=explode("&",urldecode(Yii::$app->request->get('search-field')));
+            foreach($search_params as $param):
+                list($p,$v)=explode("=",$param);
+                
+                //this is used to search based on submit id
+                if($p=="form_submit_id"):
+                        //$data_query->orWhere('form_submit_id="'.$v.'"');
+                    continue;
+                endif;
+                
+                if(count($search_params)==1):
+                    //$data_query->andWhere('param="'.$p.'"')->andWhere(['like','param_val',$v]);
+                else:
+                    //$data_query->andWhere('param="'.$p.'"')->andWhere(['like','param_val',$v]);
+                endif;
+            endforeach;            
             $criteria_found=1;            
         endif;
         if(Yii::$app->request->get('excludes')!=null):  
@@ -412,9 +477,9 @@ class FormsController extends Controller{
         
         
         if(Yii::$app->request->get('search-field')!=null):
-                $query->with('data','data.element','data.elementVal','data.property','data.propertyVal','data.setupVal','data.setup','file','ratingdetails','user')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$article->id.'"');
+                $query->with('data','data.element','data.elementVal','data.property','data.propertyVal','data.setupVal','data.setup','file','ratingdetails','user','user.displayImage')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$article->id.'"');
             else:
-                $query->with('data','data.element','data.elementVal','data.property','data.propertyVal','data.setupVal','data.setup','file','ratingdetails','user')->asArray()->where(['form_id'=>$article->id]);
+                $query->with('data','data.element','data.elementVal','data.property','data.propertyVal','data.setupVal','data.setup','file','ratingdetails','user','user.displayImage')->asArray()->where(['form_id'=>$article->id]);
         endif;
         if(Yii::$app->request->get('published')==null):
             $query->andWhere('published="1"');

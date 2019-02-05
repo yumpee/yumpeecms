@@ -2,9 +2,25 @@
 
 /* 
  * Author : Peter Odon
- * Author : peter@audmaster.com
- * Each line should be prefixed with  * 
- * This Behavior class is used to translate all components bound to the class list defined in System->Class Setup
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 namespace common\components;
 
@@ -42,8 +58,8 @@ class GUIBehavior extends Behavior
     }
     
     public function afterFind(){
-        $pattern = "/{yumpee_class}(.*?){\/yumpee_class}/";
-        //this method searches through
+        //we define the shortcodes here and then process when a match is found in this function
+        $pattern = "/{yumpee_class}(.*?){\/yumpee_class}/";        
         $pattern_data = "/{yumpee_data}(.*?){\/yumpee_data}/";
         $pattern_user = "/{yumpee_user}(.*?){\/yumpee_user}/";
         $pattern_login_to_view="/{yumpee_login_to_view}(.*?){\/yumpee_login_to_view}/";
@@ -63,6 +79,9 @@ class GUIBehavior extends Behavior
         $pattern_translate_full= "/{yumpee_t:(.*?)}(.*?){\/yumpee_t}/";
         $pattern_translate= "/{yumpee_t}(.*?){\/yumpee_t}/";
         $pattern_submit="/{yumpee_submit}(.*?){\/yumpee_submit}/";
+        $pattern_testimonial="/{yumpee_testimonial}(.*?){\/yumpee_testimonial}/";
+        $pattern_article="/{yumpee_article}(.*?){\/yumpee_article}/";
+        $pattern_page="/{yumpee_page}(.*?){\/yumpee_page}/";
         
         foreach($this->owner->fields as $field):
         $content = $this->owner->{$field};  
@@ -109,14 +128,14 @@ class GUIBehavior extends Behavior
                             endif;
                             return $replacer;
                     },$content);  
-        $array = preg_replace_callback($pattern,function ($matches) {
+        $content = preg_replace_callback($pattern,function ($matches) {
                             $replacer="";
                             $elements=[];
                             list($name,$attribute,$id) = preg_split("/:/",preg_replace("/}/",":",$matches[1]));
                             $class_setup = ClassSetup::find()->where(['name'=>$name])->one();
                             if(trim($attribute=="child")):
                                 if($id=="*"):
-                                        $elements = ClassSetup::find()->with('displayImage','parent','child')->asArray()->where(['parent_id'=>$class_setup->id])->orderBy(['display_order'=>SORT_ASC,'alias'=>SORT_ASC])->all();
+                                        $elements = ClassSetup::find()->with('displayImage','parent','child','list')->asArray()->where(['parent_id'=>$class_setup->id])->orderBy(['display_order'=>SORT_ASC,'alias'=>SORT_ASC])->all();
                                     else:
                                         $elements = ClassSetup::find()->where(['name'=>$id])->orderBy(['display_order'=>'SORT_ASC'])->one();
                                 endif;
@@ -142,7 +161,7 @@ class GUIBehavior extends Behavior
                             return $replacer;
                     },$content);
                     
-        $array = preg_replace_callback($pattern_data,function ($matches) {
+        $content = preg_replace_callback($pattern_data,function ($matches) {
                             $replacer="";
                             $order="";
                             $limit="";
@@ -152,13 +171,13 @@ class GUIBehavior extends Behavior
                             if($sent_data[0]!=null):
                                 $name = $sent_data[0];
                             endif;
-                            if($sent_data[1]!=null):
+                            if(count($sent_data) > 1):
                                 $params = $sent_data[1];
                             endif;
-                            if(isset($sent_data[2])):
+                            if(count($sent_data) > 2):
                                 $order = $sent_data[2];
                             endif;
-                            if(isset($sent_data[3])):
+                            if(count($sent_data) > 3):
                                 $limit = $sent_data[3];
                             endif;
                             //list($name,$params) = explode(":",$matches[1]);
@@ -227,15 +246,15 @@ class GUIBehavior extends Behavior
                             endif;
 							
                             if($andWhere!=""){
-				$elements = $submit_query->with('data','file','user')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->andWhere($andWhere)->all();
+				$elements = $submit_query->with('data','file','user','user.displayImage','data.setup','data.setupVal','data.element','data.elementVal','data.property','data.propertyVal')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->andWhere($andWhere)->all();
 				}else{
-				$elements = $submit_query->with('data','file','user')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->all();
+				$elements = $submit_query->with('data','file','user','user.displayImage','data.setup','data.setupVal','data.element','data.elementVal','data.property','data.propertyVal')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->all();
                             }
                             $replacer = \yii\helpers\Json::encode($elements);
                             return $replacer;
-                    },$array); 
+                    },$content); 
                     
-        $array = preg_replace_callback($pattern_user,function ($matches) {
+        $content = preg_replace_callback($pattern_user,function ($matches) {
                             $replacer="";
                             $order="";
                             $limit="";
@@ -326,9 +345,83 @@ class GUIBehavior extends Behavior
                             }
                             $replacer = \yii\helpers\Json::encode($elements);
                             return $replacer;
-                    },$array);
-        
-        $array = preg_replace_callback($pattern_menu,function ($matches) {
+                    },$content);
+                    
+        $content = preg_replace_callback($pattern_testimonial,function ($matches) {
+                            $replacer="";
+                            if($matches[1]<>"all"):
+                                $testimonial_arr=\backend\models\Testimonials::find()->limit($matches[1])->all();
+                            else:
+                                $testimonial_arr=\backend\models\Testimonials::find()->all();
+                            endif;
+                            
+                            return \yii\helpers\Json::encode($testimonial_arr);
+                    },$content);
+        //process page calls
+        $content = preg_replace_callback($pattern_article,function ($matches) { 
+            if($matches[1]=="*"):
+                $page_arr = \frontend\models\Pages::find()->all();
+            else:
+                $page_arr = \frontend\models\Pages::find()->where(['url'=>$matches[1]])->one();
+            endif;
+            return \yii\helpers\Json::encode($page_arr);
+        },$content);
+        //process Articles call
+        $content = preg_replace_callback($pattern_article,function ($matches) {                            
+                            $limit=3;
+                            $submit_query = \backend\models\Articles::find();
+                            $params = explode(":",$matches[1]);
+                            if($params[0]!=null):
+                                $filter = explode("|",$params[0]);
+                                foreach ($filter as $filter_rec):
+                                    list($v,$p)=explode("=",$filter_rec);
+                                    if($v=="index"):
+                                        $page = \backend\models\Pages::find()->where(['url'=>$p])->one();
+                                        $blog_index_articles = \backend\models\ArticlesBlogIndex::find()->select('articles_id')->where(['blog_index_id'=>$page['id']])->column();
+                                        $submit_query->where(['IN','id',$blog_index_articles]);
+                                    endif;
+                                    if($v=="category"):
+                                        $page = \backend\models\ArticlesCategories::find()->where(['url'=>$p])->one();
+                                        $blog_index_articles = \backend\models\ArticlesCategoryRelated::find()->select('articles_id')->where(['category_id'=>$page['id']])->column();
+                                        $submit_query->where(['IN','id',$blog_index_articles]);
+                                    endif;
+                                endforeach; 
+                            endif;
+                            if($params[1]!=null):
+                                $limit = $params[1];
+                                $submit_query->limit($limit);
+                            endif;
+                            if($params[2]!=null):
+                                $p=explode(" ",$params[2]);
+                                if(count($p) > 1):
+                                    if($p[1]=="DESC"):
+                                        $sort="SORT_DESC";
+                                    else:
+                                        $sort="SORT_ASC";
+                                    endif;
+                                else:
+                                        $sort="SORT_ASC";
+                                endif;
+                                $orderby=$p[0];
+                                if($params[2]=="last"):                                    
+                                    $submit_query->orderBy(['date'=>SORT_DESC]);
+                                elseif($params[2]=="first"):
+                                    $submit_query->orderBy(['date'=>SORT_ASC]);
+                                else:
+                                    if($sort=="SORT_DESC"):
+                                        $submit_query->orderBy([$orderby=>SORT_DESC]);
+                                    else:
+                                        $submit_query->orderBy([$orderby=>SORT_ASC]);
+                                    endif;
+                                endif;
+                                
+                            endif;
+                            $article_arr = $submit_query->with('documents','feedback','details','approvedComments')->asArray()->all();                            
+                            return \yii\helpers\Json::encode($article_arr);
+                    },$content);
+        //End of Articles shortcodes
+                    
+        $content = preg_replace_callback($pattern_menu,function ($matches) {
                             $replacer="";
                             $menu_arr=\backend\models\MenuProfile::find()->where(['name'=>$matches[1]])->one();
                             if($menu_arr==null):
@@ -337,8 +430,8 @@ class GUIBehavior extends Behavior
                                 $menu_id = $menu_arr['id'];
                             endif;
                             return \yii\helpers\Json::encode(\backend\models\Menus::getProfileMenus($menu_id));
-                    },$array);
-        $array = preg_replace_callback($pattern_login_to_view,function ($matches) {
+                    },$content);
+        $content = preg_replace_callback($pattern_login_to_view,function ($matches) {
                             $replacer="";
                             if(Yii::$app->user->id):
                                 //list($replacer) = preg_split("/:/",preg_replace("/}/",":",$matches[1]));
@@ -347,8 +440,8 @@ class GUIBehavior extends Behavior
                                 $replacer="";
                             endif;
                             return $replacer;
-                    },$array);  
-        $array = preg_replace_callback($pattern_hide_on_login,function ($matches) {
+                    },$content);  
+        $content = preg_replace_callback($pattern_hide_on_login,function ($matches) {
                             $replacer="";
                             if(Yii::$app->user->isGuest):
                                 //list($replacer) = preg_split("/:/",preg_replace("/}}/",":",$matches[1]));
@@ -358,8 +451,8 @@ class GUIBehavior extends Behavior
                             endif;
                             
                             return $replacer;
-                    },$array);  
-        $array = preg_replace_callback($pattern_role,function ($matches) {
+                    },$content);  
+        $content = preg_replace_callback($pattern_role,function ($matches) {
                         if(Yii::$app->user->id):
                             $role = Roles::find()->where(['id'=>Yii::$app->user->identity->role_id])->one();
                             if($role->name==$matches[1]):
@@ -368,8 +461,8 @@ class GUIBehavior extends Behavior
                                 return "";
                             endif;
                         endif;
-                    },$array);
-                    
+                    },$content);
+        $array=$content;           
         $array = preg_replace_callback($pattern_setting,function ($matches) {
                             $replacer = ContentBuilder::getSetting($matches[1]);                            
                             return $replacer;
@@ -409,8 +502,9 @@ class GUIBehavior extends Behavior
                             $twig = new \Twig_Environment($loader); 
                             $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
                             $metadata['param'] = Yii::$app->request->csrfParam;
-                            $metadata['token'] = Yii::$app->request->csrfToken;                            
-                            $content= $twig->render(Twig::find()->where(['renderer'=>$matches[1]])->one()->filename,['app'=>Yii::$app,'metadata'=>$metadata]);
+                            $metadata['token'] = Yii::$app->request->csrfToken;      
+                            $theme = $replacer = ContentBuilder::getSetting("current_theme");
+                            $content= $twig->render(Twig::find()->where(['renderer'=>$matches[1],'theme_id'=>$theme])->one()->filename,['app'=>Yii::$app,'metadata'=>$metadata]);
                             return $content;
                             //return $replacer;
                     },$array); 

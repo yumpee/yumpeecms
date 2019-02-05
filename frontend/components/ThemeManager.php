@@ -1,28 +1,42 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
-/**
- * This Class is used to determine the current theme set for the application. If not default system theme, this Class checks to see if the theme files exist and then returns the reference to the renderer
- *
- * @author Peter Odon
- */
+
 namespace frontend\components;
 
 use Yii;
 use yii\base\Widget;
 use yii\helpers\Html;
 use yii\BaseYii;
-use backend\models\Themes;
+use frontend\models\Themes;
 
 
 class ThemeManager {
     //put your code here
     public static function getHeader($defaultViewer){
+        
         $header = $defaultViewer;
         $theme = new Themes();
         $current_theme = $theme->getCurrentTheme();

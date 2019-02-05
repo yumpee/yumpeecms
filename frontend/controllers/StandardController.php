@@ -3,7 +3,24 @@
 /* 
  * Author : Peter Odon
  * Email : peter@audmaster.com
- * Each line should be prefixed with  * 
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 namespace frontend\controllers;
 
@@ -117,6 +134,14 @@ class StandardController extends Controller{
                     if(!empty($template->parent_id)):
                         $renderer = $template->renderer;
                     endif;
+                    if($article['no_of_views']==null):
+                        $views=1;
+                    else:
+                        $views =   $article['no_of_views'] + 1;                        
+                    endif;
+                    
+                    $article->setAttribute('no_of_views', $views);
+                    $article->update(false);
                     
                     //render through twig if available 
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):
@@ -130,6 +155,8 @@ class StandardController extends Controller{
                             return $this->render('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
                     endif;
+                    
+                    
                     if($article->layout=="column1"):
                             return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer,['page'=>$article,'header_image'=>$header_image]);
                     endif;

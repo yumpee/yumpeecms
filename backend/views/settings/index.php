@@ -1,10 +1,28 @@
 <?php
-$this->title="Settings";
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
+$this->title="Settings";
+
 $saveURL = \Yii::$app->getUrlManager()->createUrl('settings/save');
 $customURL = \Yii::$app->getUrlManager()->createUrl('settings/custom-save');
 $mediaURL =  \Yii::$app->getUrlManager()->createUrl('media/featured-media');
@@ -276,6 +294,12 @@ foreach($records as $record):
     if($record['setting_name']=="use_custom_backend_menus"):
         $use_custom_backend_menus = $record['setting_value'];
     endif;
+    if($record['setting_name']=="backend_home_page"):
+        $backend_home_page = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="allow_multiple_domains"):
+        $allow_multiple_domains = $record['setting_value'];
+    endif;
 endforeach;
 
     $custom_name="";
@@ -342,6 +366,7 @@ endforeach;
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: maintenance_mode">Turn Maintenance Mode On / Page</a><td><?=\yii\helpers\Html::dropDownList("maintenance_mode",$maintenance_mode,['No'=>'No','Yes'=>'Yes'],['class'=>'form-control'])?><br/>
                 <?=\yii\helpers\Html::dropDownList("maintenance_page",$maintenance_page,$maintenance_pages,['class'=>'form-control'])?>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: website_image_url">Image Directory </a><td><input type='text' class='form-control' name="website_image_url" value="<?=$website_image_url?>"> </td>
+        <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: allow_multiple_domains">Allow Multiple Domains</a><td><?= \yii\helpers\Html::dropDownList("allow_multiple_domains",$allow_multiple_domains,['No'=>'No','Yes'=>'Yes'],['class'=>'form-control'])?>
         <tr><td colspan="2"><h4>Contact Us Settings</h4></td>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: contact_us_email">Contact Us Email </a><td><input type='text' class='form-control' name="contact_us_email" value="<?=$contact_us_email?>"></td>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: contact_us_address">Contact Us Address </a><td><textarea class='form-control' rows="6" cols="40" name="contact_us_address"><?=$contact_us_address?></textarea></td>
@@ -357,6 +382,7 @@ endforeach;
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: seo_meta_tags">Meta Tags Global </a><td><textarea class='form-control' rows="6" cols="40" name="seo_meta_tags"><?=$seo_meta_tags?></textarea></td>
         <tr><td colspan="2"><h4>Backend </h4></td>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: use_custom_backend_menus">Custom Backend Menus</a><td><?=\yii\helpers\Html::dropDownList("use_custom_backend_menus",$use_custom_backend_menus,['off'=>'No','on'=>'Yes'],['class'=>'form-control'])?></td>   
+        <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: backend_home_page">Backend Home Page</a><td><?=\yii\helpers\Html::dropDownList("backend_home_page",$backend_home_page,$backend_home_pages,['class'=>'form-control'])?></td>
         <tr><td colspan="2"><h4>Blogs </h4></td>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: page_size">No of items per page</a><td><input type='text' class='form-control' name="page_size" value="<?=$page_size?>"></td>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: auto_approve_comments">Auto Approve Comments</a><td><?=\yii\helpers\Html::dropDownList("auto_approve_comments",$auto_approve_comments,['off'=>'No','on'=>'Yes'],['class'=>'form-control'])?></td>

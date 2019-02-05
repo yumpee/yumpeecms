@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 namespace backend\controllers;
@@ -16,6 +33,9 @@ use backend\models\Themes;
 use backend\models\Templates;
 use backend\models\Settings;
 use backend\models\Twig;
+use backend\models\Forms;
+use backend\models\FormTwig;
+use backend\models\CustomSettings;
 
 class ThemesController extends Controller{
 
@@ -28,6 +48,8 @@ class ThemesController extends Controller{
         endif;
         $page['records'] = Themes::find()->orderBy('name')->all();
         $page['current_theme'] = Settings::find()->where(['setting_name'=>'current_theme'])->one();
+        $my_header_home_url = Settings::find()->where(['setting_name'=>'home_url'])->one();
+        $page['home_url'] = $my_header_home_url['setting_value'];
         return $this->render('index',$page);
     }
     
@@ -152,4 +174,119 @@ class ThemesController extends Controller{
         return "Import completed successfully";
         
     }
+    public function actionSettings(){
+        $page['records'] = Themes::find()->orderBy('name')->all();
+        $page['current_theme'] = Settings::find()->where(['setting_name'=>'current_theme'])->one();
+        return $this->render('settings',$page);
+    }
+    public function actionFetchTwigSettings(){
+        $theme_id = Yii::$app->request->get('theme_id');
+        $renderer = Yii::$app->request->get('renderer');
+        
+        $record = Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$renderer,'renderer_type'=>'Z'])->one();
+        if($record!=null):
+            return $record['code'];
+        else:
+            return "";
+        endif;
+        
+    }
+    public function actionSaveTwigSettings(){
+        $theme_id = Yii::$app->request->post('theme_id');
+        $renderer = Yii::$app->request->post('renderer');
+        $code = Yii::$app->request->post('code');
+        
+        $record = Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$renderer,'renderer_type'=>'Z'])->one();
+        
+        if($record!=null):
+                if(substr(Yii::$app->request->post('filename'), 0, strlen("twig/")) === "twig/"):
+                    if(Yii::$app->request->post('code')==""):
+                        $code="<!--Refer to ".Yii::$app->request->post('filename')." for content-->";
+                    endif;
+                    $record->setAttribute("filename",Yii::$app->request->post('filename'));
+                else:
+                    if($record->filename=="" || Yii::$app->request->post('filename')==""):
+                        $record->setAttribute("filename",md5(date("YmdHis").rand(1000,10000)).".twig");
+                    endif;
+                endif;      
+                $record->setAttribute("code",$code);
+                $record->save();
+                return "Twig template updated";
+        else:
+                $twig =  new Twig();
+                $twig->setAttribute("theme_id",$theme_id);
+                $twig->setAttribute("renderer",$renderer);
+                $twig->setAttribute("renderer_type",'Z');
+                $twig->setAttribute("code",$code);
+                $twig->setAttribute("filename",md5(date("YmdHis")).".twig");
+                if(substr(Yii::$app->request->post('filename'), 0, strlen("twig/")) === "twig/"):
+                    if(Yii::$app->request->post('code')==""):
+                        $code="<!--Refer to ".Yii::$app->request->post('filename')." for content-->";
+                        $twig->setAttribute("code",$code);
+                    endif;
+                    $twig->setAttribute("filename",Yii::$app->request->post('filename'));
+                endif;
+                $twig->save();
+                return "Twig template updated";
+        endif;
+    }
+ public function actionManageSettings(){    
+        //we handle the loading of twig template if it is turned on
+                        $content="";
+                        $theme_id = Yii::$app->request->get("id");
+                        $page['theme_id'] = $theme_id;
+                        $theme_obj =  Themes::find()->where(['id'=>$theme_id])->one();
+                        $renderer = $theme_obj['id']."_".$theme_obj['folder'];
+                        $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
+                        $metadata['form_id'] = $theme_id; 
+                        $metadata['param'] = Yii::$app->request->csrfParam;
+                        $metadata['token'] = Yii::$app->request->csrfToken;
+                        $settings = CustomSettings::find()->where(['theme_id'=>$theme_id])->all();
+                        $form = Forms::find()->where(['id'=>Yii::$app->request->get("form_id")])->one();
+                        $codebase=\frontend\models\Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$renderer,'renderer_type'=>'Z'])->one();
+                        
+                        if(($codebase!=null)&& ($codebase['code']<>"")):
+                            $loader = new \frontend\models\Twig();
+                            $twig = new \Twig_Environment($loader);
+                            $content= $twig->render($codebase['filename'], ['form'=>$form,'metadata'=>$metadata,'app'=>Yii::$app,'settings'=>$settings]);
+                            return $this->render('@frontend/views/layouts/html',['data'=>$content]);
+                        endif;
+                        $page['custom_id'] = Yii::$app->request->get('custom_id',null);
+                        if($page['custom_id']!=null):
+                            $page['custom_rs'] = CustomSettings::find()->where(['id' => $page['custom_id']])->one();
+                        else:
+                            $page['custom_rs'] = CustomSettings::find()->where(['id' => "0"])->one();
+                        endif;
+                        $page['custom_records'] =CustomSettings::find()->where(['theme_id'=>$theme_id])->all();
+                        return $this->render('custom-settings',$page);
+     
+ }
+ public function actionCustomSave(){
+        $model = CustomSettings::findOne(Yii::$app->request->post("id"));
+            if($model!=null):
+                
+                $model->setting_name=Yii::$app->request->post("setting_name");
+                $model->setting_value= Yii::$app->request->post("setting_value");
+                $model->description = Yii::$app->request->post("description");
+                $model->theme_id = Yii::$app->request->post("theme_id");
+                $model->save();
+                return "Custom Setting successfully updated";
+            else:
+                $model =  new CustomSettings();
+                $model->id = md5(date("YmdHis").rand(1000,10000));
+                $model->setting_name=Yii::$app->request->post("setting_name");
+                $model->setting_value= Yii::$app->request->post("setting_value");
+                $model->description = Yii::$app->request->post("description");
+                $model->theme_id = Yii::$app->request->post("theme_id");
+                $model->save();
+                return "New Custom Setting created";
+            endif;
+    }
+    public function actionDeleteCustom(){
+        $id = str_replace("}","",Yii::$app->request->get("id"));    
+        $a = CustomSettings::findOne($id);
+        $a->delete();
+        echo "Record successfully deleted";
+    }
+ 
 }

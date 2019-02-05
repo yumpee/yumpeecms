@@ -1,15 +1,34 @@
 <?php
-$this->title = 'Menus';
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
+$this->title = 'Menus';
+
 
 use kartik\sortable\Sortable;
 $saveURL = \Yii::$app->getUrlManager()->createUrl('menus/save');
 $saveMenuProfileURL = \Yii::$app->getUrlManager()->createUrl('menus/save-profile');
 $saveFooterURL = \Yii::$app->getUrlManager()->createUrl('menus/save-footer');
+$deleteURL = \Yii::$app->getUrlManager()->createUrl('menus/delete');
 
 $this->registerJs( <<< EOT_JS
       $('#sortable4, #sortable5').sortable({
@@ -52,7 +71,20 @@ $this->registerJs( <<< EOT_JS
   $("#menu_profile_list" ).change(function() {
   location.href='index.php?r=menus/index&profile=' + $('select[name="menu_profile_list"]').val();
 });
-            
+   
+$('.delete_event').click(function (element) {                    
+                    var id = $(this).attr('id');
+                    var block = $(this).attr('menu_name');
+                    if(confirm('Are you sure you want to delete - ' + block)){
+                        $.get(  
+                            '{$deleteURL}',{id:id},
+                            function(data) {
+                                alert(data);
+                            }
+                        )
+                    }            
+  });
+                            
   $(document).on('click', '#btnSaveMenu',
        function(ev) {   
         $.post(
@@ -221,7 +253,7 @@ echo Sortable::widget([
     foreach($records as $record):
                 
 ?>
-    <tr><td><?=$record['name']?></td></td><td><?=$record['description']?></td><td><a href='?actions=edit_menu&menu_id=<?=$record['id']?>&r=menus/index'><small><i class="glyphicon glyphicon-pencil"></i></small></a> <a href='#' class='delete_event' id='<?=$record['id']?>' event_name='<?=$record['name']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a> </td>
+    <tr><td><?=$record['name']?></td></td><td><?=$record['description']?></td><td><a href='?actions=edit_menu&menu_id=<?=$record['id']?>&r=menus/index'><small><i class="glyphicon glyphicon-pencil"></i></small></a> <a href='#' class='delete_event' id='<?=$record['id']?>' menu_name='<?=$record['name']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a> </td>
         
  <?php
         endforeach;

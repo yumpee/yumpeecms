@@ -5,6 +5,11 @@ if(Yii::$app->user->identity==null):
     return ['site/index'];
     exit;
 endif;
+
+$display_image_path="";
+if(isset(Yii::$app->user->identity->displayImage->path)):
+    $display_image_path=Yii::$app->user->identity->displayImage->path;
+endif;
 $role_obj = backend\models\BackEndMenuRole::find()->select('menu_id')->where(['role_id'=>Yii::$app->user->identity->role_id])->column();
 $class_submenus_obj = backend\models\BackEndMenus::find()->where(['IN','id',$role_obj])->orderBy('parent_id,priority')->all();
 $visible = Yii::$app->user->getIdentity()!=null;
@@ -17,7 +22,7 @@ $class_submenus_list=[];
         <!-- Sidebar user panel -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle" alt="User Image"/>
+                <img src="<?=Yii::getAlias("@image_dir")?>/<?=$display_image_path?>" class="img-circle" alt="User Image"/>
             </div>
             <div class="pull-left info">
                 <p><?=Yii::$app->user->identity->first_name?></p>
@@ -133,6 +138,7 @@ $class_submenus_list=[];
                         ['label' => 'Themes', 'icon'=>'fa fa-adjust','url' => ['/themes/index'],'visible'=>Yii::$app->user->getIdentity()!=null],
                         ['label' => 'Settings', 'icon'=>'fa fa-cog','url' => ['/settings/index'],'visible'=>Yii::$app->user->getIdentity()!=null],
                         ['label' => 'Class Setup', 'icon'=>'fa fa-building','url' => ['/setup/index'],'visible'=>Yii::$app->user->getIdentity()!=null],
+                        ['label' => 'Domains', 'icon'=>'fa fa-globe','url' => ['/domains/index'],'visible'=>Yii::$app->user->getIdentity()!=null],
                         ['label' => 'Languages', 'icon'=>'fa fa-language','url' => ['/language/index'],'visible'=>Yii::$app->user->getIdentity()!=null],   
                      ]
                     ],
@@ -148,8 +154,10 @@ $class_submenus_list=[];
                                 ['label' => 'Widgets', 'icon'=>'fa fa-windows','url' => ['/forms/fwidgets'],'visible'=>Yii::$app->user->getIdentity()!=null],
                           ]
                         ],
+                        
                         ['label' => 'Import', 'icon'=>'fa fa-file','url' => ['/themes/import'],'visible'=>Yii::$app->user->getIdentity()!=null],
                         ['label' => 'Relationships', 'icon'=>'fa fa-sitemap','url' => ['/relationships/index'],'visible'=>Yii::$app->user->getIdentity()!=null],
+                        ['label' => 'Theme Settings', 'icon'=>'fa fa-cog','url' => ['/themes/settings'],'visible'=>Yii::$app->user->getIdentity()!=null],
                         
                     ],
                     ],

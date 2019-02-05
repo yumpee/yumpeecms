@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 $this->title='Themes';
@@ -44,11 +61,15 @@ $this->registerJs( <<< EOT_JS
   }); 
        $(document).on('click', '#btnNew',
        function(ev) {   
-        location.href='?r=themes/index';
-        
+        location.href='?r=themes/index';       
         
   }); 
+     
+  $('.preview_event').click(function (element){
+            var theme_id=$(this).attr('id');
+            window.open('{$home_url}?yumpee_template_preview=on&theme_id=' + theme_id);
             
+            });
   $('.delete_event').click(function (element) {                    
                     var id = $(this).attr('id');
                     var event_name = $(this).attr('event_name');
@@ -114,7 +135,7 @@ EOT_JS
               $bgcolor="<font color=red>**</font>";
           endif;
       ?>
-        <tr><td><?=$bgcolor?><?=$user['name']?></td><td><?=$user['folder']?><td><a href='?actions=edit&id=<?=$user['id']?>&r=themes/index'><small><i class="glyphicon glyphicon-pencil"></i></small></a> <a href='#' class='delete_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a>  </td>
+        <tr><td><?=$bgcolor?><?=$user['name']?></td><td><?=$user['folder']?><td> <a href='#' class='preview_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>' title='Preview'><small><i class="glyphicon glyphicon-eye-open"></i></small></a> <a href='?actions=edit&id=<?=$user['id']?>&r=themes/manage-settings' title='Settings'><small><i class="fa fa-cog"></i></small></a> <a href='?actions=edit&id=<?=$user['id']?>&r=themes/index' title='Edit'><small><i class="glyphicon glyphicon-pencil"></i></small></a> <a href='#' class='delete_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>' title='Delete'><small><i class="glyphicon glyphicon-trash"></i></small></a>  </td>
      <?php
       endforeach;
      ?>

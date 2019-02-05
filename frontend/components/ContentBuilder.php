@@ -1,10 +1,32 @@
 <?php
+/* 
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ */
 //this will build the site contents based on the URL and put everything into an array format to be navigated through mustache
 
 namespace frontend\components;
 
 use Yii;
-use backend\models\Pages;
+use frontend\models\Pages;
 use frontend\models\Templates;
 use backend\models\Media;
 use backend\models\Settings;
@@ -14,6 +36,7 @@ use backend\models\Themes;
 use backend\models\Articles;
 use backend\models\ArticlesCategories;
 use backend\models\ClassElementAttributes;
+use common\models\FormSubmit;
 class ContentBuilder {
     
     public static function ArticleFilter($query,$filter){
@@ -147,6 +170,13 @@ class ContentBuilder {
                     if($records!=null):
                         return $records->route;
                     endif;
+                //what if its a form details page, then we return the same set of widgets as the view parent
+                  $form = FormSubmit::findOne(['url'=>$url]);
+                  if($form!=null):
+                    $page = Pages::findOne(['form_id'=>$form->form_id]);
+                    ContentBuilder::getTemplateRouteByURL($page['url']);
+                  endif;
+                    
             return "blog/details";
             endif;
         }
@@ -205,12 +235,40 @@ class ContentBuilder {
         endif;
     }
     public static function getSetting($setting_name){
+        if(substr($setting_name,0,1)=="~"):
+            $setting_name=substr($setting_name,1);
+            $setting = CustomSettings::find()->where(['setting_name'=>$setting_name])->andWhere('theme_id="'.ContentBuilder::getSetting("current_theme").'"')->one();
+            if($setting!=null):
+                if($setting_name=="website_home_page"):
+                    $page = Pages::find()->where(['url'=>$setting->setting_value])->one();
+                    if($page!=null):
+                        return $page->id;
+                    endif;
+                endif;
+                return $setting->setting_value;
+            endif;
+        endif;
+               
+        
         $setting = Settings::find()->where(['setting_name'=>$setting_name])->one();
-        if($setting!=null):
-            return $setting->setting_value;
+        if($setting!=null):      
+            if($setting_name=="website_home_page"):
+                $page = Pages::find()->where(['url'=>$setting->setting_value])->one();
+                if($page!=null):
+                    return $page->id;
+                endif;
+            endif;
+            
+            return $setting->setting_value;  
         endif;
         $setting = CustomSettings::find()->where(['setting_name'=>$setting_name])->one();
         if($setting!=null):
+            if($setting_name=="website_home_page"):
+                $page = Pages::find()->where(['url'=>$setting->setting_value])->one();
+                if($page!=null):
+                    return $page->id;
+                endif;
+            endif;
             return $setting->setting_value;
         else:
             return "";
@@ -241,5 +299,98 @@ public function getBlocks(){
     return $page_object;
 }	
 
-	
+public static function getBreadCrumbTrail($page){
+    $breadcrumb=array();
+    $item=array();
+    $home_page = ContentBuilder::getSetting("home_url");
+    $page_found=0;
+    for($i=0;$i < 5;$i++){
+        $page_obj = Pages::find()->where(['url'=>$page])->one();
+        if($page_obj!=null):
+            if($page_obj['parent_id']!=null && $page_obj['parent_id']!=""):
+                $p = Pages::find()->where(['id'=>$page_obj['parent_id']])->one();
+                $page = $p['url'];
+                $item['title'] = $p['menu_title'];
+                $item['link']=$home_page."/".$p['url'];        
+                array_push($breadcrumb,$item);
+                $page_found=1;
+            endif;
+        else:
+            break;
+        endif;        
+    }
+    if($i >0):
+        return $breadcrumb;
+    endif;
+    $article_found=0;
+    $page_obj=\frontend\models\Articles::find()->where(['url'=>$page])->one();
+    if($page_obj!=null):        
+        foreach($page_obj->blogIndex as $index):
+			$item['title'] = $index->page->title;
+                        $item['link'] = $home_page."/".$index->page->url;
+                        array_push($breadcrumb,$item);              
+			break;
+	endforeach;
+        return $breadcrumb;
+    endif;
+    $frm_obj=\frontend\models\FormSubmit::find()->where(['url'=>$page])->one();
+    $page="";
+    if($frm_obj!=null):
+    for($i=0;$i < 5;$i++){
+        if($page==""):
+            $page_obj = Pages::find()->where(['form_id'=>$frm_obj['form_id']])->one();
+        else:
+            $page_obj = Pages::find()->where(['url'=>$page])->one();
+        endif;
+        if($page_obj!=null):
+            if($page_obj['parent_id']!=null && $page_obj['parent_id']!=""):
+                $p = Pages::find()->where(['id'=>$page_obj['parent_id']])->one();
+                $page = $p['url'];
+                $item['title'] = $p['menu_title'];
+                $item['link']=$home_page."/".$p['url'];        
+                array_push($breadcrumb,$item);
+            endif;
+        endif;        
+    }
+    endif;
+   return $breadcrumb;
+}
+
+public static function getMenus(){
+    
+    //we need to ensure that registration and login menus do not show when the user is logged in
+        if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
+            $install_domain = ContentBuilder::getSetting("home_url");
+            $curr_domain = Yii::$app->request->hostInfo;
+            $menu_profile=0;
+            if(strpos($install_domain, $curr_domain)===false):
+                $sub_domain = Domains::find()->where(['domain_url'=>$curr_domain])->one();
+                if($sub_domain!=null):
+                    $menu_profile = $sub_domain->menu_id;
+                endif;
+            endif;            
+            if($menu_profile > 0):
+                if (Yii::$app->user->isGuest) {
+                    $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
+                    $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
+                }else{
+                    $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
+                    $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
+                }
+                $return["header_menus"] = $header_menus;
+                $return["footer_menus"] = $footer_menus;
+                return $return;
+            endif;
+        endif;
+        if (Yii::$app->user->isGuest) {
+            $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
+            $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
+        }else{
+            $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
+            $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
+        }
+        $return["header_menus"] = $header_menus;
+        $return["footer_menus"] = $footer_menus;
+        return $return;
+}
 }

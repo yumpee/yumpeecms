@@ -1,10 +1,29 @@
 <?php
-$this->title = 'Articles Categories';
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
+
+$this->title = 'Articles Categories';
+
 
 $saveURL = \Yii::$app->getUrlManager()->createUrl('articles/save-category');
 $deleteURL = \Yii::$app->getUrlManager()->createUrl('articles/category-delete');
@@ -113,6 +132,7 @@ endif;
     <table class="table">
         <tr><td>Name<td><input name="name" id="name" value="<?=$rs['name']?>" class="form-control" type="text" />
         <tr><td>Feature Image<td><img id='my_display_image' src='<?=$image_home?>/<?=$display_image_path?>' height='100px' align='top' width='200px' style='border:1px solid #233388' HSPACE='20' VSPACE='20'/> <a href='#' class='media' id='set_feature'>Set Feature Image</a> | <a href='#' id='unset_feature'>Unset Feature Image</a><input type="hidden" name="display_image_id" id="display_image_id" value="<?=$rs['display_image_id']?>"/>
+        <tr><td>Icon (e.g fa fa-user)<td> <input name="icon" id="icon" value="<?=$rs['icon']?>" class="form-control" type="text" />       
         <tr><td>URL<td><input name="url" value="<?=$rs['url']?>" id="url" class="form-control"type="text" />
         <tr><td>Description<td><textarea name="description" id="description" class="form-control"rows="7" cols="40"><?=$rs['description']?></textarea>
         <tr><td>Category Index<td><?=$category?>

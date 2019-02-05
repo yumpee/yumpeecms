@@ -2,8 +2,25 @@
 
 /* 
  * Author : Peter Odon
- * Author : peter@audmaster.com
- * Each line should be prefixed with  * 
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 $customURL =  \Yii::$app->getUrlManager()->createUrl('forms/fetch-widget-twig-theme');
@@ -207,6 +224,8 @@ EOT_JS
         <tr><td>Widget Name(no spaces)<td><input name="name" id="name" class="form-control" type="text" value="<?=$rs['name']?>"/>
         <tr><td>Title<td><input name="title" id="title" class="form-control" type="text" value="<?=$rs['title']?>"/>
         <tr><td>Primary Form<td><?=$forms?>
+        <tr><td>Require Login to view<td><?=\yii\helpers\Html::dropDownList("require_login",$rs['require_login'],['N'=>'No','Y'=>'Yes'],['class'=>'form-control'])?></td>
+        <tr><td>Role Permission<td><?=$permissions?>
         
         <tr><td colspan="2"><button type="submit" id="btnWidgetSubmit" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button><input type="hidden" name="processor" value="true" /><input type="hidden" name="id" id="custom_id" value="<?=$id?>" /></td>
     </table>

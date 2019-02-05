@@ -1,11 +1,28 @@
 <?php
-
-$this->title = 'Blocks';
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
+$this->title = 'Blocks';
+
 
 $saveURL = \Yii::$app->getUrlManager()->createUrl('blocks/save');
 $saveGroupURL = \Yii::$app->getUrlManager()->createUrl('blocks/save-group');
@@ -100,18 +117,19 @@ EOT_JS
     
 <div class="tab-content">
     <div id="home" class="tab-pane fade in active"> <br />   
-<button class="btn btn-info" data-toggle="collapse" data-target="#addBlock">Add Block</button>
 <div id="addBlock">
      <form action="index.php?r=blocks/index" method="post" id="frm1">
     <table class="table">
-        <tr><td>Name<td><input name="name" id="name" value="<?=$rs['name']?>" class="form-control" type="text" />
+        <tr><td width="15%">Name<td><input name="name" id="name" value="<?=$rs['name']?>" class="form-control" type="text" />
         <tr><td>Title<td><input name="title" id="title" value="<?=$rs['title']?>" class="form-control" type="text" />        
         <tr><td>Content  <td><textarea name="content" id="content" class="form-control" rows="7" cols="40"><?=$rs['content']?></textarea>
-        
         <tr><td><td><?=$editable?>User Editable  <?=$show_title?>Show Title <?=$published?>Published
         <tr><td>Title Level<td><?=$title_level?>
-        <tr><td>Position<td><?=$position?>
+        <tr><td>Standard Position<td><?=$position?>
+        <tr><td>Widget Position<td><?=$custom_position?>
         <tr><td>Sort Order<td><input name="sort_order" id="sort_order" value="<?=$rs['sort_order']?>" class="form-control" type="text" />
+        <tr><td>Require Login to view<td><?=\yii\helpers\Html::dropDownList("require_login",$rs['require_login'],['N'=>'No','Y'=>'Yes'],['class'=>'form-control'])?></td>
+        <tr><td>Role Permission<td><?=$permissions?>
         <tr><td>Linked Pages<td>  <?=$pages?>      
         <tr><td colspan="2"><button type="button" id="btnSubmit" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="processor" value="true" /> <input type="hidden" name="id" value="<?=$id?>" /><input type="hidden" name="cont" id="cont"/></td>
         

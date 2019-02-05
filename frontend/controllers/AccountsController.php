@@ -1,18 +1,31 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 namespace frontend\controllers;
 
-/**
- * Description of AccountsController
- *
- * @author Peter
- */
+
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -66,12 +79,19 @@ class AccountsController extends Controller{
             endif;
         $page =[];
         $page_url =  ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl());
+        $page_url = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+        if (strpos($page_url, '?') !== false):
+                list($page_url,$search)= explode("?",$page_url);
+        endif;
         
         $article = Pages::find()->where(['url'=>$page_url])->one();
                   
         $form['login_url'] = Yii::$app->request->getBaseUrl()."/".$article['url'];
         $form['message']="";
+        
         $form['callback']="";
+        
+        
         $form['param'] = Yii::$app->request->csrfParam;
         $form['token'] = Yii::$app->request->csrfToken;
         

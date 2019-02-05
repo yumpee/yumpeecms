@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 namespace backend\models;
@@ -12,6 +29,8 @@ use frontend\components\ContentBuilder;
 use backend\models\PageTags;
 use backend\models\PageTagIndex;
 use backend\models\MenuPage;
+use backend\components\Manager;
+
 class Pages extends \yii\db\ActiveRecord
 {
    public $image = '';
@@ -61,7 +80,26 @@ class Pages extends \yii\db\ActiveRecord
         
         $records = Pages::find()->where(['id'=>Yii::$app->request->post('id')])->one();
         $rec=1;
-        
+        if(Yii::$app->request->post("published")=="1"){
+            $published='1';
+        }else{
+            $published='0';
+        }
+        $permissions = Yii::$app->request->post("permissions");
+            $perm_val="";
+            if(!empty($permissions)){
+               $counter=0;
+                // Loop to store and display values of individual checked checkbox.
+                foreach($permissions as $selected){                    
+                    $perm_val = $perm_val." ".$selected;       
+                }
+            }
+        if(Yii::$app->request->post("meta_description")==""):
+            $meta_description = Manager::getMetaData(Yii::$app->request);
+        else:
+            $meta_description = Yii::$app->request->post("meta_description");
+        endif;
+            
         if($records!=null && $save_as_new==""){               
             $id = Yii::$app->request->post("id");  
             $records->setAttribute('title',Yii::$app->request->post("title"));
@@ -72,17 +110,14 @@ class Pages extends \yii\db\ActiveRecord
             $records->setAttribute('robots',Yii::$app->request->post("robots"));
             $records->setAttribute('template',Yii::$app->request->post("template"));
             $records->setAttribute('layout',Yii::$app->request->post("layout"));
-            $records->setAttribute('show_in_footer_menu',"0");
-            $records->setAttribute('sort_order',Yii::$app->request->post("sort_order"));
-            $records->setAttribute('master_content','1');
-            $records->setAttribute('sort_order_footer','0');
-            $records->setAttribute('show_header_image','1');
+            $records->setAttribute('sort_order',Yii::$app->request->post("sort_order"));            
             $records->setAttribute('sidebar',Yii::$app->request->post("sidebar"));
             $records->setAttribute('updated',date("Y-m-d H:i:s"));
             $records->setAttribute('tab_menu_title',Yii::$app->request->post("tab_menu_title"));
             $records->setAttribute('editable',Yii::$app->request->post("editable"));
             $records->setAttribute('tag_id',Yii::$app->request->post("tag_id"));
-            $records->setAttribute('meta_description',Yii::$app->request->post("meta_description"));
+            $records->setAttribute('meta_description',$meta_description);
+            $records->setAttribute('alternate_header_content',Yii::$app->request->post("alternate_header_content"));
             $records->setAttribute('parent_id',Yii::$app->request->post("parent_id"));
             $records->setAttribute('display_image_id',Yii::$app->request->post("display_image_id"));
             $records->setAttribute('css',Yii::$app->request->post("css"));
@@ -92,6 +127,10 @@ class Pages extends \yii\db\ActiveRecord
             $records->setAttribute('form_id',Yii::$app->request->post("forms"));
             $records->setAttribute('role_id',Yii::$app->request->post("roles"));
             $records->setAttribute('renderer',Yii::$app->request->post("renderer"));
+            $records->setAttribute('show_header_image',Yii::$app->request->post("show_header_image"));
+            $records->setAttribute('show_footer_image',Yii::$app->request->post("show_footer_image"));
+            $records->setAttribute('published',$published);
+            $records->setAttribute('permissions',$perm_val);
             $records->save(false);
         
             PageTags::deleteAll(['page_id'=>$id]);
@@ -179,13 +218,15 @@ class Pages extends \yii\db\ActiveRecord
             $records->setAttribute('sort_order','0');
             $records->setAttribute('master_content','1');
             $records->setAttribute('sort_order_footer','0');
-            $records->setAttribute('show_header_image','1');
+            $records->setAttribute('show_header_image',Yii::$app->request->post("show_header_image"));
+            $records->setAttribute('show_footer_image',Yii::$app->request->post("show_footer_image"));
             $records->setAttribute('sidebar',Yii::$app->request->post("sidebar"));
             $records->setAttribute('updated',date("Y-m-d H:i:s"));
             $records->setAttribute('tab_menu_title',Yii::$app->request->post("tab_menu_title"));
             $records->setAttribute('editable',Yii::$app->request->post("editable"));
             $records->setAttribute('tag_id',Yii::$app->request->post("tag_id"));
-            $records->setAttribute('meta_description',Yii::$app->request->post("meta_description"));
+            $records->setAttribute('meta_description',$meta_description);
+            $records->setAttribute('alternate_header_content',Yii::$app->request->post("alternate_header_content"));
             $records->setAttribute('parent_id',Yii::$app->request->post("parent_id"));
             $records->setAttribute('display_image_id',Yii::$app->request->post("display_image_id"));
             $records->setAttribute('css',Yii::$app->request->post("css"));
@@ -195,6 +236,8 @@ class Pages extends \yii\db\ActiveRecord
             $records->setAttribute('form_id',Yii::$app->request->post("forms"));
             $records->setAttribute('role_id',Yii::$app->request->post("roles"));
             $records->setAttribute('renderer',Yii::$app->request->post("renderer"));
+            $records->setAttribute('published',$published);
+            $records->setAttribute('permissions',$perm_val);
             $records->save();
            
            
@@ -237,7 +280,7 @@ class Pages extends \yii\db\ActiveRecord
         $session = Yii::$app->session;
         $mydatabase = $session['mydatabase'];
         $query = new \yii\db\Query;
-        return Yii::$app->db->createCommand("SELECT  tbl_page.template,tbl_page.display_image_id,tbl_page.title,tbl_page.menu_title,tbl_page.url,tbl_page.description,tbl_page.published,tbl_page.show_in_menu,tbl_page.master_content,tbl_page.sort_order,tbl_page.id,tbl_tags.name as tag,tbl_page.parent_id from tbl_page left join tbl_tags ON tbl_page.tag_id = tbl_tags.ID")->queryAll();
+        return Yii::$app->db->createCommand("SELECT  tbl_page.require_login,tbl_page.template,tbl_page.display_image_id,tbl_page.title,tbl_page.menu_title,tbl_page.url,tbl_page.description,tbl_page.published,tbl_page.show_in_menu,tbl_page.master_content,tbl_page.sort_order,tbl_page.id,tbl_tags.name as tag,tbl_page.parent_id from tbl_page left join tbl_tags ON tbl_page.tag_id = tbl_tags.ID")->queryAll();
     }
     
     public static function getImageList(){
@@ -285,7 +328,7 @@ class Pages extends \yii\db\ActiveRecord
         return $query->select('id,title')->from('tbl_page')->where(['template'=>$line_subquery])->all();
         
     }
-    public function getBlocks(){
+    public function getBlocks(){      
         return $this->hasMany(Blocks::className(),['id'=>'block_id'])->viaTable('tbl_block_page',['page_id'=>'id']);
     }
     public static function deleteTrace(){
@@ -295,4 +338,5 @@ class Pages extends \yii\db\ActiveRecord
         MenuPage::deleteAll(['menu_id'=>$id]);
         
     }
+    
 }

@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 use dosamigos\fileupload\FileUploadUI;
 $this->title='Media';
@@ -100,7 +117,7 @@ EOT_JS
     .images {
     border: double;
 }
-
+.spacer { margin:0; padding:0; height:50px; }
     </style>
 
 <div class="container-fluid">
@@ -122,7 +139,7 @@ EOT_JS
         'accept' => 'image/*'
     ],
     'clientOptions' => [
-        'maxFileSize' => 2000000
+        'maxFileSize' => 80000000
     ],
     // ...
     'clientEvents' => [
@@ -164,9 +181,11 @@ EOT_JS
 
 <div id="library" class="tab-pane fade">
     <p>
-    <div class="row">
+    <div class="row col-md-12">
         <?php
+      $row_count=0;
       foreach ($records as $user) :
+          
           $file_type="";
           if($user['media_type']=='1'):
               $file_type="Images";
@@ -179,9 +198,16 @@ EOT_JS
           endif;
           
       ?>
-        <div class="col-md-2 images" id="im<?=$user['id']?>"><span class="border border-primary"><img src="<?=$home_image_url?>/<?=$user['path']?>" height="200px" width="250px" class="rounded"></img><br>Name :<?=$user['name']?><br>Tag:<?=$user['alt_tag']?>
+        <div class="col-md-3 col-xs-3 images" id="im<?=$user['id']?>"><span class="border border-primary"><img src="<?=$home_image_url?>/<?=$user['path']?>" height="200px" width="100%" class="rounded"></img><br>Name :<?=$user['name']?><br>Tag:<?=$user['alt_tag']?>
                 <br><br><a href='#' data-toggle="modal" data-target="#detailsModal" class="detailsImage" linkid="<?=$user['id']?>">Details </a> |<a href='#' data-toggle="modal" data-target="#myModal" class="editImage" linkid="<?=$user['id']?>">Edit </a> | <a href='#' class='delete_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>'>Delete</a></span></div>
         <?php
+        $row_count++;
+        if($row_count >3):
+            $row_count=0;
+            //echo "<div class='col-xs-12' style='height:50px;'></div>";
+        echo "<div class='col-md-12'>&nbsp;</div>";
+        endif;
+        
         endforeach;
         ?>
         

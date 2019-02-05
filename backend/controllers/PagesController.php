@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 namespace backend\controllers;
 
@@ -39,16 +56,22 @@ public function actionIndex()
         $tag_id="";
         $show_in_menu="";
         $index_tag_arr=""; //this variable is used to define the index tags
+        $show_footer_image="";
+        $show_header_image="";
+        $perm_arr="";
         
         if($page['id']!=null){            
             $page['rs'] = Pages::find()->where(['id' => $page['id']])->one();
             $page['edit']=true;
+            $perm_arr = explode(" ",$page['rs']['permissions']);
             if(count($page['rs']) > 0): // if we find any record then
                 $layout = $page['rs']['layout'];
                 $template = $page['rs']['template'];
                 $sidebar = $page['rs']['sidebar'];
                 $tag_id = $page['rs']['tag_id'];
                 $show_in_menu = $page['rs']['show_in_menu'];
+                $show_footer_image=$page['rs']['show_footer_image'];
+                $show_header_image=$page['rs']['show_header_image'];
                 //what of index tags we handle them here
                 $c = Pages::getIndexTags($page['id']);
                 $index_tag_arr =  yii\helpers\ArrayHelper::getColumn($c, 'index_tag_id');
@@ -89,7 +112,8 @@ public function actionIndex()
              
         $page['sidebar'] = \yii\helpers\Html::dropDownList("sidebar",$sidebar,['default'=>'Default Sidebar','contact'=>'Contact Page'],['class'=>'form-control']);
         $page['show_in_menu'] = \yii\helpers\Html::dropDownList("show_in_menu",$show_in_menu,['1'=>'Yes','0'=>'No'],['class'=>'form-control']);
-        
+        $page['show_header_image'] = \yii\helpers\Html::dropDownList("show_header_image",$show_header_image,['1'=>'Yes','0'=>'No'],['class'=>'form-control']);
+        $page['show_footer_image'] = \yii\helpers\Html::dropDownList("show_footer_image",$show_footer_image,['1'=>'Yes','0'=>'No'],['class'=>'form-control']);
         $tags = Tags::getTags();
         $page['selected_tags'] = Pages::getSelectedTags();
         if(count($page['selected_tags'])==0):
@@ -98,7 +122,8 @@ public function actionIndex()
         endif;
         $tag_map =  yii\helpers\ArrayHelper::map($tags, 'id', 'name'); 
         $page['tags'] = \yii\helpers\Html::dropDownList("tag_id",$tag_id,$tag_map,['prompt'=>'Select Tag'],['class'=>'form-control']);
-        $page['records'] = Pages::getMyPages(); 
+        //$page['records'] = Pages::getMyPages(); 
+        $page['records'] = Pages::find()->orderBy('title')->all();
         
         
         $tag_map =  yii\helpers\ArrayHelper::map($page['records'], 'id', 'menu_title');
@@ -127,7 +152,10 @@ public function actionIndex()
         $render_map =  yii\helpers\ArrayHelper::map($child_blog_render, 'id', 'name');
         $page['renderer'] = \yii\helpers\Html::dropDownList("renderer",$page['rs']['renderer'],array_merge($blog_map,$render_map),['prompt'=>'','class'=>'form-control']);
         
-
+        $pages = Roles::find()->orderBy('name')->all();
+        $page_map =  yii\helpers\ArrayHelper::map($pages, 'id', 'name');
+        $page['permissions'] = \yii\helpers\Html::checkboxList("permissions",$perm_arr,$page_map);
+        
         return $this->render('index',$page);        
     }
 

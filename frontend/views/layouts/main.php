@@ -1,5 +1,26 @@
 <?php
+/* 
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
 
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ */
 /* @var $this \yii\web\View */
 /* @var $content string */
 
@@ -17,7 +38,7 @@ use frontend\models\Pages;
 use backend\models\Settings;
 use frontend\models\Themes;
 use frontend\models\CSS;
-use backend\models\Menus;
+use frontend\models\Menus;
 use backend\models\Users;
 use backend\models\Media;
 use backend\models\Roles;
@@ -33,8 +54,18 @@ $my_theme_object=Themes::find()->where(['id'=>$themes->currentTheme])->one();
 $settings = new Settings();
 
 if($my_theme_object==null):
-    echo "No theme has been set for this site. Please contact the web administrator";
-    exit();
+    //just incase it came from the session, let us check the theme database ourselves
+    $theme_set= Settings::find()->where(['setting_name'=>'current_theme'])->one();
+    if($theme_set!=null):
+        $my_theme_object = Themes::find()->where(['id'=>$theme_set->setting_value])->one();
+    else:
+        echo "No theme has been set for this site. Please contact the web administrator";
+        exit();
+    endif;
+    if($my_theme_object==null):
+        echo "No theme has been set for this site. Please contact the web administrator";
+        exit();
+    endif;
 endif;
 
 //get the theme information
@@ -73,6 +104,12 @@ endif;
 //load stylesheets
 $style_sheet_array = explode(";",$stylesheet);
 for($i=0;$i<count($style_sheet_array);$i++):
+    if(substr( $style_sheet_array[$i], 0, 4 ) === "http"){
+       $this->registerCssFile($style_sheet_array[$i], [
+    'depends' => [\yii\bootstrap\BootstrapAsset::className()],
+    ], ''); 
+       continue;
+    }
     $this->registerCssFile("@themes/".$folder."/".$style_sheet_array[$i], [
     'depends' => [\yii\bootstrap\BootstrapAsset::className()],
 ], '');
@@ -82,18 +119,36 @@ endfor;
 $meta="";
 $javascript_array = explode(";",$javascript);
 for($i=0;$i<count($javascript_array);$i++):
+    if(substr( $javascript_array[$i], 0, 4 ) === "http"){
+       $this->registerJsFile($javascript_array[$i], [
+    'depends' => [\yii\web\JqueryAsset::className()],
+    ], ''); 
+       continue;
+    }
     $this->registerJsFile("@themes/".$folder."/".$javascript_array[$i],
     ['depends' => [\yii\web\JqueryAsset::className()]]);
 endfor;
 
 	
-	
+
 $current_url=ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl());
+	
 $current_page = Pages::find()->where(['url'=>$current_url])->one();
-if($current_page==null):
-    
+
+if($current_page==null):      
     $current_url=ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl(),2);
     $current_page = Pages::find()->where(['url'=>$current_url])->one();
+endif;
+if($current_page!=null && $current_page->published=='0'):
+                            $error404 = ContentBuilder::getSetting("error_page");
+                            if($error404!=""):
+                                $article = Pages::find()->where(['id'=>$error404])->one();
+                                if($article==null):
+                                    throw new \yii\web\HttpException(404, 'You do not have right privileges to view to this page. Consult with your administrator.');
+                                    exit;
+                                endif;
+                                Yii::$app->getResponse()->redirect($article->url)->send();
+                            endif;
 endif;
 
 //echo $current_url;
@@ -129,6 +184,7 @@ endif;
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="YumpeeCMS 1.0.9" />    
+    
     <?= Html::csrfMetaTags() ?>
     <?=$meta?>
     <title><?= Html::encode($this->title) ?></title>
@@ -147,21 +203,25 @@ endif;
     endif;
 	
 	
-    ?>
+    ?>   
     
     
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">  
 <!--GOOGLE FONTS-->
 
 <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-
+<?php
+if($custom_styles!=""):
+?>
 <style>
     <?php echo $custom_styles?>
 </style>
+<?php
+endif;
+?>
 <?php echo $page_styles?>
 
 <body>
@@ -195,50 +255,48 @@ $header_menu_logo =ContentBuilder::getImage($settings->logo,"logo");
 $header_baseURL = Yii::$app->request->getBaseUrl();
 $footer_menus = new Pages();
 
+$header_menus=null;
 
 if($current_page!=null):
-    $header_menus = Menus::getProfileMenus($current_page->menu_profile);
+    //$header_menus = Menus::getProfileMenus($current_page->menu_profile);
+endif;       
+if($header_menus==null):        
+        $menus = ContentBuilder::getMenus();
+        $header_menus = $menus["header_menus"];
+        $footer_menus = $menus["footer_menus"];
+endif;
 
-    if($header_menus==null):
-        //we need to ensure that registration and login menus do not show when the user is logged in
-        if (Yii::$app->user->isGuest) {
-            $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
-            $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
-        }else{
-            $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
-            $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
-        }
-    endif;
- else:
-        if (Yii::$app->user->isGuest) {
-            $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
-            $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
-        }else{
-            $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
-            $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
-        }
- endif;
 $header_request_url = Yii::$app->request->url;
 $header_title = $this->title;
 
 //End fetch for theme header
+if($current_page["show_header_image"]=="0"):
+    //do nothing
+else:
 ?>
+
 <?php $this->beginContent(ThemeManager::getHeader('@app/views/layouts/header.php'),['header_menu_logo'=>$header_menu_logo,'header_content'=>$current_theme_header,'header_theme_setting'=>ContentBuilder::getSetting("current_theme_header"),'header_baseURL'=>$header_baseURL,'header_menus'=>$header_menus,'header_request_url'=>$header_request_url,'header_title'=>$header_title,'settings'=>$settings]); ?>
 
 <?php $this->endContent(); ?>
  
+<?php endif;?>
+    
     <div id="yumpee_block_top_content"></div>
         
 <?= $content ?>
  
 <div id="yumpee_block_bottom_content"></div>
 
-
-<?php $this->beginContent(ThemeManager::getFooter('@app/views/layouts/footer.php'),['footer_content'=>$current_theme_footer,'footer_theme_setting'=>ContentBuilder::getSetting("current_theme_footer"),'settings'=>$settings,'header_baseURL'=>$header_baseURL,'footer_menus'=>$footer_menus]); ?>
+<?php
+if($current_page["show_footer_image"]=="0"):
+    //do nothing
+else:
+?>
+<?php $this->beginContent(ThemeManager::getFooter('@app/views/layouts/footer.php'),['footer_menu_logo'=>$header_menu_logo,'footer_content'=>$current_theme_footer,'footer_theme_setting'=>ContentBuilder::getSetting("current_theme_footer"),'settings'=>$settings,'header_baseURL'=>$header_baseURL,'footer_menus'=>$footer_menus]); ?>
   
 <?php $this->endContent(); ?>
 
-
+<?php endif;?>
 <?php $this->endBody() ?>
 
 
@@ -399,11 +457,12 @@ $this->registerJs( <<< EOT_JS
   }); 
   
   //processing the feedback form
-
+    
    $(document).on('click', '#btnBlogFeedback',
        function(ev) {  
+        var form = $(this).parents('form:first');
         $.get(
-            '{$blogFeedbackURL}',$( "#frmBlogFeedback" ).serialize(),
+            '{$blogFeedbackURL}',form.serialize(),
             function(data) {
                 alert(data);
             }
@@ -495,6 +554,7 @@ function carousel() {
 ///////////////////////////////////////////////////////////HANDLE CUSTOM WIDGETS///////////////////////////////////////////////////////////////////////////
    
    var widget_ref;
+   
    if($("[class^=yumpee_custom_widget]").length >0){     
           $( "[class^=yumpee_custom_widget]" ).each(function() {
             var widget_details = $(this)[0].className;

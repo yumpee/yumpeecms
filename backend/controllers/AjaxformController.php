@@ -1,9 +1,26 @@
 <?php
 
-/*
+/* 
  * Author : Peter Odon
- * Author : peter@audmaster.com
- * Each line should be prefixed with  * 
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 namespace backend\controllers;
@@ -23,6 +40,7 @@ use backend\models\Forms;
 use backend\models\ArticlesCategories;
 use backend\models\Media;
 use backend\models\CustomWidget;
+use backend\models\CustomSettings;
 use common\components\ResizeImage;
 use yii\web\Response;
 use frontend\models\Articles;
@@ -314,6 +332,24 @@ class AjaxformController extends Controller{
                         }
                     return "Feedback Saved";
                 endif;
+                if(Yii::$app->request->post("form_type")=="form-settings"):
+                    CustomSettings::deleteAll(['theme_id'=>Yii::$app->request->get("id",Yii::$app->request->post("form_id"))]);
+                
+                    foreach($_POST as $key => $value)
+                        {
+                                if($value<>""):
+                                    $id=md5(date('YmHis').rand(1000,100000));
+                                    $settings_data = new CustomSettings();
+                                    $settings_data->setAttribute("id",$id);
+                                    $settings_data->setAttribute("theme_id",Yii::$app->request->get("id",Yii::$app->request->post("form_id")));
+                                    $settings_data->setAttribute("setting_name",$key);
+                                    $settings_data->setAttribute("setting_value",$value);
+                                    $settings_data->save();
+                                endif;
+                        }
+                    return "Settings Saved";                    
+                endif;
+                
                 if(Yii::$app->request->post("form_type")=="form-twig"):
                         //we add the new
                     $usrname="";

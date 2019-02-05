@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 namespace backend\controllers;
 
@@ -22,6 +39,7 @@ use backend\models\Forms;
 use backend\models\ArticleMedia;
 use backend\models\ArticleDetails;
 use backend\models\Templates;
+use backend\models\Roles;
 
 use fedemotta\datatables\DataTables;
 
@@ -35,6 +53,7 @@ public function actionIndex()
         $page_arr="";
         $index_arr="";
         $page['selected_tags']=[];
+        $perm_arr="";
         
         $page['id'] = Yii::$app->request->get('id',null);
         
@@ -46,6 +65,7 @@ public function actionIndex()
             $page_arr =  yii\helpers\ArrayHelper::getColumn($c, 'category_id');            
             $c = $page['rs']->blogIndex;
             $index_arr =  yii\helpers\ArrayHelper::getColumn($c, 'blog_index_id');
+            $perm_arr = explode(" ",$page['rs']['permissions']);
         }else{
             $page['rs'] = Articles::find()->where(['id' => "0"])->one();
         }
@@ -78,6 +98,8 @@ public function actionIndex()
         $page_map =  yii\helpers\ArrayHelper::map($pages, 'id', 'title');
         $page['feedback'] = \yii\helpers\Html::dropDownList("feedback",$page['rs']['feedback'],$page_map,['prompt'=>'Select a form','class'=>'form-control']);
         
+        
+        
         $pages = Pages::getBlogIndex();
         $page_map =  yii\helpers\ArrayHelper::map($pages, 'id', 'title');
         $page['blog_index'] = \yii\helpers\Html::checkboxList("blog_index",$index_arr,$page_map);
@@ -88,6 +110,9 @@ public function actionIndex()
         $child_blog_render= Templates::find()->where(['parent_id'=>$brender[0]['id']])->all();
         $render_map =  yii\helpers\ArrayHelper::map($child_blog_render, 'id', 'name');
         $page['renderer'] = \yii\helpers\Html::dropDownList("render_template",$page['rs']['render_template'],array_merge($blog_map,$render_map),['class'=>'form-control']);
+        $pages = Roles::find()->orderBy('name')->all();
+        $page_map =  yii\helpers\ArrayHelper::map($pages, 'id', 'name');
+        $page['permissions'] = \yii\helpers\Html::checkboxList("permissions",$perm_arr,$page_map);
         return $this->render('index',$page);        
     }
 
@@ -163,8 +188,7 @@ public function actionCategory(){
         return $this->render('category',$page);        
     }
 
-public function actionSaveCategory(){
- 
+public function actionSaveCategory(){ 
     if(Yii::$app->request->post("processor")=="true"){            
             echo ArticlesCategories::saveEventsCategory();                        
     }

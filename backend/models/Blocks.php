@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 namespace backend\models;
 use Yii;
@@ -18,6 +35,15 @@ class Blocks extends \yii\db\ActiveRecord
     
     public static function saveBlocks(){
         $records = Blocks::find()->where(['id'=>Yii::$app->request->post('id')])->one();
+        $permissions = Yii::$app->request->post("permissions");
+        $perm_val="";
+            if(!empty($permissions)){
+               $counter=0;
+                // Loop to store and display values of individual checked checkbox.
+                foreach($permissions as $selected){                    
+                    $perm_val = $perm_val." ".$selected;       
+                }
+            }
         if($records !=null){ 
             $records->setAttribute('title',Yii::$app->request->post("title"));
             $records->setAttribute('name',Yii::$app->request->post("name"));
@@ -28,7 +54,10 @@ class Blocks extends \yii\db\ActiveRecord
             $records->setAttribute('title_level',Yii::$app->request->post("title_level"));
             $records->setAttribute('published',Yii::$app->request->post("published"));
             $records->setAttribute('editable',Yii::$app->request->post("editable"));
+            $records->setAttribute('permissions',$perm_val);
             $records->setAttribute('master_content','1');
+            $records->setAttribute('require_login',Yii::$app->request->post("require_login"));
+            $records->setAttribute('widget',Yii::$app->request->post("widget"));
             $records->save();
             $id = Yii::$app->request->post('id');
             BlockPage::deleteAll(['block_id'=>$id]);            
@@ -52,6 +81,7 @@ class Blocks extends \yii\db\ActiveRecord
                 
             }
             
+            
             return "Updates successfully made";
         }else{           
            $id = md5(date('Ymdis'));
@@ -67,6 +97,9 @@ class Blocks extends \yii\db\ActiveRecord
             $records->setAttribute('published',Yii::$app->request->post("published"));
             $records->setAttribute('editable',Yii::$app->request->post("editable"));
             $records->setAttribute('master_content','1');
+            $records->setAttribute('permissions',$perm_val);
+            $records->setAttribute('require_login',Yii::$app->request->post("require_login"));
+            $records->setAttribute('widget',Yii::$app->request->post("widget"));
             $records->save();
            
      
@@ -99,5 +132,7 @@ class Blocks extends \yii\db\ActiveRecord
     public function getBlockPages(){
         return BlockPage::find()->where(['block_id'=>$this->id])->all();
     }
+    
+    
 
 }

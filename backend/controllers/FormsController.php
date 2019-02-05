@@ -1,8 +1,25 @@
 <?php
-/*
+/* 
  * Author : Peter Odon
- * Author : peter@audmaster.com
- * Each line should be prefixed with  * 
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 namespace backend\controllers;
@@ -84,6 +101,8 @@ class FormsController extends Controller{
         $widget = CustomWidget::find()->orderBy('name')->all();
         $page['widgets'] = ArrayHelper::map($widget, 'id', 'title');
         
+        
+        
         return $this->render('index',$page);
     }
     
@@ -144,12 +163,23 @@ class FormsController extends Controller{
             endif;
     }
     public function actionSaveWidget(){
+            $permissions = Yii::$app->request->post("permissions");
+            $perm_val="";
+            if(!empty($permissions)){
+               $counter=0;
+                // Loop to store and display values of individual checked checkbox.
+                foreach($permissions as $selected){                    
+                    $perm_val = $perm_val." ".$selected;       
+                }
+            }
             $model = CustomWidget::findOne(Yii::$app->request->post("id"));
             if($model!=null):
                 $model->attributes = Yii::$app->request->post();
                 $model->setAttribute('title',Yii::$app->request->post('title'));
                 $model->setAttribute('name',Yii::$app->request->post('name'));
                 $model->setAttribute('form_id',Yii::$app->request->post('form_id'));
+                $model->setAttribute('permissions',$perm_val);
+                $model->setAttribute('require_login',Yii::$app->request->post("require_login"));
                 $model->save();
                 return "Form successfully updated";
             else:
@@ -160,6 +190,8 @@ class FormsController extends Controller{
                 $forms->setAttribute('form_id',Yii::$app->request->post('form_id'));
                 $forms->setAttribute('title',Yii::$app->request->post('title'));
                 $forms->setAttribute('name',Yii::$app->request->post('name'));
+                $forms->setAttribute('permissions',$perm_val);
+                $forms->setAttribute('require_login',Yii::$app->request->post("require_login"));
                 $forms->save();
                 return "New widget created";
             endif;
@@ -222,6 +254,8 @@ class FormsController extends Controller{
     }
     public function actionFwidgets(){
         $page=[];
+        $page_arr="";
+        $perm_arr="";
         $template_list = Themes::find()->orderBy('name')->all();
         $tag_map =  yii\helpers\ArrayHelper::map($template_list, 'id', 'name');        
         if(Yii::$app->request->get("reload")=="true"):
@@ -240,6 +274,7 @@ class FormsController extends Controller{
         
         if($page['id']!=null):
                 $page['rs'] = CustomWidget::find()->where(['id' => $page['id']])->one();
+                $perm_arr = explode(" ",$page['rs']['permissions']);
             else:
                 $page['rs'] = CustomWidget::find()->where(['id' => "0"])->one();
         endif;
@@ -247,6 +282,9 @@ class FormsController extends Controller{
         $page['forms'] = \yii\helpers\Html::dropDownList("form_id",$page['rs']['form_id'],$form_map,['prompt'=>'N/A','class'=>'form-control']);
         $page['widget_list']=CustomWidget::find()->all();
         
+        $pages = Roles::find()->orderBy('name')->all();
+        $page_map =  yii\helpers\ArrayHelper::map($pages, 'id', 'name');
+        $page['permissions'] = \yii\helpers\Html::checkboxList("permissions",$perm_arr,$page_map);
         return $this->render('frontend-widgets',$page);
     }
     public function actionFetchTwigTheme(){

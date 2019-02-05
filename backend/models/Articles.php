@@ -1,9 +1,26 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 namespace backend\models;
 
@@ -14,6 +31,7 @@ use backend\models\ArticlesBlogIndex;
 use backend\models\ArticlesCategoryRelated;
 use backend\models\ArticlesTag;
 use common\models\ArticleDetails;
+use backend\models\Feedback;
 
 class Articles extends \yii\db\ActiveRecord
 {
@@ -54,8 +72,9 @@ class Articles extends \yii\db\ActiveRecord
     public function getThumbnail(){
         return $this->hasOne(Media::className(),['id'=>'thumbnail_image_id']);
     }
-    public function getFeedback(){
-        return $this->hasMany(Feedback::className(),['target_id'=>'id'])->where(['feedback_type'=>'articles']);
+    public function getFeedbacks(){
+        return $this->hasMany(Feedback::className(),['target_id'=>'id'])->where(['feedback_type'=>'articles']);       
+        
     }
     
     public function getAuthor(){
@@ -137,7 +156,10 @@ class Articles extends \yii\db\ActiveRecord
       
   }
   public function getApprovedComments(){
-      return $this->hasMany(Comments::className(),['target_id'=>'id'])->where(['status'=>'Y']);
+      return $this->hasMany(Comments::className(),['target_id'=>'id'])->where(['status'=>'Y'])->orderBy('parent_id');
+  }
+  public function getComments(){
+      return $this->hasMany(Comments::className(),['target_id'=>'id']);
   }
   public function getArticleCategories(){
       
@@ -159,6 +181,15 @@ class Articles extends \yii\db\ActiveRecord
         }else{
             $published_by_stat='0';
         }
+        $permissions = Yii::$app->request->post("permissions");
+            $perm_val="";
+            if(!empty($permissions)){
+               $counter=0;
+                // Loop to store and display values of individual checked checkbox.
+                foreach($permissions as $selected){                    
+                    $perm_val = $perm_val." ".$selected;       
+                }
+            }
         
         if($model!=null && $save_as_new==""){         
            $id = Yii::$app->request->post('id');
@@ -181,6 +212,8 @@ class Articles extends \yii\db\ActiveRecord
            $model->setAttribute('require_login',Yii::$app->request->post("require_login"));
            $model->setAttribute('disable_comments',Yii::$app->request->post("disable_comments"));    
            $model->setAttribute('render_template',Yii::$app->request->post("render_template"));
+           $model->setAttribute('sort_order',Yii::$app->request->post("sort_order"));
+           $model->setAttribute('permissions',$perm_val);
            $model->save();          
             
             
@@ -272,6 +305,8 @@ class Articles extends \yii\db\ActiveRecord
            $model->setAttribute('disable_comments',Yii::$app->request->post("disable_comments"));
            $model->setAttribute('render_template',Yii::$app->request->post("render_template"));
            $model->setAttribute('archive',$archive);
+           $model->setAttribute('sort_order',Yii::$app->request->post("sort_order"));
+           $model->setAttribute('permissions',$perm_val);
            $model->save();          
            
            
@@ -335,7 +370,7 @@ class Articles extends \yii\db\ActiveRecord
      protected function getCategories(){        
         return ArticlesCategoryRelated::find()->where(['articles_id'=>$this->id])->all();
      }
-     protected function getBlogIndex(){         
+     public function getBlogIndex(){         
         return ArticlesBlogIndex::find()->where(['articles_id'=>$this->id])->all();
      }
      

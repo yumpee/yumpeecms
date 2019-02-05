@@ -21,7 +21,7 @@ $fieldOptions2 = [
 <img src="images/logo.png"></img>
 <div class="login-box">
     <div class="login-logo">
-        <a href="#">Yumpee CMS Admin</a>
+        <a href="#">YumpeeCMS Admin</a>
     </div>
     <!-- /.login-logo -->
     <div class="login-box-body">

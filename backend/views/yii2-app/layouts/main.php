@@ -3,6 +3,47 @@ use yii\helpers\Html;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
+$skin="skin-blue";
+if(Yii::$app->user<>null):
+switch(Yii::$app->user->identity->extension):
+  case "1":
+      $skin="skin-red-light";
+  break;
+  case "2":
+      $skin="skin-yellow-light";
+  break;
+   case "3":
+      $skin="skin-green-light";
+  break;
+  case "4":
+      $skin="skin-blue-light";
+  break;
+case "5":
+      $skin="skin-purple-light";
+  break;
+  case "6":
+      $skin="skin-black-light";
+  break;
+case "7":
+      $skin="skin-red";
+  break;
+  case "8":
+      $skin="skin-yellow";
+  break;
+case "9":
+      $skin="skin-green";
+  break;
+  case "10":
+      $skin="skin-blue";
+  break;
+case "11":
+      $skin="skin-purple";
+  break;
+  case "12":
+      $skin="skin-black";
+  break;
+endswitch;
+endif;
 
 $this->title='Yumpee CMS';
 if (Yii::$app->controller->action->id === 'login') { 
@@ -36,7 +77,7 @@ if (Yii::$app->controller->action->id === 'login') {
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
     </head>
-    <body class="hold-transition skin-blue sidebar-mini">
+    <body class="hold-transition <?=$skin?> sidebar-mini">
     <?php $this->beginBody() ?>
         <?php
         if(Yii::$app->request->get('exempt_the_headers_in_yumpee')=="true"):

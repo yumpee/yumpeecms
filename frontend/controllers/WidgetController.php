@@ -1,8 +1,25 @@
 <?php
 /* 
  * Author : Peter Odon
- * Author : peter@audmaster.com
- * Each line should be prefixed with  * 
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 namespace frontend\controllers;
 
@@ -26,18 +43,21 @@ use backend\models\Subscriptions;
 use backend\models\Comments;
 use backend\models\Settings;
 use frontend\models\Templates;
-use backend\models\TemplateWidget;
+use frontend\models\TemplateWidget;
 use backend\models\Slider;
 use frontend\models\Blocks;
 use backend\models\Forms;
 use frontend\models\FormSubmit;
 use frontend\models\FormData;
-use backend\models\CustomWidget;
+use frontend\models\CustomWidget;
 use backend\models\RatingProfile;
-use backend\models\Widgets;
+use frontend\models\Widgets;
 use backend\models\Gallery;
 use backend\models\GalleryImage;
 use backend\models\Language;
+use backend\models\Feedback;
+use backend\models\FeedbackDetails;
+
 use yii\db\Expression;
 
 class WidgetController extends Controller{
@@ -129,7 +149,18 @@ class WidgetController extends Controller{
                         $page['articles'] = Articles::find()->where(['<>','url',Yii::$app->request->get('page_id')])->andWhere(['published'=>'1'])->limit($settings->widget_limit)->all();
                         $page['title'] = $settings->widget_title;
                 endif;
-            break;            
+            break;   
+            case 'widget_breadcrumbs':
+                if(Yii::$app->request->get('limit')!=null):
+                    $limit = Yii::$app->request->get('limit');
+                    //in this case the limit will be the current label of the calling page
+                    $page['current_page'] = $limit;
+                    $page['breadcrumbs'] = ContentBuilder::getBreadCrumbTrail(Yii::$app->request->get('page_id'));
+                else:
+                    $page['current_page']="";
+                    $page['breadcrumbs'] = ContentBuilder::getBreadCrumbTrail(Yii::$app->request->get('page_id'));
+                endif;
+            break;
         
             case 'widget_feature_page':                
                 if(Yii::$app->request->get('limit')!=null): //assuming its a call from the web page
@@ -515,7 +546,7 @@ class WidgetController extends Controller{
                 return $twig->render($codebase['filename'],$page);                 
             endif;
         endif;
-		$page['settings'] = new Settings();
+        $page['settings'] = new Settings();
         return $this->renderPartial(ThemeManager::getWidget('@frontend/themes/'.ContentBuilder::getThemeFolder().'/widgets/'.$called_widget,$called_widget),$page);
         
     } 
@@ -538,6 +569,7 @@ class WidgetController extends Controller{
         $comment = new Comments();
         $comment->setAttribute('target_id',$target->id);
         $comment->setAttribute('comment_type','article');
+        $parent_id = Yii::$app->request->get("parent_id","0");
         if(Yii::$app->user->identity!=null):
             $comment->setAttribute('author',Yii::$app->user->identity->username);
         endif;
@@ -545,6 +577,7 @@ class WidgetController extends Controller{
         $comment->setAttribute('commentor',Html::encode(Yii::$app->request->get("name")));
         $comment->setAttribute('comment',Html::encode(Yii::$app->request->get("comments")));
         $comment->setAttribute('date_commented',date("Y-m-d H:i:s"));
+        $comment->setAttribute('parent_id',$parent_id);
         
         if(ContentBuilder::getSetting("auto_approve_comments")=="on"):
             $comment->setAttribute('status','Y');
@@ -554,12 +587,57 @@ class WidgetController extends Controller{
         $comment->setAttribute('ip_address',Yii::$app->request->getUserIP());
         $comment->setAttribute('email',Html::encode(Yii::$app->request->get("email")));
         $comment->setAttribute('website',Html::encode(Yii::$app->request->get("website")));
-        $comment->save();
+        $comment->save(false);
         return "Your comment has been successfully submitted";
         
     }
     public function actionContact(){
         //send to email here
+        $from_email="";
+        $to_email="";
+        $subject="";
+        if(Yii::$app->request->get("name")==""):
+            return "The name field is empty";
+        endif;
+        if(Yii::$app->request->get("comments")==""):
+            return "The message field is empty";
+        endif;
+        $message="Sender Name : ".Yii::$app->request->get("name")."<br>Sender Email : ".Yii::$app->request->get("email")."<br>Message :".Yii::$app->request->get("comments");
+        if(ContentBuilder::getSetting("contact_us_email")!="" && ContentBuilder::getSetting("smtp_sender_email")!=""):
+        Yii::$app->mailer->compose()
+            ->setFrom(ContentBuilder::getSetting("smtp_sender_email"))
+            ->setTo(ContentBuilder::getSetting("contact_us_email"))
+            ->setSubject(Yii::$app->request->get("subject"))
+            ->setHtmlBody($message)
+            ->send();
+        endif;
+        $f = new Feedback();
+        $id=md5(date("YmdHis").rand(10000,1000000));
+        $f->setAttribute("id",$id);
+        $f->setAttribute("feedback_type","contact");
+        $f->setAttribute("date_submitted",date("Y-m-d H:i:s"));
+        $f->setAttribute("ip_address",Yii::$app->request->getUserIP());
+        if(!Yii::$app->user->isGuest):
+            $f->setAttribute("usrname",Yii::$app->user->identity->usrname); 
+        endif;
+        $f->setAttribute("form_id","0");
+        $f->save(false);
+        //create the contact details in the feedback table
+        foreach($_GET as $key => $value)
+               {
+                        if($value<>""):                                    
+                                    $feedback_data = new FeedbackDetails();
+                                    $feedback_data->setAttribute("feedback_id",$id);
+                                    $feedback_data->setAttribute("param",$key);
+                                    $feedback_data->setAttribute("param_val",$value);
+                                    $feedback_data->save();
+                          endif;
+                }
+                    $feedback_data = new FeedbackDetails();
+                                    $feedback_data->setAttribute("feedback_id",$id);
+                                    $feedback_data->setAttribute("param","mark_as_read");
+                                    $feedback_data->setAttribute("param_val","N");
+                                    $feedback_data->save();
         
         return "Thanks for contacting us. Someone will contact you shortly";
     }

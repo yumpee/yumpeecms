@@ -1,10 +1,28 @@
 <?php
-$this->title = 'Pages';
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
+$this->title = 'Pages';
+
 use backend\models\Pages;
 use backend\models\Templates;
 
@@ -175,20 +193,25 @@ endif;
         <tr><td>Menu Title<td><input name="menu_title" id="menu_title" value="<?=$rs['menu_title']?>" class="form-control"type="text" />
         <tr><td>Breadcrumb Title<td><input name="breadcrumb_title" id="breadcrumb_title" value="<?=$rs['breadcrumb_title']?>" class="form-control"type="text" />
         <tr><td>Meta Description<td><textarea name="meta_description" id="meta_description" class="form-control"rows="7" cols="40"><?=$rs['meta_description']?></textarea>
+        <tr><td>Hero Header<td><textarea name="alternate_header_content" id="alternate_header_content" class="form-control"rows="7" cols="40"><?=$rs['alternate_header_content']?></textarea>        
         <tr><td>Template<td><?=$template?>
+        <tr><td>Include Header<td><?=$show_header_image?></td>  
+        <tr><td>Include Footer<td><?=$show_footer_image?></td>
         <tr><td>Select Form (Form templates only)<td><?=$forms?>
         <tr><td>List for Role (Users Index only)<td><?=$roles?>
         <tr><td>Role Renderer (Users Index only)<td><?=$renderer?>
         <tr><td>Sort Order<td><input name="sort_order" id="sort_order" value="<?=$rs['sort_order']?>" class="form-control"type="text" />
         <tr><td><td><input type="checkbox" /> Editable
         <tr><td>Show in main Menu</td><td><?=$rs['show_in_menu']?></td>
+        <tr><td>Published<td><?=$published?>
         <tr><td>URL<td><input name="url" id="url" value="<?=$rs['url']?>" class="form-control"type="text" />
-        <tr><td>Meta Robots<td><input name="robots" id="robots" value="<?=$rs['robots']?>" class="form-control"type="text" />
+        <tr><td>Meta keywords<td><input name="robots" id="robots" value="<?=$rs['robots']?>" class="form-control"type="text" />
         <tr><td>Parent Page<td><?=$parent_id?>
         <tr><td>Layout<td><?=$layout?>
         <tr><td>CSS Profile<td><?=$css?>
         <tr><td>Menu Profile<td><?=$menu_profile?>
         <tr><td>Require Login to view<td><?=\yii\helpers\Html::dropDownList("require_login",$rs['require_login'],['N'=>'No','Y'=>'Yes'],['class'=>'form-control'])?></td>
+        <tr><td>Role Permission<td><?=$permissions?>    
         <tr><td>Hide on Login<td><?=\yii\helpers\Html::dropDownList("hideon_login",$rs['hideon_login'],['N'=>'No','Y'=>'Yes'],['class'=>'form-control'])?></td>
         <tr><td colspan='2'><hr /></td>
         <tr class='addons' style="display:none"><td>Tag to display (<b>for 'tags page' templates only</b>)<td><?=$tags?>
@@ -220,6 +243,11 @@ endif;
                 else:
                     $published="No";
                 endif;
+                if($record['require_login']=="Y"):
+                    $lock="<sup><font color='red'><span class='fa fa-lock'></span></font></sup>";
+                else:
+                    $lock="";
+                endif;
                 if($record['show_in_menu']):
                     $show_in_menu="Yes";
                 else:
@@ -240,7 +268,7 @@ endif;
                         $display_image_path=$record->displayImage->path;
                 endif;
     ?>
-    <tr id="tr<?=$record["id"]?>"><td><img src="<?=$image_home?>/<?=$display_image_path?>" width='40' class="thumbnail"></img><td><?=$record['title']?><td><?=$record['menu_title']?><td><?=$template?><td><?=$record['url']?><td><?=$parent_name?><td><?=$published?><td><?=$show_in_menu?><td><?=$master_content?><td><?=$record['sort_order']?><td><a href='?actions=edit&id=<?=$record['id']?>&r=pages/index'><small><i class="glyphicon glyphicon-pencil"></i></small></a>  <a href="#" onClick="javascript:window.open('<?=$home_url['setting_value']."/".$record['url']?>','_blank')" title="Preview" id='<?=$rec['id']?>' class="preview_event"><small><i class="fa fa-eye"></i></small></a> <a href='#' class='delete_event' id='<?=$record['id']?>' event_name='<?=$record['title']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a></td>
+    <tr id="tr<?=$record["id"]?>"><td><img src="<?=$image_home?>/<?=$display_image_path?>" width='80' class="thumbnail"></img><td><?=$record['title']?><?=$lock?><td><?=$record['menu_title']?><td><?=$template?><td><?=$record['url']?><td><?=$parent_name?><td><?=$published?><td><?=$show_in_menu?><td><?=$master_content?><td><?=$record['sort_order']?><td><a href='?actions=edit&id=<?=$record['id']?>&r=pages/index'><small><i class="glyphicon glyphicon-pencil"></i></small></a>  <a href="#" onClick="javascript:window.open('<?=$home_url['setting_value']."/".$record['url']?>','_blank')" title="Preview" id='<?=$rec['id']?>' class="preview_event"><small><i class="fa fa-eye"></i></small></a> <a href='#' class='delete_event' id='<?=$record['id']?>' event_name='<?=$record['title']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a></td>
 <?php
         endforeach; 
 ?>

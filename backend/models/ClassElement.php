@@ -2,8 +2,25 @@
 
 /* 
  * Author : Peter Odon
- * Author : peter@audmaster.com
- * Each line should be prefixed with  * 
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 
@@ -32,7 +49,9 @@ class ClassElement extends \yii\db\ActiveRecord
     public function getDisplayImage(){
         //this gets the Display object array from the Media class
         return $this->hasOne(Media::className(),['id'=>'display_image_id']);
-        
+    }
+    public function getSetup(){
+        return $this->hasOne(ClassSetup::className(),['id'=>'class_id']);
     }
     
 }

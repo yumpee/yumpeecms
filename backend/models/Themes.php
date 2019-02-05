@@ -1,11 +1,27 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/* 
+ * Author : Peter Odon
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
 
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ */
 namespace backend\models;
 
 /**
@@ -14,7 +30,7 @@ namespace backend\models;
  * @author Peter
  */
 use backend\models\Settings;
-
+use Yii;
 class Themes extends \yii\db\ActiveRecord{
     //put your code here
     public static function tableName()
@@ -50,7 +66,7 @@ class Themes extends \yii\db\ActiveRecord{
         ];
     }
     public function getCurrentTheme(){
-        //this returns the current theme from the Settings Model class
+        
          $theme = Settings::findOne(['setting_name'=>'current_theme']);
          if($theme['setting_value']!=null):
              return $theme['setting_value'];
@@ -58,6 +74,15 @@ class Themes extends \yii\db\ActiveRecord{
              return '0';
          endif;
          
+    }
+    public function getHasContents(){
+        $renderer = $this->id."_".$this->folder;
+        return $this->hasOne(Twig::className(),['theme_id'=>'id'])->andWhere('renderer="'.$renderer.'"');
+        if(Yii::$app->request->get("reload")=="true"):
+            return $this->hasOne(Twig::className(),['theme_id'=>'id'])->andWhere('renderer="'.$renderer.'"');
+        else:
+            return $this->hasOne(Twig::className(),['renderer'=>'name'])->andWhere('theme_id="'.\frontend\components\ContentBuilder::getSetting("current_theme").'"');;
+        endif;
     }
     
 }

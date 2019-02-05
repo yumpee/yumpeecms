@@ -2,8 +2,25 @@
 
 /* 
  * Author : Peter Odon
- * Author : peter@audmaster.com
- * Each line should be prefixed with  * 
+ * Email : peter@audmaster.com
+ * Project Site : http://www.yumpeecms.com
+
+
+ * YumpeeCMS is a Content Management and Application Development Framework.
+ *  Copyright (C) 2018  Audmaster Technologies, Australia
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
  */
 
 namespace backend\controllers;
@@ -15,30 +32,49 @@ use yii\filters\AccessControl;
 use backend\models\Widgets;
 use backend\models\Themes;
 use backend\models\Twig;
+use backend\models\Roles;
 use yii\Helpers\ArrayHelper;
 
 class WidgetsController extends Controller{
 
     public function actionIndex(){
         $page['id']= Yii::$app->request->get('id',null);
+        $perm_arr="";
+        
+        
         if($page['id']!=null):
                 $page['rs'] = Widgets::find()->where(['id' => $page['id']])->one();
+                $perm_arr = explode(" ",$page['rs']['permissions']);
             else:
                 $page['rs'] = new Widgets();
         endif;
         $widget_list = Widgets::find()->where(['parent_id'=>'0'])->orderBy('name')->all();
         $page['widget_list'] = ArrayHelper::map($widget_list, 'id', 'name');
+        $pages = Roles::find()->orderBy('name')->all();
+        $page_map =  yii\helpers\ArrayHelper::map($pages, 'id', 'name');
+        $page['permissions'] = \yii\helpers\Html::checkboxList("permissions",$perm_arr,$page_map);
         
         $page['records'] = Widgets::find()->orderBy('name')->all();
         return $this->render('index',$page);
     }
     
     public function actionSave(){
+            $permissions = Yii::$app->request->post("permissions");
+            $perm_val="";
+            if(!empty($permissions)){
+               $counter=0;
+                // Loop to store and display values of individual checked checkbox.
+                foreach($permissions as $selected){                    
+                    $perm_val = $perm_val." ".$selected;       
+                }
+            }
             $model = Widgets::findOne(Yii::$app->request->post("id"));
             if($model!=null):
                 $model->attributes = Yii::$app->request->post();
                 $model->setting_value="";
-                $model->parent_id = Yii::$app->request->post("parent_id");     
+                $model->parent_id = Yii::$app->request->post("parent_id");   
+                $model->permissions=$perm_val;
+                $model->require_login = Yii::$app->request->post("require_login");
                 $model->save();
                 return "Widget successfully updated";
             else:
@@ -49,6 +85,8 @@ class WidgetsController extends Controller{
                 $widgets->template_type='C';
                 $widgets->name = Yii::$app->request->post("name");
                 $widgets->short_name = Yii::$app->request->post("short_name");
+                $widgets->permissions=$perm_val;
+                $widgets->require_login = Yii::$app->request->post("require_login");
                 $widgets->save();
                 return "New widget created";
             endif;
