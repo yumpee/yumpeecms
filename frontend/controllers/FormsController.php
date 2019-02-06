@@ -55,12 +55,42 @@ use frontend\models\ProfileDetails;
 use frontend\models\UserProfileFiles;
 use frontend\models\FeedbackFiles;
 use frontend\models\WebHook;
+use frontend\models\Domains;
 
 use yii\helpers\FileHelper;
 use yii\db\Expression;
 
 class FormsController extends Controller{
     
+	public static function allowedDomains()
+{
+	if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
+		return Domains::find()->select('domain_url')->column();
+	endif;
+    
+}
+
+/**
+ * @inheritdoc
+ */
+public function behaviors()
+{
+    return array_merge(parent::behaviors(), [
+
+        // For cross-domain AJAX request
+        'corsFilter'  => [
+            'class' => \yii\filters\Cors::className(),
+            'cors'  => [
+                // restrict access to domains:
+                'Origin'                           => static::allowedDomains(),
+                'Access-Control-Request-Method'    => ['POST','GET'],
+                'Access-Control-Allow-Credentials' => false,
+                'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+            ],
+        ],
+
+    ]);
+}
     /*This class is used to display custom forms, its data and its search results    
      * actionDisplay method is used to render forms whether they be twig, profile, user profile and feedback forms
      * actionView is used to display the summary and details view of the forms

@@ -38,14 +38,44 @@ use frontend\models\FormFiles;
 use frontend\models\Feedback;
 use frontend\models\FeedbackDetails;
 use frontend\models\Users;
+use frontend\models\Domains;
 
 class HookController extends Controller{
+    
     /*
      * This class is used to interract with different aspect of Yumpee once a form has been submitted or a process has been completed
      */
     /**
      * @inheritdoc
      */
+    public static function allowedDomains()
+{
+    if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
+		return Domains::find()->select('domain_url')->column();
+	endif;
+}
+
+/**
+ * @inheritdoc
+ */
+public function behaviors()
+{
+    return array_merge(parent::behaviors(), [
+
+        // For cross-domain AJAX request
+        'corsFilter'  => [
+            'class' => \yii\filters\Cors::className(),
+            'cors'  => [
+                // restrict access to domains:
+                'Origin'                           => static::allowedDomains(),
+                'Access-Control-Request-Method'    => ['POST','GET'],
+                'Access-Control-Allow-Credentials' => false,
+                'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+            ],
+        ],
+
+    ]);
+}
     public function actions()
     {
         return [

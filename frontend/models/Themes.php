@@ -32,6 +32,7 @@ namespace frontend\models;
 use common\components\GUIBehavior;
 use backend\models\Settings;
 use frontend\components\ContentBuilder;
+use frontend\models\Domains;
 use Yii;
 
 
@@ -63,7 +64,7 @@ class Themes extends \backend\models\Themes{
             $curr_domain = Yii::$app->request->hostInfo;
             $theme_id=null;
             if(strpos($install_domain, $curr_domain)===false):
-                $sub_domain = Domains::find()->where(['domain_url'=>$curr_domain])->one();
+                $sub_domain = \frontend\models\Domains::find()->where(['domain_url'=>$curr_domain])->one();
                 if($sub_domain!=null):
                     $theme_id = $sub_domain->theme_id;
                 endif;

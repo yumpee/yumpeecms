@@ -36,9 +36,38 @@ use frontend\models\Templates;
 use backend\models\Pages;
 use common\models\LoginForm;
 use common\models\User;
+use frontend\models\Domains;
 
 class AccountsController extends Controller{
     //put your code here
+public static function allowedDomains()
+{
+    if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
+		return Domains::find()->select('domain_url')->column();
+	endif;
+}
+
+/**
+ * @inheritdoc
+ */
+public function behaviors()
+{
+    return array_merge(parent::behaviors(), [
+
+        // For cross-domain AJAX request
+        'corsFilter'  => [
+            'class' => \yii\filters\Cors::className(),
+            'cors'  => [
+                // restrict access to domains:
+                'Origin'                           => static::allowedDomains(),
+                'Access-Control-Request-Method'    => ['POST','GET'],
+                'Access-Control-Allow-Credentials' => false,
+                'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+            ],
+        ],
+
+    ]);
+}
     public function actionIndex(){
         $page =[];
         
