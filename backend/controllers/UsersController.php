@@ -170,13 +170,26 @@ public function actionDelete(){
 public function actionSaveRole(){
             $model = Roles::findOne(Yii::$app->request->post("role_id"));
             if($model!=null):
+                if(Yii::$app->request->post("menu_id")==null):
+                    $menu_id=0;
+                else:
+                    $menu_id = Yii::$app->request->post("menu_id");
+                endif;
                 $model->attributes = Yii::$app->request->post();
+                $model->setAttribute('menu_id',$menu_id);
                 $model->save();
                 return "Roles successfully updated";
             else:
+                
+                if(Yii::$app->request->post("menu_id")==null):
+                    $menu_id=0;
+                else:
+                    $menu_id = Yii::$app->request->post("menu_id");
+                endif;
                 $themes =  new Roles();
                 $themes->attributes = Yii::$app->request->post();
                 $themes->setAttribute('id',substr(md5(date("YmdHis")),30));
+                $themes->setAttribute('menu_id',$menu_id);
                 $themes->save();
                 return "New role created";
             endif;

@@ -193,10 +193,10 @@ endif;
         <tr><td>Menu Title<td><input name="menu_title" id="menu_title" value="<?=$rs['menu_title']?>" class="form-control"type="text" />
         <tr><td>Breadcrumb Title<td><input name="breadcrumb_title" id="breadcrumb_title" value="<?=$rs['breadcrumb_title']?>" class="form-control"type="text" />
         <tr><td>Meta Description<td><textarea name="meta_description" id="meta_description" class="form-control"rows="7" cols="40"><?=$rs['meta_description']?></textarea>
-        <tr><td>Hero Header<td><textarea name="alternate_header_content" id="alternate_header_content" class="form-control"rows="7" cols="40"><?=$rs['alternate_header_content']?></textarea>        
-        <tr><td>Template<td><?=$template?>
+        <tr><td>Hero Header<td><textarea name="alternate_header_content" id="alternate_header_content" class="form-control"rows="7" cols="40"><?=$rs['alternate_header_content']?></textarea>                
         <tr><td>Include Header<td><?=$show_header_image?></td>  
         <tr><td>Include Footer<td><?=$show_footer_image?></td>
+        <tr><td>Template<td><?=$template?>
         <tr><td>Select Form (Form templates only)<td><?=$forms?>
         <tr><td>List for Role (Users Index only)<td><?=$roles?>
         <tr><td>Role Renderer (Users Index only)<td><?=$renderer?>

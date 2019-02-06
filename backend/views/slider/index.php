@@ -159,7 +159,7 @@ EOT_JS
     <table class="table">
         <tr><td width="30%">Slider Name<td><input name="name" id="name" value="<?=$rs['name']?>" class="form-control" type="text" />
         <tr><td width="30%">Title<td><input name="title" id="title" value="<?=$rs['title']?>" class="form-control" type="text" />
-        <tr><td>Transition Type<td><?= \yii\helpers\Html::dropDownList("transition_type",$rs['transition_type'],['M'=>'Manual','A'=>'Automatic'])?>
+        <tr><td>Transition Type<td><?= \yii\helpers\Html::dropDownList("transition_type",$rs['transition_type'],['M'=>'Manual','A'=>'Automatic'],['class'=>'form-control'])?>
         <tr><td>Transition Duration (in seconds)<td><input name="duration" id="name" value="<?=$rs['duration']?>" class="form-control" type="text" /></td>
         <tr><td>Default Height<td><input name="default_height" id="name" value="<?=$rs['default_height']?>" class="form-control" type="text" /></td>
         <tr><td>Default Width<td><input name="default_width" id="name" value="<?=$rs['default_width']?>" class="form-control" type="text" /></td>

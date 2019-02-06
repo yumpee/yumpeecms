@@ -141,7 +141,10 @@ endif;
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<?=Yii::getAlias("@image_dir")?>/<?=$display_image_path?>" class="user-image" alt="User Image"/>
+                        <?php
+                        if($display_image_path<>""):?>
+                            <img src="<?=Yii::getAlias("@image_dir")?>/<?=$display_image_path?>" class="user-image" alt=""/>
+                        <?php endif;?>
                         <span class="hidden-xs"><?=Yii::$app->user->identity->first_name." ".Yii::$app->user->identity->last_name?></span>
                     </a>
                     <ul class="dropdown-menu">

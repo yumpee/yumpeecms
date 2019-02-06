@@ -156,7 +156,7 @@ EOT_JS
         <tr><td>Category Name<td><input name="name" id="name" value="<?=$rs_category['name']?>" class="form-control" type="text" />
         <tr><td>Description<td><input name="description" id="email" value="<?=$rs_category['description']?>" class="form-control" type="text" />
                
-        <tr><td colspan="2"><button type="submit" id="btnSubmitCategory" class="btn btn-success">Save</button> <button type="button" id="btnNewCategory" class="btn btn-primary">New</button> <input type="hidden" name="id" value="<?=$cat_id?>" />
+        <tr><td colspan="2"><button type="submit" id="btnSubmitCategory" class="btn btn-success">Save</button> <button type="button" id="btnNewCategory" class="btn btn-primary">New</button> <input type="hidden" name="id" id="cat_id" value="<?=$cat_id?>" />
             
             </td>
         

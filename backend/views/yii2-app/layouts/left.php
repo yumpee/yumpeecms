@@ -22,7 +22,7 @@ $class_submenus_list=[];
         <!-- Sidebar user panel -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="<?=Yii::getAlias("@image_dir")?>/<?=$display_image_path?>" class="img-circle" alt="User Image"/>
+                <img src="<?=Yii::getAlias("@image_dir")?>/<?=$display_image_path?>" class="img-circle" alt=""/>
             </div>
             <div class="pull-left info">
                 <p><?=Yii::$app->user->identity->first_name?></p>

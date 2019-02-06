@@ -4,7 +4,7 @@ use yii\helpers\Html;
 /* @var $this \yii\web\View */
 /* @var $content string */
 $skin="skin-blue";
-if(Yii::$app->user<>null):
+if(Yii::$app->user->identity<>null):
 switch(Yii::$app->user->identity->extension):
   case "1":
       $skin="skin-red-light";
