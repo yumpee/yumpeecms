@@ -48,7 +48,7 @@ class DomainsController extends Controller{
         $page['setup_list'] = ArrayHelper::map($setup_list, 'id', 'name');
         $tag_map =  yii\helpers\ArrayHelper::map(MenuProfile::find()->all(), 'id', 'name');
         $page['menu_profile'] = \yii\helpers\Html::dropDownList("menu_id",$page['rs']['menu_id'],$tag_map,['prompt'=>'System:Default','class'=>'form-control']);
-        $tag_map =  yii\helpers\ArrayHelper::map(Themes::find()->all(), 'id', 'name');
+        $tag_map =  yii\helpers\ArrayHelper::map(Themes::find()->orderBy('name')->all(), 'id', 'name');
         $page['theme_profile'] = \yii\helpers\Html::dropDownList("theme_id",$page['rs']['theme_id'],$tag_map,['prompt'=>'Select Theme','class'=>'form-control']);
         $page['records'] = Domains::find()->orderBy('name')->all();
         return $this->render('index',$page);

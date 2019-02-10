@@ -52,8 +52,14 @@ $('.delete_custom').click(function (element) {
                             }
                         )
                     }            
-  });          
-  
+  });     
+      
+ $(document).on('click', '#btnNew',
+       function(ev) {   
+        location.href='?r=themes/manage-settings&actions=edit&id={$theme_id}';
+        
+        
+  });  
 EOT_JS
 );         
 ?>
@@ -61,7 +67,7 @@ EOT_JS
 
         <form action="index.php?r=settings/index" method="post" id="frmCustom">
     <table class="table">
-        <tr><td>Setting Name<td><input name="setting_name" id="setting_name" value="<?=$custom_name?>" class="form-control" type="text" />
+        <tr><td>Setting Name<td><input name="setting_name" id="setting_name" value="<?=$custom_rs['setting_name']?>" class="form-control" type="text" />
         <tr><td>Setting Value<td><input name="setting_value" id="setting_value" value="<?=$custom_rs['setting_value']?>" class="form-control" type="text" />
         <tr><td>Description<td><textarea class="form-control" name="description"><?=$custom_rs['description']?></textarea>
         

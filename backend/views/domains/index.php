@@ -41,7 +41,7 @@ $this->registerJs( <<< EOT_JS
   }); 
        $(document).on('click', '#btnNew',
        function(ev) {   
-        location.href='?r=setup/index';
+        location.href='?r=domains/index';
         
         
   }); 
@@ -125,7 +125,7 @@ endif;
                                     $display_image_path=$user->displayImage->path;
                             endif;
       ?>
-        <tr><td><?=$user['name']?></td><td> <?=$user['domain_url']?><td><?=$user['theme']['name']?><td><?=$user['menu']['name']?><td> <a href='?actions=edit&id=<?=$user['id']?>&r=domains/index'><small><i class="glyphicon glyphicon-pencil"></i></small></a>  <a href='#' class='delete_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a>  </td>
+        <tr><td><?=$user['name']?></td><td> <a href="<?=$user['domain_url']?>" target="_blank"><?=$user['domain_url']?></a><td><?=$user['theme']['name']?><td><?=$user['menu']['name']?><td> <a href='?actions=edit&id=<?=$user['id']?>&r=domains/index'><small><i class="glyphicon glyphicon-pencil"></i></small></a>  <a href='#' class='delete_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a>  </td>
      <?php
       endforeach;
      ?>

@@ -36,6 +36,7 @@ class MenusController extends Controller{
 public function actionIndex()
     {
         $page=[];      
+        
         if(Yii::$app->request->get('profile')==null || Yii::$app->request->get('profile')=="0"):
             $page['active_menu'] = Menus::getActiveMenus();
             $page['inactive_menu'] = Menus::getInActiveMenus();
@@ -51,6 +52,7 @@ public function actionIndex()
         else:
             $page['menu_rs'] = MenuProfile::find()->where(['id'=>'0'])->one();
         endif;
+        $page["submenu"] = Yii::$app->request->get("submenu","0");
         return $this->render('index',$page);        
     }
 

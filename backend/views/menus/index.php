@@ -71,6 +71,13 @@ $this->registerJs( <<< EOT_JS
   $("#menu_profile_list" ).change(function() {
   location.href='index.php?r=menus/index&profile=' + $('select[name="menu_profile_list"]').val();
 });
+            
+$(document).on('click', '#btnNew',
+       function(ev) {   
+        location.href='?r=menus/index&submenu=new';
+        
+        
+  }); 
    
 $('.delete_event').click(function (element) {                    
                     var id = $(this).attr('id');
@@ -99,6 +106,9 @@ $('.delete_event').click(function (element) {
 if($("#edit_menu").val()=="edit_menu"){
   $('#menu_tab').trigger('click')        
  }
+if($("#submenu").val()=="new"){
+  $('#menu_tab').trigger('click')        
+ } 
             
 EOT_JS
 ); 
@@ -240,7 +250,7 @@ echo Sortable::widget([
         <tr><td>Menu Name<td><input name="name" id="name" value="<?=$menu_rs['name']?>" class="form-control" type="text" />
         <tr><td>Description<td><textarea name="description" id="description" rows="3" cols="30" class="form-control"><?=$menu_rs['description']?></textarea>  
         
-        <tr><td colspan="2"><button type="submit" id="btnSaveMenu" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="processor" value="true" /><input type="hidden" name="menu_id" value="<?=$menu_rs["id"]?>" />
+        <tr><td colspan="2"><button type="submit" id="btnSaveMenu" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="processor" value="true" /><input type="hidden" name="menu_id" value="<?=$menu_rs["id"]?>" /><input type="hidden" id="submenu" value="<?=$submenu?>" />
             
         </td>
     </table>

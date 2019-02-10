@@ -36,6 +36,8 @@ use backend\models\Themes;
 use backend\models\Articles;
 use backend\models\ArticlesCategories;
 use backend\models\ClassElementAttributes;
+use backend\models\MenuPage;
+use frontend\models\Domains;
 use common\models\FormSubmit;
 class ContentBuilder {
     
@@ -370,8 +372,9 @@ public static function getMenus(){
                 endif;
             endif;            
             if($menu_profile > 0):
+                $page_arr = MenuPage::find()->select('menu_id')->where(['profile'=>$menu_profile])->column();
                 if (Yii::$app->user->isGuest) {
-                    $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
+                    $header_menus = Pages::find()->where(['IN','id',$page_arr])->andWhere('show_in_menu="1"')->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
                     $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
                 }else{
                     $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();

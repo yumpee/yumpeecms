@@ -660,6 +660,7 @@ if(ContentBuilder::getSetting("captcha")=="on"):
     var verifyCallback = function( response ) {
         console.log( 'g-recaptcha-response: ' + response );
         yumpee_captcha_validate(response);
+        
     };
     
 </script>
