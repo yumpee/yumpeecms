@@ -39,6 +39,7 @@ use frontend\models\Feedback;
 use frontend\models\FeedbackDetails;
 use frontend\models\Users;
 use frontend\models\Domains;
+use frontend\components\ContentBuilder;
 
 class HookController extends Controller{
     
