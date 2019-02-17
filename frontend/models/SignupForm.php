@@ -28,6 +28,7 @@ use yii\base\Model;
 use common\models\User;
 use frontend\models\ProfileDetails;
 use frontend\components\ContentBuilder;
+use backend\models\Roles;
 
 /**
  * Signup form
@@ -115,7 +116,9 @@ class SignupForm extends Model
                 endif;
             endforeach;
         endif;     
-        
+        if(Yii::$app->request->post("role_id")!==null && Yii::$app->request->post("role_id")!=""):
+            $role_arr = Roles::find()->where(['id'=>Yii::$app->request->post("role_id")])->andWhere('access_type="F"')->one();
+        endif;
         
         $user->setAttribute('username',Yii::$app->request->post("username"));
         $user->setAttribute('first_name',Yii::$app->request->post("first_name"));
@@ -126,9 +129,13 @@ class SignupForm extends Model
         $user->setAttribute('created_at',time());
         $user->setAttribute('about',Yii::$app->request->post("about"));
         $user->setAttribute('title','');
-        $user->setAttribute('email',Yii::$app->request->post("email"));
+        $user->setAttribute('email',Yii::$app->request->post("email"));        
+        if($role_arr!=null):
+            $user->setAttribute('role_id',$role_arr->id);
+        else:
+            $user->setAttribute('role_id',ContentBuilder::getSetting("registration_role"));
+        endif;
         
-        $user->setAttribute('role_id',ContentBuilder::getSetting("registration_role"));
         $user->setAttribute('status',10);
         return $user->save() ? $user : null; 
         
