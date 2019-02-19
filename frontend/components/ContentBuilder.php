@@ -236,10 +236,14 @@ class ContentBuilder {
             return "";
         endif;
     }
-    public static function getSetting($setting_name){
+    public static function getSetting($setting_name,$theme_id=0){
         if(substr($setting_name,0,1)=="~"):
             $setting_name=substr($setting_name,1);
-            $setting = CustomSettings::find()->where(['setting_name'=>$setting_name])->andWhere('theme_id="'.ContentBuilder::getSetting("current_theme").'"')->one();
+			if($theme_id!=0):
+				$setting = CustomSettings::find()->where(['setting_name'=>$setting_name])->andWhere('theme_id="'.$theme_id.'"')->one();
+			else:
+				$setting = CustomSettings::find()->where(['setting_name'=>$setting_name])->andWhere('theme_id="'.ContentBuilder::getSetting("current_theme").'"')->one();
+			endif;
             if($setting!=null):
                 if($setting_name=="website_home_page"):
                     $page = Pages::find()->where(['url'=>$setting->setting_value])->one();
@@ -249,6 +253,7 @@ class ContentBuilder {
                 endif;
                 return $setting->setting_value;
             endif;
+		
         endif;
                
         
@@ -370,28 +375,30 @@ public static function getMenus(){
                 if($sub_domain!=null):
                     $menu_profile = $sub_domain->menu_id;
                 endif;
-            endif;            
+            endif;    
+            
             if($menu_profile > 0):
                 $page_arr = MenuPage::find()->select('menu_id')->where(['profile'=>$menu_profile])->column();
-                if (Yii::$app->user->isGuest) {
-                    $header_menus = Pages::find()->where(['IN','id',$page_arr])->andWhere('show_in_menu="1"')->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
+                if (Yii::$app->user->isGuest) :
+                    $header_menus = Pages::find()->where(['IN','id',$page_arr])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
                     $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
-                }else{
-                    $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
+                else:
+                    $header_menus = Pages::find()->where(['IN','id',$page_arr])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
                     $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('menu_profile="'.$menu_profile.'"')->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
-                }
+                endif;
                 $return["header_menus"] = $header_menus;
                 $return["footer_menus"] = $footer_menus;
                 return $return;
+            
             endif;
         endif;
-        if (Yii::$app->user->isGuest) {
+        if (Yii::$app->user->isGuest) :
             $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
             $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
-        }else{
+        else:
             $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
             $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
-        }
+        endif;
         $return["header_menus"] = $header_menus;
         $return["footer_menus"] = $footer_menus;
         return $return;

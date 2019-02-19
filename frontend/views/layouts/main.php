@@ -35,7 +35,7 @@ use frontend\components\BlockComponent;
 use frontend\components\ContentBuilder;
 use frontend\components\Minify;
 use frontend\models\Pages;
-use backend\models\Settings;
+use frontend\models\Settings;
 use frontend\models\Themes;
 use frontend\models\CSS;
 use frontend\models\Menus;

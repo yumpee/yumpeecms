@@ -24,7 +24,7 @@
  */
 namespace frontend\models;
 
-use backend\models\Settings;
+
 use common\components\GUIBehavior;
 
 

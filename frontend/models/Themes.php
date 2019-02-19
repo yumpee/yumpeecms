@@ -86,4 +86,33 @@ class Themes extends \backend\models\Themes{
          endif;
          
     }
+	public function getDataTheme(){
+        //this returns the current theme from the Settings Model class         
+         if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
+            $install_domain = ContentBuilder::getSetting("home_url");
+            $curr_domain = Yii::$app->request->hostInfo;
+            $theme_id=null;
+            if(strpos($install_domain, $curr_domain)===false):
+                $sub_domain = \frontend\models\Domains::find()->where(['domain_url'=>$curr_domain])->one();
+                if($sub_domain!=null):
+                    $theme_id = $sub_domain->theme_id;
+                endif;
+            endif; 
+            if($theme_id!=null):
+                return $theme_id;
+            endif;
+         endif;
+         
+         
+         
+         
+        //this returns the current theme from the Settings Model class
+         $theme = Settings::findOne(['setting_name'=>'current_theme']);
+         if($theme['setting_value']!=null):
+             return $theme['setting_value'];
+         else:
+             return '0';
+         endif;
+         
+    }
 }

@@ -56,6 +56,7 @@ use frontend\models\UserProfileFiles;
 use frontend\models\FeedbackFiles;
 use frontend\models\WebHook;
 use frontend\models\Domains;
+use frontend\models\Themes;
 
 use yii\helpers\FileHelper;
 use yii\db\Expression;
@@ -118,7 +119,11 @@ public function behaviors()
             $form['token'] = Yii::$app->request->csrfToken;
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):
                         //we handle the loading of twig template if it is turned on
-                        $theme_id = ContentBuilder::getSetting("current_theme");
+							$themes = new Themes();
+							$theme_id=$themes->dataTheme;
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
                         $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>'accounts/login','renderer_type'=>'V'])->one();
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
@@ -185,7 +190,11 @@ public function behaviors()
                     
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):                        
                         //we handle the loading of twig template if it is turned on
-                        $theme_id = ContentBuilder::getSetting("current_theme");
+                        $themes = new Themes();
+							$theme_id=$themes->dataTheme;
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
                         $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$article->form_id,'renderer_type'=>'F'])->one();
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
@@ -261,7 +270,12 @@ public function behaviors()
                     $page['records'] = FormSubmit::find()->where(['form_id'=>$article->form_id])->andWhere('published="1"')->all();
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):
                         //we handle the loading of twig template if it is turned on
-                        $theme_id = ContentBuilder::getSetting("current_theme");
+						$themes = new Themes();
+						$theme_id=$themes->dataTheme;
+						if($theme_id=="0"):
+							$theme_id = ContentBuilder::getSetting("current_theme");
+						endif;
+						
                         $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$article->id,'renderer_type'=>'R'])->one();
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
@@ -288,7 +302,12 @@ public function behaviors()
                     if($page['records']!=null):
                         if(ContentBuilder::getSetting("twig_template")=="Yes"):
                             //we handle the loading of twig template if it is turned on
-                            $theme_id = ContentBuilder::getSetting("current_theme");
+                            $themes = new Themes();
+							$theme_id=$themes->dataTheme;
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
+							
                             $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$article->id,'renderer_type'=>'R'])->one();
                             if(($codebase!=null)&& ($codebase['code']<>"")):
                                 $loader = new Twig();
@@ -323,7 +342,11 @@ public function behaviors()
                             $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
             if(ContentBuilder::getSetting("twig_template")=="Yes"):
                         //we handle the loading of twig template if it is turned on
-                        $theme_id = ContentBuilder::getSetting("current_theme");
+                        $themes = new Themes();
+							$theme_id=$themes->dataTheme;
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
                         $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$page['records']->form_id,'renderer_type'=>'D'])->one();
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
@@ -541,7 +564,12 @@ public function behaviors()
                 $page['records'] = $query->all();
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):
                         //we handle the loading of twig template if it is turned on
-                        $theme_id = ContentBuilder::getSetting("current_theme");
+                        $themes = new Themes();
+							$theme_id=$themes->getDataTheme();
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
+							
                         //$render = 
                         //since we may get the widget we want to use to display the result
                         $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
