@@ -87,6 +87,8 @@ class FormSubmitHookBehaviour extends Behavior{
                             $form_submit = new FormSubmit();
                             if($form_id_obj->published=="Y"):
                                 $form_submit->setAttribute('published',"1");
+                            else:
+                                $form_submit->setAttribute('published',"0");
                             endif;
                             $form_submit->setAttribute("form_id",$form_id_obj->id);
                             $form_submit->setAttribute("usrname",$usrname);

@@ -27,7 +27,7 @@ namespace frontend\models;
 
 use Yii;
 use frontend\components\ContentBuilder;
-use backend\models\Settings;
+//use backend\models\Settings;
 //use backend\models\Pages;
 //use backend\models\Templates;
 use backend\models\Users;

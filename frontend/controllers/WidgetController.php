@@ -66,7 +66,7 @@ class WidgetController extends Controller{
 public static function allowedDomains()
 {
     if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
-		return Domains::find()->select('domain_url')->column();
+		return Domains::find()->select('domain_url')->where(['active_stat'=>'Yes'])->column();
 	endif;
 }
 

@@ -87,20 +87,25 @@ class Themes extends \backend\models\Themes{
          
     }
 	public function getDataTheme(){
-        //this returns the current theme from the Settings Model class         
+        //this returns the current theme from the Settings Model class     
+		
          if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
-            $install_domain = ContentBuilder::getSetting("home_url");
-            $curr_domain = Yii::$app->request->hostInfo;
-            $theme_id=null;
-            if(strpos($install_domain, $curr_domain)===false):
-                $sub_domain = \frontend\models\Domains::find()->where(['domain_url'=>$curr_domain])->one();
+			$theme = Settings::findOne(['setting_name'=>'home_url']);
+            $install_domain = $theme['setting_value'];
+            $curr_domain = Yii::$app->request->hostInfo;	
+            $theme_id=null;			
+            if(strpos($install_domain, $curr_domain)===false):	
+				$sub_domain = \frontend\models\Domains::find()->where(['domain_url'=>$curr_domain])->one();
                 if($sub_domain!=null):
                     $theme_id = $sub_domain->theme_id;
+					return $theme_id;
                 endif;
+				
             endif; 
-            if($theme_id!=null):
+            if($theme_id!=null):				
                 return $theme_id;
             endif;
+			
          endif;
          
          

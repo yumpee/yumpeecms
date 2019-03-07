@@ -66,7 +66,7 @@ class FormsController extends Controller{
 	public static function allowedDomains()
 {
 	if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
-		return Domains::find()->select('domain_url')->column();
+		return Domains::find()->select('domain_url')->where(['active_stat'=>'Yes'])->column();
 	endif;
     
 }
@@ -468,9 +468,10 @@ public function behaviors()
         if(Yii::$app->request->get('search-field')!=null):            
             $data_query = FormData::find()->select('form_submit_id');            
             $search_params=explode("|",urldecode(Yii::$app->request->get('search-field')));
+            $search_succeed=0;
+            if(sizeof($search_params) > 1):
             foreach($search_params as $param):
-                list($p,$v)=explode("=",$param);
-                
+                list($p,$v)=explode("=",$param);                
                 //this is used to search based on submit id
                 if($p=="form_submit_id"):
                         $data_query->orWhere('form_submit_id="'.$v.'"');
@@ -483,22 +484,49 @@ public function behaviors()
                         $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v]);                    
                 endif;
             endforeach;
+            $search_succeed=1;
+            endif;
+            
+            if($search_succeed < 1):
             $search_params=explode("&",urldecode(Yii::$app->request->get('search-field')));
-            foreach($search_params as $param):
-                list($p,$v)=explode("=",$param);
+            if(sizeof($search_params) > 1):
+                $form_arr= array();
+                $int_count=0;
+                foreach($search_params as $param):
+                    list($p,$v)=explode("=",$param);
                 
+                    //this is used to search based on submit id
+                    if($p=="form_submit_id"):
+                            $data_query->andWhere('form_submit_id="'.$v.'"');
+                        continue;
+                    endif;
+                    $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$p])->andWhere(['like','param_val',$v])->column();
+                    $int_count++;
+                endforeach;
+                    $form_submit_arr = $form_arr[0];
+                    foreach ($form_arr as $form_submit_item):
+                        $form_submit_arr = array_intersect($form_submit_arr,$form_submit_item);
+                    endforeach;
+                    $data_query->where(['IN','form_submit_id',$form_submit_arr]);
+                $search_succeed=1;
+            endif;            
+            endif;
+            if($search_succeed < 1):
+                foreach($search_params as $param):
+                list($p,$v)=explode("=",$param);                
                 //this is used to search based on submit id
                 if($p=="form_submit_id"):
-                        //$data_query->orWhere('form_submit_id="'.$v.'"');
+                        $data_query->orWhere('form_submit_id="'.$v.'"');
                     continue;
                 endif;
                 
                 if(count($search_params)==1):
-                    //$data_query->andWhere('param="'.$p.'"')->andWhere(['like','param_val',$v]);
-                else:
-                    //$data_query->andWhere('param="'.$p.'"')->andWhere(['like','param_val',$v]);
+                        $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v])->andFilterCompare('param_val',$v);
+                else:                    
+                        $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v]);                    
                 endif;
-            endforeach;            
+                endforeach;
+            endif;
             $criteria_found=1;            
         endif;
         if(Yii::$app->request->get('excludes')!=null):  
@@ -549,7 +577,7 @@ public function behaviors()
 		if (Yii::$app->request->get('logged')=="false"):
             $query->andWhere('usrname<>"'.Yii::$app->user->identity->username.'"');            
         endif;
-		if(Yii::$app->request->get('url')!=null):
+	if(Yii::$app->request->get('url')!=null):
             $query->andWhere('url="'.Yii::$app->request->get('url').'"');
         endif;
         if(Yii::$app->request->get('return-type')=="count"):

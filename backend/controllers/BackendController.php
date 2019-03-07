@@ -64,11 +64,13 @@ class BackendController extends Controller {
                 $page['roles'] = \yii\helpers\Html::dropDownList("role_id",NULL,$roles_map,['prompt'=>'Select a role','class'=>'form-control','id'=>'role_id']);
        endif;
        
-       $menus = BackEndMenus::find()->orderBy('parent_id')->all();
+       $menus = BackEndMenus::find()->orderBy('parent_id','priority')->all();
        $menu_map = yii\helpers\ArrayHelper::map($menus, 'id', 'name');
        if(Yii::$app->request->get("role_id")!=null): 
                 $selected = BackEndMenuRole::find()->select('menu_id')->where(['role_id'=>Yii::$app->request->get("role_id")])->column();
-                $page['menus_list'] = \yii\helpers\Html::checkboxList("menu_permission_id",$selected,$menu_map);
+                $page['menus_list'] = \yii\helpers\Html::checkboxList("menu_permission_id",$selected,$menu_map,['separator' => '<br>']);
+                $page['selected'] = $selected;
+                $page['menu_map'] = $menu_map;                
            else:
                $page['menus_list'] = \yii\helpers\Html::checkboxList("menu_permission_id",NULL,$menu_map);
        endif;

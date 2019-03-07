@@ -43,7 +43,7 @@ class AccountsController extends Controller{
 public static function allowedDomains()
 {
     if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
-		return Domains::find()->select('domain_url')->column();
+		return Domains::find()->select('domain_url')->where(['active_stat'=>'Yes'])->column();
 	endif;
 }
 
@@ -113,12 +113,17 @@ public function behaviors()
                 list($page_url,$search)= explode("?",$page_url);
         endif;
         
-        $article = Pages::find()->where(['url'=>$page_url])->one();
-                  
+        $article = Pages::find()->where(['url'=>$page_url])->one();                  
         $form['login_url'] = Yii::$app->request->getBaseUrl()."/".$article['url'];
         $form['message']="";
         
-        $form['callback']="";
+        if(Yii::$app->request->get("callback")!=null):
+            $form['callback']=Yii::$app->request->get("callback");
+        elseif(Yii::$app->request->post("callback")!=null):
+            $form['callback']=Yii::$app->request->post("callback");
+        else:
+            $form['callback']="";
+        endif;
         
         
         $form['param'] = Yii::$app->request->csrfParam;

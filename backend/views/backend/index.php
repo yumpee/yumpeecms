@@ -67,7 +67,18 @@ if($("#role_id").val()!=""){
   $('#bl_tab').trigger('click')        
  }
    $("#datalisting").DataTable();                          
-  
+ 
+            
+$(".submenus").each(function(){
+            var source = $(this).attr("id");
+            var destination = $(this).attr("parent");
+            
+            $("#" + source).appendTo("#" + destination);
+            //jQuery("#" + source).detach().appendTo("#" + destination);
+            //$("#" + destination).html($("#" + source).html());
+           //alert(source + " appends "  + destination);
+            
+})
 EOT_JS
 );  
 
@@ -137,7 +148,10 @@ endif;
     <form action="index.php?r=blocks/index" method="post" id="frmApply">
     <table class="table">
         <tr><td>Select Role<td><?=$roles?>
-        <tr><td>Menus<td><?=$menus_list?> 
+        <tr><td>Menus<td><?=$menus_list?>
+                
+                
+                
         <tr><td colspan="2"><button type="button" id="btnApply" class="btn btn-success">Apply</button> <input type="hidden" name="processor" value="true" /> <input type="hidden" name="role_id" id="role_id" value="<?=Yii::$app->request->get("role_id")?>" /><input type="hidden" name="cont" id="cont"/></td>
         
         

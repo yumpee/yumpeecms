@@ -38,13 +38,14 @@ use frontend\models\Twig;
 use backend\models\Roles;
 use backend\models\MenuPage;
 use frontend\models\Domains;
+use frontend\models\Themes;
 
 
 class StandardController extends Controller{
    public static function allowedDomains()
 {
     if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
-		return Domains::find()->select('domain_url')->column();
+		return Domains::find()->select('domain_url')->where(['active_stat'=>'Yes'])->column();
 	endif;
 }
 
@@ -95,7 +96,11 @@ public function behaviors()
             $form['token'] = Yii::$app->request->csrfToken;
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):
                         //we handle the loading of twig template if it is turned on
-                        $theme_id = ContentBuilder::getSetting("current_theme");
+						$themes = new Themes();
+                        $theme_id=$themes->dataTheme;
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
                         $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>'accounts/login','renderer_type'=>'V'])->one();
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
@@ -175,7 +180,11 @@ public function behaviors()
                     //render through twig if available 
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):
                         //we handle the loading of twig template if it is turned on
-                        $theme_id = ContentBuilder::getSetting("current_theme");
+						$themes = new Themes();
+                        $theme_id=$themes->dataTheme;
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
                         $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$renderer,'renderer_type'=>'V'])->one();
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();

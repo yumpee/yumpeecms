@@ -146,6 +146,13 @@ $(document).on('click','#btnInsertMedia',
                         $("#my_display_image").attr("src","0");
                     }            
   });
+           
+$("#btnNew").click(function(){
+    location.href="?actions=edit&r=setup/details&class={$class_id}";
+   })
+$("#btnNewProperty").click(function(){
+    location.href="?actions=edit_attrib&r=setup/details&class={$class_id}&tab=property";
+   })
     
  if($("#current_tab_open").val()=="edit_attrib"){
     $('#tab_property').trigger('click')        
@@ -246,7 +253,7 @@ endif;
             <tr><td>Parent property<td><?=\yii\helpers\Html::dropDownList("parent_id",$prop_rs['parent_id'],$prop_list,['class'=>'form-control','prompt'=>''])?>            
             <tr><td>Notes<td><textarea name="description" id="el_description"><?=$prop_rs['description']?></textarea>       
             <tr><td>Display Order<td><input name="display_order" id="display_order" value="<?=$rs['display_order']?>" class="form-control" type="text" />
-            <tr><td colspan="2"><button type="submit" id="btnSubmitProperties" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="id" value="<?=$prop_id?>" /><input type='hidden' name='class_id' value='<?=Yii::$app->request->get('class')?>'/>
+            <tr><td colspan="2"><button type="submit" id="btnSubmitProperties" class="btn btn-success">Save</button> <button type="button" id="btnNewProperty" class="btn btn-primary">New</button> <input type="hidden" name="id" value="<?=$prop_id?>" /><input type='hidden' name='class_id' value='<?=Yii::$app->request->get('class')?>'/>
                     <input type='hidden' name='classname' value='<?=$classname?>'/>
             
             </td>
@@ -298,7 +305,7 @@ endif;
                 endforeach;
             ?>
                         
-            <tr><td colspan="2"><button type="submit" id="btnElemAttrib" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="id" value="<?=$id?>" /><input type='hidden' name='class_id' value='<?=Yii::$app->request->get('class')?>'/>
+            <tr><td colspan="2"><button type="submit" id="btnElemAttrib" class="btn btn-success">Save</button> <input type="hidden" name="id" value="<?=$id?>" /><input type='hidden' name='class_id' value='<?=Yii::$app->request->get('class')?>'/>
             
             </td>
         

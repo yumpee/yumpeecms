@@ -104,6 +104,7 @@ endif;
         <tr><td>Theme <td><?=$theme_profile?>
         <tr><td>Menu<td><?=$menu_profile?>
         <tr><td>Description<td><textarea class="form-control" name="description" id="description"><?=$rs["description"]?></textarea>
+        <tr><td>Status<td><?=\yii\helpers\Html::dropDownList("active_stat",$rs["active_stat"],['Yes'=>'Yes','No'=>'No'],['class'=>'form-control'])?>
         <tr><td colspan="2"><button type="submit" id="btnSubmit" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="id" value="<?=$id?>" />
             
             </td>
@@ -116,7 +117,7 @@ endif;
 <div class="box">
 <div class="box-body">
 <table id="datalisting" class="table table-bordered table-striped">
-    <thead><tr><th>Domain<th>Domain Name<th>Theme<th>Menu<th>Actions</thead>
+    <thead><tr><th>Domain<th>Domain Name<th>Theme<th>Menu<th>Active<th>Actions</thead>
     <tbody>
       <?php
       foreach ($records as $user) :
@@ -125,7 +126,7 @@ endif;
                                     $display_image_path=$user->displayImage->path;
                             endif;
       ?>
-        <tr><td><?=$user['name']?></td><td> <a href="<?=$user['domain_url']?>" target="_blank"><?=$user['domain_url']?></a><td><?=$user['theme']['name']?><td><?=$user['menu']['name']?><td> <a href='?actions=edit&id=<?=$user['id']?>&r=domains/index'><small><i class="glyphicon glyphicon-pencil"></i></small></a>  <a href='#' class='delete_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a>  </td>
+        <tr><td><?=$user['name']?></td><td> <a href="<?=$user['domain_url']?>" target="_blank"><?=$user['domain_url']?></a><td><?=$user['theme']['name']?><td><?=$user['menu']['name']?><td><?=$user['active_stat']?><td> <a href='?actions=edit&id=<?=$user['id']?>&r=domains/index'><small><i class="glyphicon glyphicon-pencil"></i></small></a>  <a href='#' class='delete_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>'><small><i class="glyphicon glyphicon-trash"></i></small></a>  </td>
      <?php
       endforeach;
      ?>

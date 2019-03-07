@@ -61,6 +61,7 @@ class DomainsController extends Controller{
                 $model->domain_url = Yii::$app->request->post("domain_url");
                 $model->theme_id=Yii::$app->request->post("theme_id");
                 $model->menu_id=Yii::$app->request->post("menu_id");
+                $model->active_stat=Yii::$app->request->post("active_stat");
                 $model->description=Yii::$app->request->post("description");                
                 $model->save();
                 return "Domain profile successfully updated";
@@ -71,7 +72,8 @@ class DomainsController extends Controller{
                 $model->domain_url = Yii::$app->request->post("domain_url");
                 $model->theme_id=Yii::$app->request->post("theme_id");
                 $model->menu_id=Yii::$app->request->post("menu_id");
-                $model->description=Yii::$app->request->post("description");                  
+                $model->description=Yii::$app->request->post("description");  
+                $model->active_stat=Yii::$app->request->post("active_stat");
                 $model->save();
                 return "New domain profile created";
             endif;

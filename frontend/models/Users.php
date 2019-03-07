@@ -36,7 +36,7 @@ class Users extends \yii\db\ActiveRecord {
         return $this->hasOne(\backend\models\Media::className(),['id'=>'display_image_id']);
     }
     public function getDetails(){
-        return $this->hasOne(ProfileDetails::className(),['profile_id'=>'id']);
+        return $this->hasMany(ProfileDetails::className(),['profile_id'=>'id']);
     }
     public function getProfileFiles(){
         return $this->hasMany(UserProfileFiles::className(),['profile_id'=>'id']);

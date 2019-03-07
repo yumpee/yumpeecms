@@ -42,6 +42,7 @@ use frontend\components\ContentBuilder;
 use frontend\models\Twig;
 use frontend\models\Users;
 use frontend\models\ProfileDetails;
+use frontend\models\Themes;
 
 class GUIBehavior extends Behavior
 {
@@ -83,11 +84,19 @@ class GUIBehavior extends Behavior
         $pattern_article="/{yumpee_article}(.*?){\/yumpee_article}/";
         $pattern_page="/{yumpee_page}(.*?){\/yumpee_page}/";
         
+		
+		$themes = new Themes();
+		$theme_id=$themes->dataTheme;
+		
+		if($theme_id=="0"):
+			$theme_id = ContentBuilder::getSetting("current_theme");			
+		endif;
+							
         foreach($this->owner->fields as $field):
         $content = $this->owner->{$field};  
         //$content = str_replace("\r\n","",$content);
-        $content = preg_replace_callback($pattern_setting,function ($matches) {
-                            $replacer = ContentBuilder::getSetting($matches[1]);                            
+        $content = preg_replace_callback($pattern_setting,function ($matches) use($theme_id){
+                            $replacer = ContentBuilder::getSetting($matches[1],$theme_id);                            
                             return $replacer;
                     },$content); 
         $content = preg_replace_callback($pattern_get,function ($matches) {
@@ -157,7 +166,9 @@ class GUIBehavior extends Behavior
                                     $elements = ClassAttributes::find()->where(['class_id'=>$class_setup['id']])->andWhere("name='".$id."'")->orderBy('alias')->one();
                                 endif;
                             endif;
-                            $replacer = \yii\helpers\Json::encode($elements);
+							if($elements!=null){
+								$replacer = \yii\helpers\Json::encode($elements);
+							}
                             return $replacer;
                     },$content);
                     
@@ -497,14 +508,14 @@ class GUIBehavior extends Behavior
                             endif;
                     },$array); 
                     
-        $array = preg_replace_callback($pattern_twig,function ($matches) {
+        $array = preg_replace_callback($pattern_twig,function ($matches) use($theme_id){
                             $loader = new Twig();
                             $twig = new \Twig_Environment($loader); 
                             $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
                             $metadata['param'] = Yii::$app->request->csrfParam;
                             $metadata['token'] = Yii::$app->request->csrfToken;      
-                            $theme = $replacer = ContentBuilder::getSetting("current_theme");
-                            $content= $twig->render(Twig::find()->where(['renderer'=>$matches[1],'theme_id'=>$theme])->one()->filename,['app'=>Yii::$app,'metadata'=>$metadata]);
+                            
+                            $content= $twig->render(Twig::find()->where(['renderer'=>$matches[1],'theme_id'=>$theme_id])->one()->filename,['app'=>Yii::$app,'metadata'=>$metadata]);
                             return $content;
                             //return $replacer;
                     },$array); 
