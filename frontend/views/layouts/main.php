@@ -224,7 +224,7 @@ endif;
 ?>
 <?php echo $page_styles?>
 
-<body>
+
 <?php
 if(ContentBuilder::getSetting("container_display_type")=="fluid"):
         $container_display_type="class='container-fluid'";
@@ -263,7 +263,7 @@ endif;
 if($header_menus==null):        
         $menus = ContentBuilder::getMenus();
         $header_menus = $menus["header_menus"];
-        $footer_menus = $menus["footer_menus"];
+        $footer_menus = $menus["footer_menus"];		
 endif;
 
 $header_request_url = Yii::$app->request->url;
@@ -275,7 +275,7 @@ if($current_page["show_header_image"]=="0"):
 else:
 ?>
 
-<?php $this->beginContent(ThemeManager::getHeader('@app/views/layouts/header.php'),['header_menu_logo'=>$header_menu_logo,'header_content'=>$current_theme_header,'header_theme_setting'=>ContentBuilder::getSetting("current_theme_header"),'header_baseURL'=>$header_baseURL,'header_menus'=>$header_menus,'header_request_url'=>$header_request_url,'header_title'=>$header_title,'settings'=>$settings]); ?>
+<?php $this->beginContent(ThemeManager::getHeader('@app/views/layouts/header.php'),['header_menu_logo'=>$header_menu_logo,'header_content'=>$current_theme_header,'header_theme_setting'=>ContentBuilder::getSetting("current_theme_header"),'header_baseURL'=>$header_baseURL,'header_menus'=>$header_menus,'header_request_url'=>$header_request_url,'header_title'=>$header_title,'settings'=>$settings,'app'=>Yii::$app]); ?>
 
 <?php $this->endContent(); ?>
  
@@ -292,7 +292,7 @@ if($current_page["show_footer_image"]=="0"):
     //do nothing
 else:
 ?>
-<?php $this->beginContent(ThemeManager::getFooter('@app/views/layouts/footer.php'),['footer_menu_logo'=>$header_menu_logo,'footer_content'=>$current_theme_footer,'footer_theme_setting'=>ContentBuilder::getSetting("current_theme_footer"),'settings'=>$settings,'header_baseURL'=>$header_baseURL,'footer_menus'=>$footer_menus]); ?>
+<?php $this->beginContent(ThemeManager::getFooter('@app/views/layouts/footer.php'),['footer_menu_logo'=>$header_menu_logo,'footer_content'=>$current_theme_footer,'footer_theme_setting'=>ContentBuilder::getSetting("current_theme_footer"),'settings'=>$settings,'header_baseURL'=>$header_baseURL,'footer_menus'=>$footer_menus,'app'=>Yii::$app,'settings'=>$settings]); ?>
   
 <?php $this->endContent(); ?>
 

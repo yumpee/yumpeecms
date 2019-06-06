@@ -208,6 +208,20 @@ public function behaviors()
                         $page['title'] = $settings->widget_title;
                 endif;
             break;
+            case 'widget_random_post':                
+                if(Yii::$app->request->get('limit')!=null): //assuming its a call from the web page
+                        $limit = Yii::$app->request->get('limit');
+                        $page['articles'] = Articles::find()->where(['published'=>'1'])->limit($limit)->orderBy(['updated'=>SORT_DESC])->all();
+                        $page['title']="";
+                    else:
+                        $route = ContentBuilder::getTemplateRouteByURL(Yii::$app->request->get('page_id'),false);
+                        $route_id = Templates::find()->where(['route'=>$route])->one();
+                        $record = TemplateWidget::find()->where(['widget'=>$called_widget])->andWhere(['page_id'=>$route_id['id']])->one();
+                        $settings = json_decode($record->settings);
+                        $page['articles'] = Articles::find()->where(['<>','url',Yii::$app->request->get('page_id')])->andWhere(['published'=>'1'])->limit($settings->widget_limit)->all();
+                        $page['title'] = $settings->widget_title;
+                endif;
+            break;
             
             case 'widget_blog_article':
                 $query = Articles::find();

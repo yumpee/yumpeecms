@@ -31,6 +31,7 @@ use yii\filters\AccessControl;
 use backend\models\Users;
 use backend\models\Roles;
 use backend\models\MenuProfile;
+use backend\models\Pages;
 use fedemotta\datatables\DataTables;
 use yii\Helpers\ArrayHelper;
 
@@ -67,7 +68,10 @@ public function actionIndex()
         
         $role_list = Roles::find()->all();
         $role_map =  yii\helpers\ArrayHelper::map($role_list, 'id', 'name');
+        $page_list = Pages::find()->orderBy('menu_title')->all();
+        $page_map = yii\helpers\ArrayHelper::map($page_list, 'id', 'menu_title'); 
         $page['role_dropdown'] = \yii\helpers\Html::dropDownList("role_id",$page['rs']['role_id'],$role_map,['prompt'=>'Select a role','class'=>'form-control']);
+        $page['home_page_dropdown'] = \yii\helpers\Html::dropDownList("home_page",$page['role_rs']['home_page'],$page_map,['prompt'=>'Select a page','class'=>'form-control']);
         $page['role_parent_dropdown'] = \yii\helpers\Html::dropDownList("parent_role_id",$page['role_rs']['parent_role_id'],$role_map,['prompt'=>'Select parent role','class'=>'form-control']);
         $page['access_type']=$page['role_rs']['access_type'];
      

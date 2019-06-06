@@ -33,6 +33,7 @@ namespace frontend\models;
 use Yii;
 use frontend\components\ContentBuilder;
 use common\components\GUIBehavior;
+use frontend\models\ArticleFiles;
 
 class Articles  extends \backend\models\Articles{
     //put your code here
@@ -53,7 +54,12 @@ public function getFeedback(){
 public function getDetails(){
         return $this->hasMany(ArticleDetails::className(),['article_id'=>'id']);
 }
-
+public function getFile(){
+        return $this->hasMany(ArticleFiles::className(),['article_id'=>'id']);
+    }
+public function getFormattedIndexURL(){
+      return Yii::$app->request->getBaseUrl()."/".ContentBuilder::getURLByRoute("blog/index");
+  }
 public static function saveArticle($save_as_new=""){
         $session = Yii::$app->session;
         $records = Articles::find()->where(['id'=>Yii::$app->request->post('id')])->andWhere('usrname="'.Yii::$app->user->identity->username.'"')->one();

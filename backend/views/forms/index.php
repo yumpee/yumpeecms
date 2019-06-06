@@ -222,7 +222,7 @@ EOT_JS
                                                 <p>External Client Profile
                                                 <p><?=\yii\helpers\Html::dropDownList("external_profile",$wex_rs['client_profile'],$client_profiles,['class'=>'form-control','prompt'=>'None'])?>
                                                 <p>Call Type : 
-                                                <p><?=\yii\helpers\Html::dropDownList("external_post",$wex_rs['post_type'],['G'=>'GET','P'=>'POST'],['class'=>'form-control'])?>
+                                                <p><?=\yii\helpers\Html::dropDownList("external_post",$wex_rs['post_type'],['G'=>'GET','P'=>'POST','T'=>'PUT','D'=>'DELETE'],['class'=>'form-control'])?>
                                                 <p>End Point URL
                                                  <input type="text" name="external_endpoint" value="<?=$wex_rs["end_point"]?>" class="form-control" />
                                                 <p>JSON template data

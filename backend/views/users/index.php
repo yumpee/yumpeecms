@@ -179,6 +179,7 @@ endif;
         <tr><td>Parent Role<td><?=$role_parent_dropdown?>
         <tr><td>Access Type<td><?=\yii\helpers\Html::dropDownList("access_type",$access_type,['F'=>'Front End','B'=>'Back End'],['class'=>'form-control'])?></td>
         <tr><td>Default Menu(frontend)</td><td><?=$menu_list?></td>
+        <tr><td>Home Page</td><td><?=$home_page_dropdown?></td>
         <tr><td>Description<td><textarea name="description" id="description" rows="3" cols="30" class="form-control"><?=$role_rs["description"]?></textarea>  
         
         <tr><td colspan="2"><button type="submit" id="btnSubmitRole" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="processor" value="true" /><input type="hidden" name="role_id" value="<?=$role_rs["id"]?>" />

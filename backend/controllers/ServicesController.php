@@ -78,7 +78,13 @@ class ServicesController extends Controller{
             curl_setopt($ch, CURLOPT_POSTFIELDS, Yii::$app->request->post("body"));                                                                  
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             if(Yii::$app->request->post("header")!=""):
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")), Yii::$app->request->post("header")) );
+                    $post_arr = explode(",",Yii::$app->request->post("header"));
+                    $nr = array();
+                    $nr = $post_arr;
+                    $count = count($post_arr);
+                    $nr[$count + 1]='Content-Type: application/json';                    
+                   curl_setopt($ch, CURLOPT_HTTPHEADER, $nr );
+                  //curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")),'NETOAPI_USERNAME:NetoAPI','Accept:application/json','NETOAPI_KEY:o1lZClvfWa4jePs7SZ4bT5LbBDD8BYm4','NETOAPI_ACTION:GetOrder'));
             else:
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")), ) );
             endif;
@@ -105,7 +111,12 @@ class ServicesController extends Controller{
                 )                                                                       
                 ); 
                 if(Yii::$app->request->post("header")!=""):
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")), Yii::$app->request->post("header")) );
+                    $post_arr = explode(",",Yii::$app->request->post("header"));
+                    $nr = array();
+                    $nr = $post_arr;
+                    $count = count($post_arr);
+                    $nr[$count + 1]='Content-Type: application/json';
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $nr);
                 else:
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")), ) );
                 endif;

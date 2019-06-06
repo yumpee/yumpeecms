@@ -23,46 +23,30 @@
 
  */
 
-namespace backend\models;
+namespace frontend\models;
 
 /**
- * Description of Themes
+ * Description of CustomSettings
  *
  * @author Peter
  */
-
-
-class Roles extends \yii\db\ActiveRecord{
+use Yii;
+use common\components\GUIBehavior;
+class CustomSettings extends yii\db\ActiveRecord{
     //put your code here
+    private $fields = array('setting_value');
+    public function behaviors() {        
+        return [
+                   
+            ['class'=>GUIBehavior::className(),                
+                'fields'=>$this->fields,
+            ],          
+            
+        ];
+    }
     public static function tableName()
     {
-        return 'tbl_roles';
+        return 'tbl_custom_settings';
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['name'], 'required'],
-            [['id','access_type','menu_id','parent_role_id','home_page'],'safe'],
-            [['name'], 'string', 'max' => 50],
-            [['description'],'string'],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'name' => 'Name of role',
-            'description'=>'Theme description'
-        ];
-    }
-    
     
 }

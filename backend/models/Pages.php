@@ -63,6 +63,7 @@ class Pages extends \yii\db\ActiveRecord
             return $this->find()->where(['show_in_menu'=>'1'])->orderBy('sort_order')->all();
         endif;
     }
+    
     public function getPagePath(){
         return ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl());
     }

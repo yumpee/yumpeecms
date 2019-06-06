@@ -24,7 +24,7 @@
  */
 
 namespace frontend\models;
-use \backend\models\CustomSettings;
+use \frontend\models\CustomSettings;
 class Settings extends \yii\db\ActiveRecord{
     
     public static function tableName()

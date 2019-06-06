@@ -218,4 +218,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function getDisplayImage(){
         return $this->hasOne(\backend\models\Media::className(),['id'=>'display_image_id']);
     }
+    
+    public function getFormVal($field,$val,$retval=null){        
+        if($field=="form_submit_id"):
+            if($retval!=null):
+                return \frontend\models\FormData::find()->where(['form_submit_id'=>$val])->andWhere('param="'.$retval.'"')->one();
+            else:
+                return \frontend\models\FormData::find()->where(['form_submit_id'=>$val])->all();
+            endif;
+        endif;
+    }
 }

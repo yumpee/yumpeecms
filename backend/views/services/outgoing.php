@@ -104,12 +104,12 @@ endif;
      <form action="index.php?r=services/outgoing" method="post" name="frm1" id="frm1">
     <table class="table">
         <tr><td width="30%">Client Name<td><input name="name" id="name" value="<?=$rs['name']?>" class="form-control" type="text" />
-        <tr><td>Authentication Type<td><?=\yii\helpers\Html::dropDownList("authentication",$authentication,['basic'=>'Basic','bearer'=>'Bearer Token','oauth'=>'OAuth'],['class'=>'form-control'])?></td>
+        <tr><td>Authentication Type<td><?=\yii\helpers\Html::dropDownList("authentication",$authentication,['none'=>'None','basic'=>'Basic','bearer'=>'Bearer Token','oauth'=>'OAuth'],['class'=>'form-control'])?></td>
         <tr><td>Encryption Type(for Basic)<td><?=\yii\helpers\Html::dropDownList("encryption",$encryption,['plain'=>'Plain','base64'=>'Base64'],['class'=>'form-control'])?></td>
         <tr><td>Client ID<td><input name="client_id" id="client_id" value="<?=$rs['client_id']?>" class="form-control" type="text" />
         <tr><td>Client / Token Key<td><input name="client_key" id="client_key" value="<?=$rs['client_key']?>" class="form-control" type="text" />
         <tr><td>Authentication URL (for Bearer Token / OAuth 2 )<td><input name="auth_url" id="auth_url" value="<?=$auth_url?>" class="form-control" type="text" />
-        <tr><td>Preferred Authentication Method<td><?=\yii\helpers\Html::dropDownList("authenticate_method",$authenticate_method,['POST'=>'POST','GET'=>'GET'],['class'=>'form-control'])?>      
+        <tr><td>Preferred Authentication Method<td><?=\yii\helpers\Html::dropDownList("authenticate_method",$authenticate_method,['POST'=>'POST','GET'=>'GET','PUT'=>'PUT','DELETE'=>'DELETE'],['class'=>'form-control'])?>      
         <tr><td>Preferred Authentication Header<td><textarea name="header" id="header" rows="8" cols="30" class="form-control"><?=$rs['header']?></textarea>
         <tr><td>Preferred Authentication Body(JSON)<td><textarea name="body_content" id="body_content" rows="8" cols="30" class="form-control"><?=$body_content?></textarea>        
         <tr><td>Bearer Token Variable Name<td><input name="bearer_token" id="bearer_token" value="<?=$bearer_token?>" class="form-control" type="text" />

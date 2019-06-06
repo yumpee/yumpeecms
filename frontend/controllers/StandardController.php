@@ -105,7 +105,8 @@ public function behaviors()
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
                             $twig = new \Twig_Environment($loader);
-                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article]);
+                            $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
+                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app,'metadata'=>$metadata]);
                             return $this->render('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
                     endif;
@@ -189,7 +190,8 @@ public function behaviors()
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
                             $twig = new \Twig_Environment($loader);
-                            $content= $twig->render($codebase['filename'], ['page'=>$article,'header_image'=>$header_image]);
+                            $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
+                            $content= $twig->render($codebase['filename'], ['page'=>$article,'header_image'=>$header_image,'app'=>Yii::$app,'metadata'=>$metadata]);
                             return $this->render('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
                     endif;

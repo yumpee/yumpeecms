@@ -30,13 +30,14 @@ use frontend\models\Pages;
 use frontend\models\Templates;
 use backend\models\Media;
 use backend\models\Settings;
-use backend\models\CustomSettings;
+use frontend\models\CustomSettings;
 use backend\models\Tags;
 use backend\models\Themes;
 use backend\models\Articles;
 use backend\models\ArticlesCategories;
 use backend\models\ClassElementAttributes;
 use backend\models\MenuPage;
+use backend\models\Roles;
 use frontend\models\Domains;
 use common\models\FormSubmit;
 class ContentBuilder {
@@ -199,6 +200,17 @@ class ContentBuilder {
             return "";
         }
     }
+    public static function getRoleHomePage(){
+            $role_obj = Roles::find()->where(['id'=>Yii::$app->user->identity->role_id])->one();
+            if($role_obj!=null):                
+                $role_home_page = Pages::find()->where(['id'=>$role_obj['home_page']])->one();
+                if($role_home_page!=null):
+                    $role_home=ContentBuilder::getSetting("home_url")."/".$role_home_page['url'];   
+                    return $role_home;
+                endif;
+            endif;
+            return ContentBuilder::getSetting("home_url");
+    }
     public static function getActionURL($url,$index=0){
             $url_arr = explode("/",$url);
             $url_length = count($url_arr);
@@ -237,6 +249,9 @@ class ContentBuilder {
         endif;
     }
     public static function getSetting($setting_name,$theme_id=0){
+        if($setting_name=="yumpee_role_home_page"):
+            return ContentBuilder::getRoleHomePage();
+        endif;
         if(substr($setting_name,0,1)=="~"):
             $setting_name=substr($setting_name,1);
 			if($theme_id!=0):
@@ -392,10 +407,32 @@ public static function getMenus(){
             
             endif;
         endif;
+        
+        
+        
+        
         if (Yii::$app->user->isGuest) :
             $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
             $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
         else:
+            //logged in user has a role
+            $role = Yii::$app->user->identity->role_id;
+            //logged role has a frontend profile
+            
+            if($role!=null):
+                $menu_rec = Roles::find()->where(['id'=>$role])->one();
+                $menu_id = $menu_rec['menu_id'];
+                
+                //get pages in this frontend profile
+                $page_arr = MenuPage::find()->select('menu_id')->asArray()->where(['profile'=>$menu_id])->column();
+                if($page_arr!=null):                    
+                    $header_menus = Pages::find()->where(['IN','id',$page_arr])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
+                    $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
+                    $return["header_menus"] = $header_menus;
+                    $return["footer_menus"] = $footer_menus;
+                    return $return;
+                endif;
+            endif;
             $header_menus = Pages::find()->where(['show_in_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
             $footer_menus = Pages::find()->where(['show_in_footer_menu'=>'1'])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
         endif;

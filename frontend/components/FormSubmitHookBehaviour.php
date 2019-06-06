@@ -49,6 +49,9 @@ class FormSubmitHookBehaviour extends Behavior{
         $from_email = ContentBuilder::getSetting("smtp_sender_email");
         $pattern = "/{yumpee_hook}(.*?){\/yumpee_hook}/";  //use this to capture form elements submitted
         $pattern_setting= "/{yumpee_setting}(.*?){\/yumpee_setting}/"; //use this to capture settings value in the settings page
+        if(Yii::$app->request->post("yumpee_ignore_hook")=="true"):
+            return;
+        endif;
         
         foreach($webhooks as $webhook):
             $json_data = preg_replace_callback($pattern,function ($matches) {

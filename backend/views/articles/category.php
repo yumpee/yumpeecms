@@ -31,7 +31,7 @@ $mediaURL =  \Yii::$app->getUrlManager()->createUrl('media/featured-media');
 $image_home = Yii::getAlias('@image_dir/');
 $this->registerJs( <<< EOT_JS
        $(document).on('click', '#btnSubmit',
-       function(ev) {   
+       function(ev) {         
         $.post(
             '{$saveURL}',$( "#frm1" ).serialize(),
             function(data) {
@@ -130,13 +130,13 @@ endif;
 <div id="addCategories">
      <form action="index.php?r=events/index" method="post" id="frm1">
     <table class="table">
-        <tr><td>Name<td><input name="name" id="name" value="<?=$rs['name']?>" class="form-control" type="text" />
+        <tr><td>Name<td><input name="name" id="name" value="<?=$rs['name']?>" class="form-control" type="text" required/>
         <tr><td>Feature Image<td><img id='my_display_image' src='<?=$image_home?>/<?=$display_image_path?>' height='100px' align='top' width='200px' style='border:1px solid #233388' HSPACE='20' VSPACE='20'/> <a href='#' class='media' id='set_feature'>Set Feature Image</a> | <a href='#' id='unset_feature'>Unset Feature Image</a><input type="hidden" name="display_image_id" id="display_image_id" value="<?=$rs['display_image_id']?>"/>
         <tr><td>Icon (e.g fa fa-user)<td> <input name="icon" id="icon" value="<?=$rs['icon']?>" class="form-control" type="text" />       
-        <tr><td>URL<td><input name="url" value="<?=$rs['url']?>" id="url" class="form-control"type="text" />
+        <tr><td>URL<td><input name="url" value="<?=$rs['url']?>" id="url" class="form-control"type="text" required/>
         <tr><td>Description<td><textarea name="description" id="description" class="form-control"rows="7" cols="40"><?=$rs['description']?></textarea>
         <tr><td>Category Index<td><?=$category?>
-        <tr><td>Display Order<td><input name="display_order" value="<?=$rs['display_order']?>" id="display_order"  class="form-control"type="text" />
+        <tr><td>Display Order<td><input name="display_order" value="<?=$rs['display_order']?>" id="display_order"  class="form-control"type="text" required/>
         <tr><td>Published<td><?=$published?>
         <tr><td colspan="2"><button type="submit" id="btnSubmit" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button><input type="hidden" name="processor" value="true" /><input type="hidden" name="id" value="<?=$id?>" />
             

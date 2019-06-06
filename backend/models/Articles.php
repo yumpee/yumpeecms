@@ -57,7 +57,9 @@ class Articles extends \yii\db\ActiveRecord
     public function getDocuments(){
         return $this->hasMany(ArticleMedia::className(),['article_id'=>'id']);
     }
-    
+    public function getFeedback(){
+    return $this->hasMany(Feedback::className(),['target_id'=>'id'])->where(['feedback_type'=>'articles']);
+    }
     public function getRatingCount(){
         return $this->hasMany(RatingDetails::className(),['target_id'=>'id'])->where(['target_type'=>'A'])->count();
     }
@@ -370,8 +372,11 @@ class Articles extends \yii\db\ActiveRecord
      protected function getCategories(){        
         return ArticlesCategoryRelated::find()->where(['articles_id'=>$this->id])->all();
      }
-     public function getBlogIndex(){         
-        return ArticlesBlogIndex::find()->where(['articles_id'=>$this->id])->all();
+     
+     public function getBlogIndex(){ 
+         return $this->hasMany(ArticlesBlogIndex::className(),['articles_id'=>'id']);
+        //return ArticlesBlogIndex::find()->where(['articles_id'=>$this->id])->all();
      }
+     
      
 }

@@ -26,7 +26,7 @@ namespace frontend\models;
 use Yii;
 use frontend\models\ProfileDetails;
 
-class Users extends \yii\db\ActiveRecord {
+class Users extends \backend\models\Users {
     
     public static function tableName()
     {

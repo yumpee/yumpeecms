@@ -37,15 +37,16 @@ class TemplateWidget extends \yii\db\ActiveRecord
     public function getOwner(){
         return $this->hasOne(Widgets::className(),['short_name'=>'widget']);
     }
-    public function afterFind(){        
-        if($this->owner->require_login=="Y"):
-            if(Yii::$app->user->isGuest):
-                $this->widget=null;
-            elseif (strpos($this->owner->permissions,Yii::$app->user->identity->role_id) === false) :
+    public function afterFind(){ 
+        if($this->owner!==null):
+            if($this->owner->require_login=="Y"):
+                if(Yii::$app->user->isGuest):
+                    $this->widget=null;
+                elseif (strpos($this->owner->permissions,Yii::$app->user->identity->role_id) === false) :
                     $this->widget=null;                
+                endif;
             endif;
         endif;
-         
          
         return parent::afterFind();
    

@@ -29,6 +29,7 @@ use common\models\User;
 use frontend\models\ProfileDetails;
 use frontend\components\ContentBuilder;
 use backend\models\Roles;
+use backend\models\Subscriptions;
 
 /**
  * Signup form
@@ -97,6 +98,7 @@ class SignupForm extends Model
             return ["error"=>"Username already exist"];
         endif;
         
+        $role_arr=[];
         $password = Yii::$app->request->post('password');
         $user = new User();
         //lets check for unique attributes been checked
@@ -119,6 +121,17 @@ class SignupForm extends Model
         if(Yii::$app->request->post("role_id")!==null && Yii::$app->request->post("role_id")!=""):
             $role_arr = Roles::find()->where(['id'=>Yii::$app->request->post("role_id")])->andWhere('access_type="F"')->one();
         endif;
+        if(Yii::$app->request->post("register-subscription")!==null && Yii::$app->request->post("register-subscription")=="true"):
+          $model = Subscriptions::find()->where(['email'=>Yii::$app->request->post("email")])->one();
+            if($model!=null):                
+            else:
+                $subscriptions =  new Subscriptions();
+                $subscriptions->setAttribute('name',Html::encode(Yii::$app->request->post("first_name",""))." ".Html::encode(Yii::$app->request->post("last_name","")));
+                $subscriptions->setAttribute('email',Html::encode(Yii::$app->request->post("email")));
+                $subscriptions->save();                
+            endif;
+        endif;
+        
         
         $user->setAttribute('username',Yii::$app->request->post("username"));
         $user->setAttribute('first_name',Yii::$app->request->post("first_name"));

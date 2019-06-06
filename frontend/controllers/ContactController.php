@@ -100,21 +100,22 @@ public function behaviors()
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
                             $twig = new \Twig_Environment($loader);
-                            $content = $twig->render($codebase['filename'], ['page'=>$article,'header_image'=>$header_image]);
+                            $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
+                            $content = $twig->render($codebase['filename'], ['page'=>$article,'header_image'=>$header_image,'app'=>Yii::$app,'metadata'=>$metadata]);
                             return $this->render('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
                     endif;
-					$settings = new Settings();
+                    $settings = new Settings();
                     if($article->layout=="column1"):
-                            return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer,['page'=>$article,'header_image'=>$header_image,'settings'=>$settings]);
+                            return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer,['page'=>$article,'header_image'=>$header_image,'settings'=>$settings,'app'=>Yii::$app]);
                     endif;
                     if($article->layout=="column2"):
-                            return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer.'-2',['page'=>$article,'header_image'=>$header_image,'settings'=>$settings]);
+                            return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer.'-2',['page'=>$article,'header_image'=>$header_image,'settings'=>$settings,'app'=>Yii::$app]);
                     endif;
                     if($article->layout=="column3"):
-                            return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer.'-3',['page'=>$article,'header_image'=>$header_image,'settings'=>$settings]);
+                            return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer.'-3',['page'=>$article,'header_image'=>$header_image,'settings'=>$settings,'app'=>Yii::$app]);
                     endif;
-                    return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer,['page'=>$article,'header_image'=>$header_image,'settings'=>$settings]);
+                    return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer,['page'=>$article,'header_image'=>$header_image,'settings'=>$settings,'app'=>Yii::$app]);
     }
     
     public function actionWidget(){

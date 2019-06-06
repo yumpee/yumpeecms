@@ -48,7 +48,7 @@ class Pages extends \backend\models\Pages
             return $this->hasOne(Pages::className(),['id'=>'parent_id']);
         }
         public function getChild(){
-            return $this->hasMany(Pages::className(),['parent_id'=>'id']);
+            return $this->hasMany(Pages::className(),['parent_id'=>'id'])->all();
         }
         public function afterFind(){            
             if($this->published=="N"):
@@ -58,10 +58,13 @@ class Pages extends \backend\models\Pages
                 if(Yii::$app->user->isGuest):
                     //throw new \yii\web\HttpException(404, 'You do not have sufficient rights to view this page. Consult with your administrator.');
                 elseif (strpos($this->permissions,Yii::$app->user->identity->role_id) === false) :    
-                    $this->description="<font color='red'>You do not have access to view this content. Consult the Administrator</font>";
+                    $this->description="<font color='red'>You do not have access to view this content. Consult the Administrator</font>";                    
+                    echo "<center>You do not have permissions to view this page. Consult the Administrator</center>";
+                    exit;
                 endif;
             endif;
             parent::afterFind();
             
         }
+        
 }

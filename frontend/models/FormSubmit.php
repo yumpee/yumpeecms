@@ -51,7 +51,12 @@ class FormSubmit extends \yii\db\ActiveRecord
     public function getData(){
         return $this->hasMany(FormData::className(),['form_submit_id'=>'id']);
     }
-    
+    public function reference($form,$field,$value){
+        
+    }
+    public function getVal($form,$field,$value){
+        return $this->hasMany(FormData::className(),['form_submit_id'=>'id']);
+    }
     public function getBaseURL(){
         return Yii::$app->request->getBaseUrl();
     }

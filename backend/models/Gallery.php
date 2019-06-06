@@ -45,6 +45,9 @@ class Gallery extends \yii\db\ActiveRecord{
             
         ];
     } 
+    public function getItems(){
+        return $this->hasMany(GalleryImage::className(),['gallery_id'=>'id']);
+    }
     public function getImages(){
         $return="";
         //$records = Yii::$app->db->createCommand("SELECT media_id FROM tbl_slider_image WHERE slider_id='".Yii::$app->request->get('id')."'")->queryAll();

@@ -50,16 +50,26 @@ class Menus extends \yii\db\ActiveRecord
             $subquery = (new \yii\db\Query())->select('menu_id')->from('tbl_menu_page')->where(['profile'=>$menu_profile]);
             
             if (Yii::$app->user->isGuest) {
-                return Pages::find()->where(['in',"id",$subquery])->andWhere('require_login<>"Y"')->all();
-                
+                if($subquery==null):                        
+                        return Pages::find()->where(['require_login'=>'Y'])->orderBy('sort_order')->all();                
+                    else:
+                        
+                        return Pages::find()->where(['in',"id",$subquery])->andWhere('require_login<>"Y"')->orderBy('sort_order')->all();
+                endif;        
             }else{
                 $username = \Yii::$app->user->identity->username;
+                
                 $user_rec = Users::find()->where(['username'=>$username])->one();
                 $subquery = (new \yii\db\Query())->select('menu_id')->from('tbl_menu_page')->where(['profile'=>$user_rec->role->menu_id]);
                 $header_menus = Pages::find()->where(['in',"id",$subquery])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
                 if($header_menus==null):
                     $subquery = (new \yii\db\Query())->select('menu_id')->from('tbl_menu_page')->where(['profile'=>$menu_profile]);
-                    return Pages::find()->where(['in',"id",$subquery])->andWhere('hideon_login<>"Y"')->all();
+                
+                    if($menu_profile==0):                        
+                        return Pages::find()->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();                
+                    else:
+                        return Pages::find()->where(['in',"id",$subquery])->andWhere('hideon_login<>"Y"')->orderBy('sort_order')->all();
+                    endif;
                 else:                    
                     return $header_menus;
                 endif;

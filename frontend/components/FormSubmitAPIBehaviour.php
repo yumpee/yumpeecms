@@ -44,8 +44,6 @@ class FormSubmitAPIBehaviour extends Behavior{
         $pattern = "/{yumpee_hook}(.*?){\/yumpee_hook}/";  //use this to capture form elements submitted
         $pattern_setting= "/{yumpee_setting}(.*?){\/yumpee_setting}/"; //use this to capture settings value in the settings page
         $pattern_record= "/{yumpee_record}(.*?){\/yumpee_record}/"; //use this for the client id and secret   
-        
-        
         $json_data = preg_replace_callback($pattern,function ($matches) {
                             $request = Yii::$app->request;
                             $replacer="";
@@ -77,12 +75,54 @@ class FormSubmitAPIBehaviour extends Behavior{
         if($webhook->post_type=="G"):
             $ptype="GET";
         endif;
+        if($webhook->post_type=="T"):
+            $ptype="PUT";
+        endif;
+        if($webhook->post_type=="D"):
+            $ptype="DELETE";
+        endif;
         $body="";
         $headers="";
-                                                                              
+                                                                   
         if($webhook->client_profile!==null && $webhook->client_profile!=""):
             $client_obj = ServicesOutgoing::find()->where(['id'=>$webhook->client_profile])->one();
             $config = json_decode($client_obj['config']);
+            $client_header = preg_replace_callback($pattern,function ($matches) {
+                            $request = Yii::$app->request;
+                            $replacer="";
+                            $replacer=$request->getBodyParam($matches[1]);
+                            return $replacer;
+                    },$client_obj["header"]);
+                    
+            $client_header = preg_replace_callback($pattern_setting,function ($matches) {
+                            $replacer = ContentBuilder::getSetting($matches[1]);                            
+                            return $replacer;
+                    },$client_header);
+            if($config->authentication=="none"):
+                $ch = curl_init($web_endpoint); 
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $ptype);                                                                     
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);                                                                  
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                if($client_header!=""):
+                    $post_arr = explode(",",$client_header);
+                    $nr = array();
+                    $nr = $post_arr;
+                    $count = count($post_arr);
+                    $nr[$count]='Content-Type: application/json';  
+                    $nr[$count + 1]='Content-Length: '. strlen($json_data); 
+                   curl_setopt($ch, CURLOPT_HTTPHEADER, $nr );
+                   //return $json_data;
+                  //curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")),'NETOAPI_USERNAME:NetoAPI','Accept:application/json','NETOAPI_KEY:o1lZClvfWa4jePs7SZ4bT5LbBDD8BYm4','NETOAPI_ACTION:GetOrder'));
+                else:
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($json_data), ) );
+                endif;
+                $result = curl_exec($ch);
+                if(curl_exec($ch) === false):
+                        return 'Curl error: ' . curl_error($ch);
+                else:
+                        return $result;
+                endif;
+            endif;
             if($config->authentication=="basic"):                
                 $encoded_credentials= base64_encode($client_obj['client_id'].":".$client_obj['client_key']); 
                 $ch = curl_init($web_endpoint); 
@@ -124,7 +164,7 @@ class FormSubmitAPIBehaviour extends Behavior{
                 endif;
                 
                 
-                if(trim($client_obj['header'])!=""):
+                if(trim($client_header)!=""):
                     $headers = preg_replace_callback($pattern_record,function ($matches) use($client_obj){
                                     if($matches[1]=="client_id"):
                                         return $client_obj['client_id'];
@@ -132,7 +172,19 @@ class FormSubmitAPIBehaviour extends Behavior{
                                     if($matches[1]=="client_key"):
                                         return $client_obj['client_key'];
                                     endif;
-                    },$client_obj['header']);      
+                    },$client_header); 
+                    
+                    $headers = preg_replace_callback($pattern_setting,function ($matches) {
+                            $replacer = ContentBuilder::getSetting($matches[1]);                            
+                            return $replacer;
+                    },$headers);
+                    
+                    $headers = preg_replace_callback($pattern,function ($matches) {
+                            $request = Yii::$app->request;
+                            $replacer="";
+                            $replacer=$request->getBodyParam($matches[1]);
+                            return $replacer;
+                    },$headers);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($body), $headers) );
                 else:
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($body), ) );
@@ -200,7 +252,18 @@ class FormSubmitAPIBehaviour extends Behavior{
                                     if($matches[1]=="client_key"):
                                         return $client_obj['client_key'];
                                     endif;
-                    },$client_obj['header']);      
+                    },$client_obj['header']);  
+                    $headers = preg_replace_callback($pattern_setting,function ($matches) {
+                            $replacer = ContentBuilder::getSetting($matches[1]);                            
+                            return $replacer;
+                    },$headers);
+                    
+                    $headers = preg_replace_callback($pattern,function ($matches) {
+                            $request = Yii::$app->request;
+                            $replacer="";
+                            $replacer=$request->getBodyParam($matches[1]);
+                            return $replacer;
+                    },$headers);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($body), $headers) );
                 else:
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($body), ) );

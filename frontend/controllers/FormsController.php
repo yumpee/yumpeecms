@@ -35,14 +35,16 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use frontend\components\ContentBuilder;
-use backend\models\Pages;
+use frontend\models\Pages;
 use backend\models\Forms;
 use backend\models\ArticlesCategories;
 use backend\models\Media;
 use backend\models\CustomWidget;
 use common\components\ResizeImage;
+use common\components\CSVManager;
 use yii\web\Response;
 use frontend\models\Articles;
+use frontend\models\ArticleDetails;
 use frontend\models\ArticleFiles;
 use frontend\models\Twig;
 use frontend\models\Users;
@@ -267,7 +269,7 @@ public function behaviors()
             $page['article'] = $article;
             $form = Forms::find()->where(['id'=>$article->form_id])->one();    
             
-                    $page['records'] = FormSubmit::find()->where(['form_id'=>$article->form_id])->andWhere('published="1"')->all();
+                    $page['records'] = FormSubmit::find()->where(['form_id'=>$article->form_id])->andWhere('published="1"')->limit(200)->all();
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):
                         //we handle the loading of twig template if it is turned on
 						$themes = new Themes();
@@ -439,11 +441,25 @@ public function behaviors()
                                     endif;
                                     $order_sorted=1;
                                 endif; 
-                                if($order_sorted==0):                   
+                                if($order_sorted==0):  
+                                    $offset=0;
+                                    if(Yii::$app->request->get('page')!=null && Yii::$app->request->get('page') >0):
+                                        if(Yii::$app->request->get('limit')!=null):
+                                            $offset = (Yii::$app->request->get('page') - 1) * Yii::$app->request->get('limit');                                            
+                                        endif;
+                                    endif;    
                                     if(trim($ordering)=="DESC"):
-                                        $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_DESC])->asArray()->column();
+                                        if($offset!=0):
+                                            $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_DESC])->offset($offset)->asArray()->column();
+                                        else:
+                                            $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_DESC])->asArray()->column();
+                                        endif;
                                     else:
-                                        $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_ASC])->asArray()->column();  
+                                        if($offset!=0):
+                                            $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_ASC])->offset($offset)->asArray()->column();  
+                                        else:
+                                            $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_ASC])->asArray()->column();  
+                                        endif;
                                     endif;
                                     $query->andWhere(['in','id',$submit_arr])->orderBy(new Expression('FIND_IN_SET (id,:form_submit_id)'))->addParams([':form_submit_id'=>implode(",",$submit_arr)]);
                                     
@@ -492,12 +508,38 @@ public function behaviors()
             if(sizeof($search_params) > 1):
                 $form_arr= array();
                 $int_count=0;
-                foreach($search_params as $param):
-                    list($p,$v)=explode("=",$param);
-                
+                foreach($search_params as $param):                    
+                    $pn = explode("=",$param);
+                    if(count($pn) > 1):
+                        list($p,$v)=explode("=",$param);
+                    endif;
+                    $pl=explode("<",$param);
+                    $pg=explode(">",$param);
+                    $plq=explode("<=",$param);
+                    $pgq=explode(">=",$param);
                     //this is used to search based on submit id
                     if($p=="form_submit_id"):
                             $data_query->andWhere('form_submit_id="'.$v.'"');
+                        continue;
+                    endif;
+                    if(count($pgq) > 1):
+                        $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$pgq[0]])->andWhere('param_val >="'.$pgq[1].'"')->column();
+                        $int_count++;
+                        continue;
+                    endif;
+                    if(count($plq) > 1):
+                        $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$plq[0]])->andWhere('param_val <="'.$plq[1].'"')->column();
+                        $int_count++;
+                        continue;
+                    endif;
+                    if(count($pg) > 1):
+                        $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$pg[0]])->andWhere('param_val >"'.$pg[1].'"')->column();
+                        $int_count++;
+                        continue;
+                    endif;
+                    if(count($pl) > 1):
+                        $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$pl[0]])->andWhere('param_val <"'.$pl[1].'"')->column();
+                        $int_count++;
                         continue;
                     endif;
                     $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$p])->andWhere(['like','param_val',$v])->column();
@@ -574,11 +616,29 @@ public function behaviors()
         if (Yii::$app->request->get('logged')=="true"):
             $query->andWhere('usrname="'.Yii::$app->user->identity->username.'"');            
         endif;
-		if (Yii::$app->request->get('logged')=="false"):
+	if (Yii::$app->request->get('logged')=="false"):
             $query->andWhere('usrname<>"'.Yii::$app->user->identity->username.'"');            
+        endif;
+        if(Yii::$app->request->get('user_id')!=null):
+            $user_arr = Users::find()->where(['id'=>Yii::$app->request->get('user_id')])->one();
+            if($user_arr!=null):
+                $query->andWhere('usrname="'.$user_arr['username'].'"');
+            endif;
         endif;
 	if(Yii::$app->request->get('url')!=null):
             $query->andWhere('url="'.Yii::$app->request->get('url').'"');
+        endif;
+        if(Yii::$app->request->get('date_stamp')!=null):
+            $query->andWhere(['LIKE','date_stamp',Yii::$app->request->get('date_stamp')]);
+        endif;
+        if(Yii::$app->request->get('between')!=null):
+            list($start_from,$end_at) = explode(",",Yii::$app->request->get('between'));
+            if($start_from!=""):
+                $query->andWhere('date_stamp>="'.$start_from.'"');
+            endif;
+            if($end_at!=""):
+                $query->andWhere('date_stamp<="'.$end_at.'"');
+            endif;
         endif;
         if(Yii::$app->request->get('return-type')=="count"):
             return \yii\helpers\Json::encode($query->count());
@@ -645,6 +705,34 @@ public function behaviors()
                                 endif;
                         endif;
                     $id = Articles::saveArticle(); //we get the ID of the article saved
+                    //
+                    //
+                    //if the yumpee-flush-data=* is set then delete all entries
+                        if(Yii::$app->request->post("yumpee-flush-data")=="*"): 
+                            $a = ArticleDetails::deleteAll(['article_id'=>$id]);
+                        endif;
+                       
+                        foreach($_POST as $key => $value)                        {
+                                //we check if the 
+                                if($value<>""):                                    
+                                    $form_data = new ArticleDetails();
+                                    $form_data->setAttribute("article_id",$id);
+                                    $form_data->setAttribute("param",$key);
+                                    $form_data->setAttribute("param_val",$value);
+                                    if(Yii::$app->request->post("yumpee_ignore_save")=="true"):
+                                            //do not save the data
+                                        else:
+                                            $a = ArticleDetails::deleteAll(['article_id'=>$id,'param'=>$key]);
+                                            $form_data->save();
+                                    endif;
+                                else:
+                                    if(Yii::$app->request->post("yumpee-flush-data")!==null):
+                                        if (strpos(Yii::$app->request->post("yumpee-flush-data"), $key) !== false):
+                                            $a = ArticleDetails::deleteAll(['article_id'=>$id,'param'=>$key]);
+                                        endif;
+                                    endif;
+                                endif;
+                        }
                     //we now deal with files if they have been uploaded with this
                     if( strtolower( $_SERVER[ 'REQUEST_METHOD' ] ) == 'post' && !empty( $_FILES ) && !Yii::$app->user->isGuest && $id > 0) {
                                 $random = rand(1000,100000);
@@ -734,6 +822,9 @@ public function behaviors()
                     if(Yii::$app->request->post("about")!=null):
                         $model->setAttribute("about",Yii::$app->request->post("about"));
                     endif;
+                    if(Yii::$app->request->post("extension")!=null):
+                        $model->setAttribute("extensiont",Yii::$app->request->post("extension"));
+                    endif;
                     if(Yii::$app->request->post("passwd")!=null):
                         if($model['password_hash']<>Yii::$app->request->post('passwd')):
                             $model->setAttribute("password_hash",Yii::$app->security->generatePasswordHash(Yii::$app->request->post('passwd')));
@@ -774,19 +865,34 @@ public function behaviors()
                     $model->save();  
                     
                     
+                        if(Yii::$app->request->post("yumpee-flush-data")=="*"): 
+                            $a = ProfileDetails::deleteAll(['profile_id'=>Yii::$app->user->identity->id]);
+                        endif; 
                        
                         foreach($_POST as $key => $value)
                         {
                                 //if there are more fields in this form, we should extend the information and store in the data model
                                 $a = ProfileDetails::deleteAll(['profile_id'=>Yii::$app->user->identity->id,'param'=>$key]);
                                 if($value<>""):
+                                    if($value=="passwd"):
+                                        //we cannot store the password
+                                        continue;
+                                    endif;
                                     $profile_data = new ProfileDetails();
                                     $profile_data->setAttribute("profile_id",Yii::$app->user->identity->id);
                                     $profile_data->setAttribute("param",$key);
                                     $profile_data->setAttribute("param_val",$value);
                                     $profile_data->save();
+                                else:
+                                    if(Yii::$app->request->post("yumpee-flush-data")!==null):
+                                        if (strpos(Yii::$app->request->post("yumpee-flush-data"), $key) !== false):
+                                            $a = ProfileDetails::deleteAll(['profile_id'=>Yii::$app->user->identity->id,'param'=>$key]);
+                                        endif;
+                                    endif;
                                 endif;
                         }
+                        
+                    
                     //we handle form uploads here
                         if( strtolower( $_SERVER[ 'REQUEST_METHOD' ] ) == 'post' && !empty( $_FILES ) ) {
                                 $random = rand(1,10000);
@@ -864,7 +970,9 @@ public function behaviors()
                                 
                             }
                     
-                    
+                    if(Yii::$app->request->post("return-type")=="json"):
+                        return Yii::$app->api->sendSuccessResponse(["id"=>$my_last_insert_id]);
+                    endif;
                     return "Profile Saved";
                 endif;
                 if(Yii::$app->request->post("form_type")=="form-feedback"):
@@ -885,6 +993,10 @@ public function behaviors()
                             $feedback->setAttribute("usrname",$usrname);
                             $feedback->save();
                             
+                        //if the yumpee-flush-data=* is set then delete all entries
+                        if(Yii::$app->request->post("yumpee-flush-data")=="*"): 
+                            $a = FeedbackDetails::deleteAll(['feedback_id'=>$id]);
+                        endif;  
                        
                         foreach($_POST as $key => $value)
                         {
@@ -895,6 +1007,12 @@ public function behaviors()
                                     $feedback_data->setAttribute("param",$key);
                                     $feedback_data->setAttribute("param_val",$value);
                                     $feedback_data->save();
+                                else:
+                                    if(Yii::$app->request->post("yumpee-flush-data")!==null):
+                                        if (strpos(Yii::$app->request->post("yumpee-flush-data"), $key) !== false):
+                                            $a = FeedbackDetails::deleteAll(['feedback_id'=>$id,'param'=>$key]);
+                                        endif;
+                                    endif;
                                 endif;
                         }
                         
@@ -974,6 +1092,7 @@ public function behaviors()
                                 }
                                 
                             }
+                    
                     return "Feedback Saved";
                 endif;
                 if(Yii::$app->request->post("form_type")=="form-twig"):
@@ -1032,24 +1151,36 @@ public function behaviors()
                             $record->setAttribute("token",Yii::$app->request->post("_csrf-frontend"));
                             $record->setAttribute("date_stamp",date("Y-m-d H:i:s"));
                             $record->setAttribute("ip_address",Yii::$app->getRequest()->getUserIP());
+                            //we deal with override of url here. Check to see that no one else has the URL and also ensure that you replace space with '-'
+                            if(Yii::$app->request->post("url")!==null && Yii::$app->request->post("url")!=""):
+                                $nurl = str_replace(" ","-",Yii::$app->request->post("url"));
+                                $form_submit_url = FormSubmit::find()->where(['form_id'=>$form->id])->andWhere('url="'.$nurl.'"')->one();
+                                if($form_submit_url==null):
+                                    $record->setAttribute("url",$nurl);
+                                endif;
+                            endif;
                             
                             if(Yii::$app->request->post("yumpee_ignore_save")=="true"):
                                             //do not save the data
                                         else:
                                             $record->save();
+                                            
+
                             endif;
                             if(Yii::$app->request->post("id")):
                                 $id = Yii::$app->request->post("id");
                             endif;
                         endif;
                         $x="";
-                        //delete where form id is 
-                        //$a = FormData::deleteAll(['form_submit_id'=>$id]);
+                        //if the yumpee-flush-data=* is set then delete all entries
+                        if(Yii::$app->request->post("yumpee-flush-data")=="*"): 
+                            $a = FormData::deleteAll(['form_submit_id'=>$id]);
+                        endif;
                        
                         foreach($_POST as $key => $value)
                         {
-                                if($value<>""):
-                                    
+                                //we check if the 
+                                if($value<>""):                                    
                                     $form_data = new FormData();
                                     $form_data->setAttribute("form_submit_id",$id);
                                     $form_data->setAttribute("param",$key);
@@ -1060,7 +1191,12 @@ public function behaviors()
                                             $a = FormData::deleteAll(['form_submit_id'=>$id,'param'=>$key]);
                                             $form_data->save();
                                     endif;
-                                        
+                                else:
+                                    if(Yii::$app->request->post("yumpee-flush-data")!==null):
+                                        if (strpos(Yii::$app->request->post("yumpee-flush-data"), $key) !== false):
+                                            $a = FormData::deleteAll(['form_submit_id'=>$id,'param'=>$key]);
+                                        endif;
+                                    endif;
                                 endif;
                         }
                         //lets deal with uploaded files here
@@ -1069,6 +1205,32 @@ public function behaviors()
                         else:
                             $session=Yii::$app->session->id;
                         endif;
+                        
+                    //let's handle yumpee-attached-files here
+                    if(Yii::$app->request->post("yumpee-attached-files")!==null): 
+                            $file_arr = explode(",",Yii::$app->request->post("yumpee-attached-files"));
+                            foreach($file_arr as $fl):
+                                $file_rec = FormFiles::find()->where(['id'=>$fl])->one();
+                                if($file_rec!=null):
+                                $frmFiles = new FormFiles();
+                                $frmFiles->setAttribute("form_submit_id",$id);
+                                $frmFiles->setAttribute("file_name",$file_rec['file_name']);
+                                $frmFiles->setAttribute("file_path",$file_rec['file_path']);
+                                $frmFiles->setAttribute("file_type",$file_rec['file_type']);
+                                $frmFiles->setAttribute("file_size",$file_rec['file_size']);
+                                $frmFiles->setAttribute("doc_name",$file_rec['doc_name']);
+                                $frmFiles->save();
+                                endif;
+                            endforeach;
+                    endif;
+                    
+                    if(Yii::$app->request->post("yumpee-flush-file")!==null):
+                            if (Yii::$app->request->post("yumpee-flush-file") =="*"):
+                                $a = FormFiles::deleteAll(['form_submit_id'=>$id]);
+                            else:
+                                $a = FormFiles::deleteAll(['id'=>Yii::$app->request->post("yumpee-flush-file")]);
+                            endif;
+                    endif;
                         if( strtolower( $_SERVER[ 'REQUEST_METHOD' ] ) == 'post' && !empty( $_FILES ) ) {
                                 $directory = Yii::getAlias('@uploads/uploads/') .$session;
                                 if (!is_dir($directory)) {
@@ -1094,6 +1256,73 @@ public function behaviors()
                                                 }else{
                                                     move_uploaded_file( $v['tmp_name'], $filePath."/".$fileName); // move to new location perhaps?
                                                 }
+                                                //if you are uploading a CSV, then handle it differently
+                                                if(Yii::$app->request->post("yumpee_upload_csv")=="true"):
+                                                    $handle = fopen($filePath."/".$fileName, "r");
+                                                    $row_counter=0;
+                                                    $row_header=[];
+                                                    while (($fileop = fgetcsv($handle, 1000, ",")) !== false) 
+                                                    {
+                                                        if($row_counter==0):
+                                                            $row_header =$fileop;
+                                                        else:
+                                                            $form_submit = new FormSubmit();
+                                                            if($form->published=="Y"):
+                                                                $form_submit->setAttribute('published',"1");
+                                                            else :
+                                                                $form_submit->setAttribute('published',"0");
+                                                            endif;
+                                                            $form_submit->setAttribute("form_id",Yii::$app->request->post("form_id"));
+                                                            $form_submit->setAttribute("usrname",$usrname);
+                                                            $form_submit->setAttribute("token",Yii::$app->request->post("_csrf-frontend"));
+                                                            $form_submit->setAttribute("date_stamp",date("Y-m-d H:i:s"));
+                                                            $form_submit->setAttribute("ip_address",Yii::$app->getRequest()->getUserIP());
+                                                            $form_submit->setAttribute("url",$usrname.md5(Yii::$app->getRequest()->getUserIP().date('YmdHiis')));
+                                                            if(Yii::$app->request->post("yumpee_ignore_save")=="true"):
+                                                                    //lets ignore the save
+                                                                    $id="0";
+                                                            else:
+                                                                    $form_submit->save();
+                                                                    $id = $form_submit->id;
+                                                            endif;
+                                                            $column=0;
+                                                            foreach($fileop as $value):                                                                
+                                                                if($value<>""):                                    
+                                                                $form_data = new FormData();
+                                                                $form_data->setAttribute("form_submit_id",$id);
+                                                                $form_data->setAttribute("param",$row_header[$column]);
+                                                                $form_data->setAttribute("param_val",$value);
+                                                                    if(Yii::$app->request->post("yumpee_ignore_save")=="true"):
+                                                                        //do not save the data
+                                                                    else:  
+                                                                            $form_data->save();
+                                                                    endif;
+                                                                endif;
+                                                                $column++;
+                                                            endforeach;
+                                                            //we need to use te fields also submitted against CSV to label CSV
+                                                            foreach($_POST as $key => $value)
+                                                            {
+                                                                if($value<>""):
+                                                                $form_data = new FormData();
+                                                                $form_data->setAttribute("form_submit_id",$id);
+                                                                $form_data->setAttribute("param",$key);
+                                                                $form_data->setAttribute("param_val",$value);
+                                                                    if(Yii::$app->request->post("yumpee_ignore_save")=="true"):
+                                                                    //do not save the data
+                                                                    else:
+                                                                        $a = FormData::deleteAll(['form_submit_id'=>$id,'param'=>$key]);
+                                                                        $form_data->save();
+                                                                    endif;
+                                        
+                                                                endif;
+                                                            }
+                                                        endif;
+                                                        $row_counter++;                                                        
+                                                    }
+                                                endif;
+                                                //////End of CSV conditional upload
+                                                
                                                 $frmFiles = new FormFiles();
                                                 $frmFiles->setAttribute("form_submit_id",$id);
                                                 $frmFiles->setAttribute("file_name",$v['name']);
@@ -1123,6 +1352,75 @@ public function behaviors()
                                                     }else{
                                                         move_uploaded_file( $v['tmp_name'][$counter], $filePath."/".$fileName); // move to new location perhaps?
                                                     }
+                                                    
+                                                //if you are uploading a CSV, then handle it differently
+                                                if(Yii::$app->request->post("yumpee_upload_csv")=="true"):
+                                                    $handle = fopen($filePath."/".$fileName, "r");
+                                                    $row_counter=0;
+                                                    $row_header=[];
+                                                    while (($fileop = fgetcsv($handle, 1000, ",")) !== false) 
+                                                    {
+                                                        if($row_counter==0):
+                                                            $row_header =$fileop;
+                                                        else:
+                                                            $form_submit = new FormSubmit();
+                                                            if($form->published=="Y"):
+                                                                $form_submit->setAttribute('published',"1");
+                                                            else :
+                                                                $form_submit->setAttribute('published',"0");
+                                                            endif;
+                                                            $form_submit->setAttribute("form_id",Yii::$app->request->post("form_id"));
+                                                            $form_submit->setAttribute("usrname",$usrname);
+                                                            $form_submit->setAttribute("token",Yii::$app->request->post("_csrf-frontend"));
+                                                            $form_submit->setAttribute("date_stamp",date("Y-m-d H:i:s"));
+                                                            $form_submit->setAttribute("ip_address",Yii::$app->getRequest()->getUserIP());
+                                                            $form_submit->setAttribute("url",$usrname.md5(Yii::$app->getRequest()->getUserIP().date('YmdHiis')));
+                                                            if(Yii::$app->request->post("yumpee_ignore_save")=="true"):
+                                                                    //lets ignore the save
+                                                                    $id="0";
+                                                            else:
+                                                                    $form_submit->save();
+                                                                    $id = $form_submit->id;
+                                                            endif;
+                                                            $column=0;
+                                                            foreach($fileop as $value):                                                                
+                                                                if($value<>""):                                    
+                                                                $form_data = new FormData();
+                                                                $form_data->setAttribute("form_submit_id",$id);
+                                                                $form_data->setAttribute("param",$row_header[$column]);
+                                                                $form_data->setAttribute("param_val",$value);
+                                                                    if(Yii::$app->request->post("yumpee_ignore_save")=="true"):
+                                                                        //do not save the data
+                                                                    else:  
+                                                                            $form_data->save();
+                                                                    endif;
+                                                                endif;
+                                                                $column++;
+                                                            endforeach;
+                                                            //we need to use te fields also submitted against CSV to label CSV
+                                                            foreach($_POST as $key => $value)
+                                                            {
+                                                                if($value<>""):
+                                                                $form_data = new FormData();
+                                                                $form_data->setAttribute("form_submit_id",$id);
+                                                                $form_data->setAttribute("param",$key);
+                                                                $form_data->setAttribute("param_val",$value);
+                                                                    if(Yii::$app->request->post("yumpee_ignore_save")=="true"):
+                                                                    //do not save the data
+                                                                    else:
+                                                                        $a = FormData::deleteAll(['form_submit_id'=>$id,'param'=>$key]);
+                                                                        $form_data->save();
+                                                                    endif;
+                                        
+                                                                endif;
+                                                            }
+                                                            
+                                                        endif;
+                                                        $row_counter++;                                                        
+                                                    }
+                                                endif;
+                                                //////End of CSV conditional upload
+                                                    
                                                     $frmFiles = new FormFiles();
                                                     $frmFiles->setAttribute("form_submit_id",$id);
                                                     $frmFiles->setAttribute("file_name",$v['name'][$counter]);
@@ -1169,13 +1467,14 @@ public function behaviors()
                                 
                             endif;
                 endif;
-                return "Form saved successfully ";
-                
+                if(Yii::$app->request->post("return-type")=="json"):
+                    //if the form requests a json return after submission
+                    $return = ["id"=>$id];
+                    return Yii::$app->api->sendSuccessResponse($return);
+                endif;
+                return "Form saved successfully ";                
         }
-
-        
-        
-    }
+}
     
 public static function actionFeedback(){
     /*

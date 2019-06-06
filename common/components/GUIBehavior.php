@@ -34,6 +34,7 @@ use backend\models\ClassAttributes;
 use frontend\models\Blocks;
 use backend\models\BlockGroup;
 use backend\models\BlockGroupList;
+use backend\models\Templates;
 use frontend\models\FormData;
 use frontend\models\FormSubmit;
 use backend\models\Forms;
@@ -83,6 +84,8 @@ class GUIBehavior extends Behavior
         $pattern_testimonial="/{yumpee_testimonial}(.*?){\/yumpee_testimonial}/";
         $pattern_article="/{yumpee_article}(.*?){\/yumpee_article}/";
         $pattern_page="/{yumpee_page}(.*?){\/yumpee_page}/";
+        $pattern_comment="/{yumpee_comment}(.*?){\/yumpee_comment}/";
+        $pattern_gallery="/{yumpee_gallery}(.*?){\/yumpee_gallery}/";
         
 		
 		$themes = new Themes();
@@ -134,6 +137,9 @@ class GUIBehavior extends Behavior
                             endif;
                             if($matches[1]=="username" && Yii::$app->user->identity!=null):
                                 $replacer=Yii::$app->user->identity->username;
+                            endif;
+                            if($matches[1]=="role_id" && Yii::$app->user->identity!=null):
+                                $replacer=Yii::$app->user->identity->role_id;
                             endif;
                             return $replacer;
                     },$content);  
@@ -221,35 +227,66 @@ class GUIBehavior extends Behavior
                                 $data_query->all();
                             endif;
                             $submit_query = FormSubmit::find();
-                            
+                            $order_sorted=0;
                             if($order!=""):
                                 if($order=="random"):
                                     $submit_query->orderBy(new Expression('rand()'));
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="last"):
                                     $submit_query->orderBy(['date_stamp'=>SORT_DESC]);
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="first"):
                                     $submit_query->orderBy(['date_stamp'=>SORT_ASC]);
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="views"):
                                     $submit_query->orderBy(['no_of_views'=>SORT_DESC]);
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="user"):
                                     $submit_query->orderBy(['usrname'=>SORT_ASC]);
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="rating"):
                                     $submit_query->orderBy(['rating'=>SORT_DESC]);
-                                endif;  
+                                    $order_sorted=1;
+                                endif;                               
+                                
                                 if($order=="count"):
-                                    if($andWhere!=""){
+                                    if($andWhere!=""):
                                         $elements = $submit_query->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->andWhere($andWhere);
-                                    }else{
+                                    else:
                                         $elements = $submit_query->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"');
-                                    }
+                                    endif;
                                     $elements = $submit_query->count();
                                     $replacer = \yii\helpers\Json::encode($elements);
                                     return $replacer;
+                                endif;
+                                if($order_sorted==0):
+                                    $order_arr= explode(" ",$order);
+                                    $ordering="";
+                                    if(sizeof($order_arr) > 1):
+                                        $ordering = $order_arr[1];
+                                        $order=trim($order_arr[0]);
+                                    endif;
+                                    if(trim($ordering)=="DESC"):
+                                        if($limit!=""):
+                                            $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_DESC])->offset($limit)->asArray()->column();
+                                        else:
+                                            $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_DESC])->asArray()->column();
+                                        endif;                                        
+                                    else:
+                                        if($limit!=""):
+                                            $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_ASC])->offset($limit)->asArray()->column();
+                                        else:
+                                            $submit_arr = FormData::find()->select('form_submit_id')->where(['param'=>$order])->orderBy(['param_val'=>SORT_ASC])->asArray()->column();  
+                                        endif;
+                                        
+                                    endif;
+                                    $submit_query->andWhere(['in','id',$submit_arr])->orderBy(new Expression('FIND_IN_SET (id,:form_submit_id)'))->addParams([':form_submit_id'=>implode(",",$submit_arr)]);
+                                    
                                 endif;
                             endif;
                             if($limit!=""):
@@ -368,11 +405,72 @@ class GUIBehavior extends Behavior
                             
                             return \yii\helpers\Json::encode($testimonial_arr);
                     },$content);
+        $content = preg_replace_callback($pattern_comment,function ($matches) {
+                            $replacer="";
+                            if($matches[1]<>"all"):
+                                $testimonial_arr=\backend\models\Comments::find()->limit($matches[1])->all();
+                            else:
+                                $testimonial_arr=\backend\models\Comments::find()->all();
+                            endif;
+                            
+                            return \yii\helpers\Json::encode($testimonial_arr);
+                    },$content);
+        $content = preg_replace_callback($pattern_gallery,function ($matches) {
+                            $replacer="";
+                            $gallery_arr=[];
+                            if($matches[1]<>"all"):
+                                $gallery_arr=\backend\models\Gallery::find()->with('items')->asArray()->where(['name'=>$matches[1]])->one();                            
+                            endif;
+                            
+                            return \yii\helpers\Json::encode($gallery_arr);
+                    },$content);
         //process page calls
-        $content = preg_replace_callback($pattern_article,function ($matches) { 
+        $content = preg_replace_callback($pattern_page,function ($matches) { 
             if($matches[1]=="*"):
                 $page_arr = \frontend\models\Pages::find()->all();
             else:
+                $params = explode(":",$matches[1]);
+                if($params[0]!=null):
+                    $submit_query = \frontend\models\Pages::find();
+                     $filter = explode("|",$params[0]);
+                                foreach ($filter as $filter_rec):
+                                    list($v,$p)=explode("=",$filter_rec);
+                                    if($v=="route"):
+                                        $template = \backend\models\Templates::find()->where(['route'=>$p])->one();
+                                        $submit_query->where(['template'=>$template['id']]);
+                                    endif;
+                                endforeach;
+                                if($params[1]!=null):
+                                    $limit = $params[1];
+                                    $submit_query->limit($limit);
+                                endif;
+                                if($params[2]!=null):
+                                    $p=explode(" ",$params[2]);
+                                    if(count($p) > 1):
+                                        if($p[1]=="DESC"):
+                                            $sort="SORT_DESC";
+                                        else:
+                                            $sort="SORT_ASC";
+                                        endif;
+                                    else:
+                                        $sort="SORT_ASC";
+                                    endif;
+                                    $orderby=$p[0];
+                                    if($params[2]=="last"):                                    
+                                        $submit_query->orderBy(['updated'=>SORT_DESC]);
+                                    elseif($params[2]=="first"):
+                                        $submit_query->orderBy(['updated'=>SORT_ASC]);
+                                    else:
+                                        if($sort=="SORT_DESC"):
+                                            $submit_query->orderBy([$orderby=>SORT_DESC]);
+                                        else:
+                                            $submit_query->orderBy([$orderby=>SORT_ASC]);
+                                        endif;
+                                    endif;
+                                endif;
+                                $page_arr = $submit_query->all();
+                                return \yii\helpers\Json::encode($page_arr);
+                endif;
                 $page_arr = \frontend\models\Pages::find()->where(['url'=>$matches[1]])->one();
             endif;
             return \yii\helpers\Json::encode($page_arr);
@@ -386,9 +484,9 @@ class GUIBehavior extends Behavior
                                 $filter = explode("|",$params[0]);
                                 foreach ($filter as $filter_rec):
                                     list($v,$p)=explode("=",$filter_rec);
-                                    if($v=="index"):
+                                    if($v=="index"):                                        
                                         $page = \backend\models\Pages::find()->where(['url'=>$p])->one();
-                                        $blog_index_articles = \backend\models\ArticlesBlogIndex::find()->select('articles_id')->where(['blog_index_id'=>$page['id']])->column();
+                                        $blog_index_articles = \backend\models\ArticlesBlogIndex::find()->select('articles_id')->where(['blog_index_id'=>$page['id']])->column();                                        
                                         $submit_query->where(['IN','id',$blog_index_articles]);
                                     endif;
                                     if($v=="category"):
@@ -427,7 +525,7 @@ class GUIBehavior extends Behavior
                                 endif;
                                 
                             endif;
-                            $article_arr = $submit_query->with('documents','feedback','details','approvedComments')->asArray()->all();                            
+                            $article_arr = $submit_query->with('documents','feedback','details','approvedComments','displayImage','blogIndex','blogIndex.page','author')->asArray()->all();                            
                             return \yii\helpers\Json::encode($article_arr);
                     },$content);
         //End of Articles shortcodes
@@ -440,6 +538,7 @@ class GUIBehavior extends Behavior
                             else:
                                 $menu_id = $menu_arr['id'];
                             endif;
+                            
                             return \yii\helpers\Json::encode(\backend\models\Menus::getProfileMenus($menu_id));
                     },$content);
         $content = preg_replace_callback($pattern_login_to_view,function ($matches) {
@@ -464,7 +563,12 @@ class GUIBehavior extends Behavior
                             return $replacer;
                     },$content);  
         $content = preg_replace_callback($pattern_role,function ($matches) {
+                            if($matches[1]=="all"):
+                                $replacer = Roles::find()->orderBy('name')->all(); 
+                                return \yii\helpers\Json::encode($replacer);
+                            endif;
                         if(Yii::$app->user->id):
+                            
                             $role = Roles::find()->where(['id'=>Yii::$app->user->identity->role_id])->one();
                             if($role->name==$matches[1]):
                                 return $matches[2];
@@ -475,6 +579,9 @@ class GUIBehavior extends Behavior
                     },$content);
         $array=$content;           
         $array = preg_replace_callback($pattern_setting,function ($matches) {
+                            if($matches[1]=="yumpee_role_home_page"):
+                                return ContentBuilder::getRoleHomePage();
+                            endif;
                             $replacer = ContentBuilder::getSetting($matches[1]);                            
                             return $replacer;
                     },$array); 
