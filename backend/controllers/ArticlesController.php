@@ -40,11 +40,56 @@ use backend\models\ArticleMedia;
 use backend\models\ArticleDetails;
 use backend\models\Templates;
 use backend\models\Roles;
+use backend\models\Tags;
+use backend\models\BackEndMenus;
+use backend\models\BackEndMenuRole;
+
+
 
 use fedemotta\datatables\DataTables;
 
 class ArticlesController extends Controller{
-
+public function behaviors()
+{
+    if(Settings::find()->where(['setting_name'=>'use_custom_backend_menus'])->one()->setting_value=="on" && !Yii::$app->user->isGuest):
+    $can_access=1;
+    $route = "/".Yii::$app->request->get("r");
+    //check to see if route exists in our system
+    $menu_rec = BackEndMenus::find()->where(['url'=>$route])->one();
+    if($menu_rec!=null):
+        //we now check that the current role has rights to use it
+        $role_access = BackEndMenuRole::find()->where(['menu_id'=>$menu_rec->id,'role_id'=>Yii::$app->user->identity->role_id])->one();
+        if(!$role_access):
+            //let's take a step further if there is a custom module
+            $can_access=0;            
+        endif;
+    endif;
+    if($can_access < 1):
+        echo "You do not have permission to view this page";
+        exit;
+    endif;
+    endif;
+    
+    return [
+        'access' => [
+            'class' => \yii\filters\AccessControl::className(),
+            'only' => ['create', 'update'],
+            'rules' => [
+                // deny all POST requests
+                [
+                    'allow' => false,
+                    'verbs' => ['POST']
+                ],
+                // allow authenticated users
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                ],
+                // everything else is denied
+            ],
+        ],
+    ];
+}
 public function actionIndex()
     {
         
@@ -133,6 +178,20 @@ public function actionSave(){
                             $model->save();                            
                     endif;
                 endfor;
+                $db_arr=array("category","blog_index","articles_id","url","id","processor","tag_array","date","title","featured_media");
+                        $id = Yii::$app->request->post("id");
+                        foreach($_POST as $key => $value)
+                        {
+                                //if there are more fields in this form, we should extend the information and store in the data model
+                                $a = ArticleDetails::deleteAll(['article_id'=>$id,'param'=>$key]);
+                                if($value<>"" && !in_array($key,$db_arr)):                                    
+                                    $profile_data = new ArticleDetails();
+                                    $profile_data->setAttribute("article_id",$id);
+                                    $profile_data->setAttribute("param",$key);
+                                    $profile_data->setAttribute("param_val",$value);
+                                    $profile_data->save(false);
+                                endif;
+                        }
             endif;
             echo Articles::saveArticle();                        
     }
@@ -202,6 +261,75 @@ public function actionCategoryDelete(){
 public function actionDeleteAttachment(){
     ArticleMedia::deleteAll(['article_id'=>Yii::$app->request->get('article_id'),'media_id'=>Yii::$app->request->get('id')]);
     echo "Record successfully deleted";
+}
+public function actionAddTag(){
+    //we check to see if the tag already exist and if not we create it and get the ID
+    $tag = Tags::find()->where(['name'=>Yii::$app->request->get('tag')])->one();
+    if($tag!=null):
+        return $tag->id;
+    else:
+            
+            if(Yii::$app->request->get("url")==""):
+                $url=strtolower(str_replace(" ","-",Yii::$app->request->get("tag")));            
+            endif;
+           $url_gen=0;
+           $url_exist = Pages::find()->where(['url'=>$url])->one();
+           if($url_exist!=null):
+               $url_gen=1;
+               $url=$url."_".md5(date("YmdHis").rand(10000,1000000));
+           endif;
+           if($url_gen==0):
+            $url_exist = Tags::find()->where(['url'=>$url])->one();
+            if($url_exist!=null):
+                $url_gen=1;
+                $url=$url."_".md5(date("YmdHis").rand(10000,1000000));
+            endif;
+           endif;
+           if($url_gen==0):
+            $url_exist = Templates::find()->where(['url'=>$url])->one();
+            if($url_exist!=null):
+                $url_gen=1;
+                $url=$url."_".md5(date("YmdHis").rand(10000,1000000));
+            endif;
+           endif;
+           if($url_gen==0):
+            $url_exist = ArticlesCategories::find()->where(['url'=>$url])->one();
+            if($url_exist!=null):
+                $url_gen=1;
+                $url=$url."_".md5(date("YmdHis").rand(10000,1000000));
+            endif;
+           endif;
+           $records = new Tags();
+           $id = md5(date('Ymdis').rand(1000,100000));
+           $records->setAttribute('id',$id);
+           $records->setAttribute('url',$url);
+           $records->setAttribute('name',Yii::$app->request->get("tag"));
+           $records->setAttribute('description',"");
+           $records->setAttribute('master_content','1');
+           $records->save();  
+           return $id;
+    endif;
+}
+public function actionDetails(){
+        $page=[];
+        $page['article'] = Articles::find()->where(['id'=>Yii::$app->request->get("article")])->one();
+        $page['records'] = ArticleDetails::find()->where(['article_id'=>Yii::$app->request->get("article")])->all();
+        return $this->renderPartial("details",$page);
+}
+public function actionSaveProfileDetails(){    
+    foreach($_POST as $key => $value)
+                        {
+                                //if there are more fields in this form, we should extend the information and store in the data model
+                                $a = ArticleDetails::deleteAll(['article_id'=>Yii::$app->request->post("article_id"),'param'=>$key]);
+                                if($value<>""):                                    
+                                    $profile_data = new ArticleDetails();
+                                    $profile_data->setAttribute("article_id",Yii::$app->request->post("article_id"));
+                                    $profile_data->setAttribute("param",$key);
+                                    $profile_data->setAttribute("param_val",$value);
+                                    $profile_data->save();
+                                endif;
+                        }
+    return "Details saved";
 }
 }
 

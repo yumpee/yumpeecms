@@ -87,7 +87,7 @@ class Tags extends \yii\db\ActiveRecord
            endif;
            $records = new Tags();
            $records->setAttribute('id',md5(date('Ymdis').rand(1000,100000)));
-           $records->setAttribute('url',Yii::$app->request->post("url"));
+           $records->setAttribute('url',$url);
            $records->setAttribute('name',Yii::$app->request->post("name"));
            $records->setAttribute('description',Yii::$app->request->post("description"));
            $records->setAttribute('master_content','1');
@@ -101,7 +101,7 @@ class Tags extends \yii\db\ActiveRecord
         $query = new \yii\db\Query;
         $search = Yii::$app->request->get('search');
         if(Yii::$app->request->get('search')):
-                return Tags::find()->where(['LIKE','name','%'.$search.'%'])->orderBy('name')->all();
+                return Tags::find()->where(['LIKE','name',$search])->orderBy('name')->all();
             else:
                 return Tags::find()->orderBy('name')->all();
         endif;

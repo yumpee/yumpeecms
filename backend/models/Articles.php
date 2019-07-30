@@ -267,7 +267,9 @@ class Articles extends \yii\db\ActiveRecord
                     $c->setAttribute('articles_id',$id);
                     $c->save();   
                endif;
-        endfor;        
+        endfor;   
+        
+                        
             return "Updates successfully made";
         }else{           
             $id=md5(date('Ymdis'));
@@ -354,8 +356,7 @@ class Articles extends \yii\db\ActiveRecord
                     $c->setAttribute('articles_id',$id);
                     $c->setAttribute('blog_index_id',$selected);
                     $c->save();     
-                }
-                
+                }                
             }
             
             return "Articles successfully created";

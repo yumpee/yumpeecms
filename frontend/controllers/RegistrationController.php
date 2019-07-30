@@ -29,6 +29,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use frontend\components\ContentBuilder;
 use frontend\models\SignupForm;
+use frontend\models\ProfileDetails;
 use frontend\models\Twig;
 use frontend\models\Templates;
 use backend\models\Pages;
@@ -77,6 +78,22 @@ public function behaviors()
             $result = $model->registerNewUser();          
             
             if($result!=null && isset($result["id"])): 
+                    foreach($_POST as $key => $value):                        
+                                //if there are more fields in this form, we should extend the information and store in the data model
+                                $a = ProfileDetails::deleteAll(['profile_id'=>$result["id"],'param'=>$key]);
+                                if($value<>""):
+                                    if($key=="password"):
+                                        //we cannot store the password
+                                        continue;
+                                    endif;
+                                    $profile_data = new ProfileDetails();
+                                    $profile_data->setAttribute("profile_id",$result["id"]);
+                                    $profile_data->setAttribute("param",$key);
+                                    $profile_data->setAttribute("param_val",$value);
+                                    $profile_data->save();                                    
+                                endif;
+                    endforeach;
+                
                 if(Yii::$app->request->post("mail-widget")!==null && Yii::$app->request->post("mail-widget")!="" && $twig_set=="Yes"):
                     $theme_id = ContentBuilder::getSetting("current_theme");
                     $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>Yii::$app->request->post("mail-widget"),'renderer_type'=>'I'])->one();
@@ -162,7 +179,7 @@ public function behaviors()
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
                             $twig = new \Twig_Environment($loader);
-                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article]);
+                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
                             return $this->render('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
                     endif;

@@ -40,6 +40,7 @@ use backend\models\Roles;
 
 
 class BackendController extends Controller {
+    
     //put your code here
     public function actionIndex(){
        $page=[];
@@ -53,6 +54,7 @@ class BackendController extends Controller {
        
        $menus = BackEndMenus::find()->orderBy('label')->all();
        $menu_map = yii\helpers\ArrayHelper::map($menus, 'id', 'name');
+       $menu_parents = yii\helpers\ArrayHelper::map($menus, 'id','parent_id');
        $page['parent_menus'] = \yii\helpers\Html::dropDownList("parent_id",$page['rs']['parent_id'],$menu_map,['prompt'=>'Select a menu','class'=>'form-control']);
        $page['records']= BackEndMenus::find()->orderBy('label')->all();
        
@@ -70,7 +72,8 @@ class BackendController extends Controller {
                 $selected = BackEndMenuRole::find()->select('menu_id')->where(['role_id'=>Yii::$app->request->get("role_id")])->column();
                 $page['menus_list'] = \yii\helpers\Html::checkboxList("menu_permission_id",$selected,$menu_map,['separator' => '<br>']);
                 $page['selected'] = $selected;
-                $page['menu_map'] = $menu_map;                
+                $page['menu_map'] = $menu_map;  
+                $page['menu_parents'] = BackEndMenus::find()->orderBy('parent_id','priority')->all();
            else:
                $page['menus_list'] = \yii\helpers\Html::checkboxList("menu_permission_id",NULL,$menu_map);
        endif;
@@ -104,10 +107,9 @@ class BackendController extends Controller {
         //$model->setAttribute("original_label",Yii::$app->request->post("label"));
         $model->save();
         return "Menus successfully created";
-    endif;
-        
-        
+    endif;  
     }
+    
     public function actionApply(){
         BackEndMenuRole::deleteAll(['IN','role_id',Yii::$app->request->post("role_id")]);
         

@@ -27,6 +27,7 @@ namespace backend\models;
 use Yii;
 use frontend\models\FormSubmit;
 use backend\models\Forms;
+use backend\models\ProfileDetails;
 
 
 class Users extends \yii\db\ActiveRecord
@@ -35,6 +36,7 @@ class Users extends \yii\db\ActiveRecord
     {
         return 'tbl_user';
     }
+    
     public function getRole(){
         return $this->hasOne(Roles::className(),['id'=>'role_id']);
     }
@@ -94,8 +96,24 @@ class Users extends \yii\db\ActiveRecord
            //if the password has changed
            if($records['password_hash']<>Yii::$app->request->post('passwd')):
                $records->setAttribute('password_hash',Yii::$app->security->generatePasswordHash($password));
-           endif;
+           endif;  
             $records->save();
+            
+            foreach($_POST as $key => $value)
+                        {
+                                $a = ProfileDetails::deleteAll(['profile_id'=>Yii::$app->request->post("id"),'param'=>$key]);
+                                if($value<>""):
+                                    if($key=="passwd"):
+                                        //we cannot store the password
+                                        continue;
+                                    endif;
+                                    $profile_data = new ProfileDetails();
+                                    $profile_data->setAttribute("profile_id",Yii::$app->request->post("id"));
+                                    $profile_data->setAttribute("param",$key);
+                                    $profile_data->setAttribute("param_val",$value);
+                                    $profile_data->save();
+                                endif;
+                        }
             return "Updates successfully made";
         }else{  
             $records = new Users();

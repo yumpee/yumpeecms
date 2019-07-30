@@ -115,8 +115,6 @@ public function behaviors()
                     return $this->redirect($role_home,302)->send();
                 endif;
             endif;
-            
-            
             return $this->goHome();
         } else {        
             if(Yii::$app->request->post("return-type")=="json"):
@@ -163,7 +161,7 @@ public function behaviors()
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
                             $twig = new \Twig_Environment($loader);
-                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article]);
+                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
                             return $this->render('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
                     endif;
@@ -193,7 +191,7 @@ public function behaviors()
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
                             $twig = new \Twig_Environment($loader);
-                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article]);
+                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
                             return $this->render('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
                     endif;
@@ -208,7 +206,7 @@ public function behaviors()
         $article = Pages::find()->where(['url'=>$page_url])->one();
         $form=[];
         $form["message"]="";
-        
+        $twig_set= ContentBuilder::getSetting("twig_template");
         if(Yii::$app->request->get("token")):
             //if the token is not in the system that flag as an error 404 page
             $user = User::find()->where(['password_reset_token'=>Yii::$app->request->get("token")])->andWhere('email="'.Yii::$app->request->get("email").'"')->one();
@@ -224,6 +222,15 @@ public function behaviors()
                 Yii::$app->session->setFlash('success', "Your new password has been saved. You may now log into your account");  
                 $form["message"] = "Your new password has been saved. You may now log into your account";
             endif;
+            //if we get a reset-password-url parameter, we can redirect to that
+            if((Yii::$app->request->get("reset-password-widget")!=null) && ($twig_set=="Yes")):
+                    $theme_id = ContentBuilder::getSetting("current_theme");
+                    $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>Yii::$app->request->get("reset-password-widget"),'renderer_type'=>'I'])->one();
+                    $loader = new Twig();
+                    $twig = new \Twig_Environment($loader);
+                    $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
+                    return $this->render('@frontend/views/layouts/html',['data'=>$content]);
+            endif;
             return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/account/reset-password',['form'=>$form,'page'=>$article]);
         endif;
         
@@ -234,16 +241,30 @@ public function behaviors()
                 Yii::$app->session->setFlash('error', "There is no record of this email in the database");                
             else:
                 //generate a token for this user
+                $subject="Password reset information"; 
+                if(Yii::$app->request->post("message-subject")!=null):
+                    $subject = Yii::$app->request->post("message-subject");
+                endif;
                 $email = Yii::$app->request->post("email");
                 $token = md5(date("YmdHis").Yii::$app->request->post("email").rand(1000,100000));
                 $user_record->setAttribute("password_reset_token",$token);
                 $user_record->save(false);
-                $message="Hi, <br><br>Click on the link below to reset your lost password.<br><a href='".Yii::$app->request->getAbsoluteUrl()."?token=".$token."&email=".$email."'>".Yii::$app->request->getAbsoluteUrl()."?token=".$token."&email=".$email."</a>";
+                if((Yii::$app->request->post("message-widget")!=null) && ($twig_set=="Yes")):
+                    $theme_id = ContentBuilder::getSetting("current_theme");
+                    $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>Yii::$app->request->post("message-widget"),'renderer_type'=>'I'])->one();
+                    $loader = new Twig();
+                    $twig = new \Twig_Environment($loader);
+                    $content= $twig->render($codebase['filename'], ['token_url'=>Yii::$app->request->getAbsoluteUrl()."?token=".$token."&email=".$email,'app'=>Yii::$app]);
+                    $message = $this->render('@frontend/views/layouts/html',['data'=>$content]);
+                else:
+                    $message="Hi, <br><br>Click on the link below to reset your lost password.<br><a href='".Yii::$app->request->getAbsoluteUrl()."?token=".$token."&email=".$email."'>".Yii::$app->request->getAbsoluteUrl()."?token=".$token."&email=".$email."</a>";
+                endif;
+                
                 $from_email = ContentBuilder::getSetting("smtp_sender_email");
                 Yii::$app->mailer->compose()
             ->setFrom($from_email)
             ->setTo(Yii::$app->request->post("email"))
-            ->setSubject("Password reset information")
+            ->setSubject($subject)
             ->setHtmlBody($message)
             ->send();
                 Yii::$app->session->setFlash('success', "An email has been set with a link to reset your password");
@@ -265,7 +286,7 @@ public function behaviors()
       endif;
         
         
-        if(ContentBuilder::getSetting("twig_template")=="Yes"):
+        if($twig_set=="Yes"):
                         //we handle the loading of twig template if it is turned on
                         $theme_id = ContentBuilder::getSetting("current_theme");
                         $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$renderer,'renderer_type'=>'V'])->one();
@@ -291,7 +312,40 @@ public function behaviors()
          * Yii::$app->request->get('search-type') - if this is feedback then we call the feedback function to return feedback
          * Yii::$app->request->get('params') - if this is set we pass the name=value pairs to the called widget e.g name1=val1&name2=val2 etc
          */
-	
+	$page =[];
+        $page_url =  ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl());
+            if (strpos($page_url, '?') !== false):
+                list($page_url,$search)= explode("?",$page_url);
+            endif;
+       $article = Pages::find()->where(['url'=>$page_url])->one();
+       
+       //if it requires log in and we are not logged in then redirect to login page
+       if(($article['require_login']=="Y")&&(Yii::$app->user->isGuest)):       
+            $page =[];
+            $form['callback'] = $page_url;
+            $page_url =  ContentBuilder::getURLByRoute("accounts/login");
+            $article = Pages::find()->where(['url'=>$page_url])->one();          
+            $form['login_url'] = Yii::$app->request->getBaseUrl()."/".$article['url'];
+            $form['message'] = "You have to login to view this page";
+            $form['param'] = Yii::$app->request->csrfParam;
+            $form['token'] = Yii::$app->request->csrfToken;
+                    if(ContentBuilder::getSetting("twig_template")=="Yes"):
+                        //we handle the loading of twig template if it is turned on
+							$themes = new Themes();
+							$theme_id=$themes->dataTheme;
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
+                        $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>'accounts/login','renderer_type'=>'V'])->one();
+                        if(($codebase!=null)&& ($codebase['code']<>"")):
+                            $loader = new Twig();
+                            $twig = new \Twig_Environment($loader);
+                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
+                            return $this->render('@frontend/views/layouts/html',['data'=>$content]);
+                        endif;
+                    endif;                         
+                    return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/account/login',['form'=>$form,'page'=>$article]);
+       endif;
         if(Yii::$app->request->get('search-type')=="feedback"):		
 			return AccountsController::actionFeedback();      
         endif;
@@ -487,7 +541,7 @@ public function behaviors()
                 foreach($search_params as $param):
                 list($p,$v)=explode("=",$param);                
                 //this is used to search based on submit id
-                if($p=="article_id"):
+                if($p=="form_submit_id"):
                         $data_query->orWhere('profile_id="'.$v.'"');
                     continue;
                 endif;
@@ -531,10 +585,34 @@ public function behaviors()
             $data_query->all();
         endif;
         
-        if(Yii::$app->request->get('search-field')!=null):
+        if(Yii::$app->request->get('relations')!=null):
+            //we implement the relations parameter here if call decides to be relational data specific
+            $relation_with=[];
+            $qr = new \frontend\models\Users();
+            $relations = $qr->getRelationData();
+            
+            if(Yii::$app->request->get('relations')=="all"):
+                foreach($relations as $a):  
+                    $query->with($a['name']);
+                endforeach;
+            else:
+                $relations = explode(",",Yii::$app->request->get('relations'));
+                $relation_with=[];
+                foreach($relations as $a):                
+                    $query->with($a);
+                endforeach;                
+            endif;
+            if(Yii::$app->request->get('search-field')!=null):
+                $query->asArray();
+            else:
+                $query->asArray();
+            endif;
+        else:
+            if(Yii::$app->request->get('search-field')!=null):
                 $query->with('details')->asArray();
             else:
                 $query->with('details')->asArray();
+            endif;
         endif;
          
         if(Yii::$app->request->get('status')==null):

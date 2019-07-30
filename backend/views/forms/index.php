@@ -31,6 +31,7 @@ $formURL = \Yii::$app->getUrlManager()->createUrl('web-hook-email/form');
 $responseURL = \Yii::$app->getUrlManager()->createUrl('web-hook-email/response');
 $internalURL = \Yii::$app->getUrlManager()->createUrl('web-hook/internal');
 $externalURL = \Yii::$app->getUrlManager()->createUrl('web-hook/external');
+$permissionURL = \Yii::$app->getUrlManager()->createUrl('forms/permissions');
 
 $this->registerJs( <<< EOT_JS
        tinymce.init({ 
@@ -56,7 +57,7 @@ $this->registerJs( <<< EOT_JS
         $.post(
             '{$saveURL}',$( "#frm1" ).serialize(),
             function(data) {
-                alert(data);                
+                alert(data);                    
             }
         )
         ev.preventDefault();
@@ -136,6 +137,26 @@ $this->registerJs( <<< EOT_JS
                         )
                     }            
   });
+ 
+
+$(".role_permit_label").each(function(){
+    
+    if($("#form_id_val").val()!=""){
+        $(this).html($(this).html() + "<a href='#' class='permission_fetcher' role_id='" + $(this).find("input").val() + "' role_name='" + $(this).text() + "' data-toggle='collapse' data-target='#demo'><i class='fa fa-caret-down'></i></a>");
+    }
+})
+                           
+$(".permission_fetcher").click(function(){        
+        $.get(
+            '{$permissionURL}',{'role':$(this).attr("role_name"),'role_id':$(this).attr("role_id"),'form_id':'{$id}'},
+            function(data) {
+                $("#demo").html(data);         
+            }
+        )             
+});
+ 
+
+    
 $("#datalisting").DataTable(); 
 EOT_JS
 );  
@@ -162,6 +183,9 @@ EOT_JS
         <tr><td>Display On Backend Menu<td><?=\yii\helpers\Html::dropDownList("show_in_menu",$rs['show_in_menu'],['N'=>'No','Y'=>'Yes'],['class'=>'form-control'])?>
         <tr><td>Auto-publish form data to views<td><input type="checkbox" name="published" <?=$published?>> 
         <tr><td>Role permissions<td><?=$roles?>
+                <div id="demo" class="collapse panel panel-default">
+                            
+                </div>
         <?php
         if($id!=null):
         ?>
@@ -240,7 +264,7 @@ EOT_JS
                                         
   
                     
-        <tr><td colspan="2"><button type="submit" id="btnSubmit" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="id" value="<?=$id?>" />
+        <tr><td colspan="2"><button type="submit" id="btnSubmit" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="id" id="form_id_val" value="<?=$id?>" />
             
             </td>
         

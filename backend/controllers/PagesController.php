@@ -38,10 +38,53 @@ use backend\models\Forms;
 use backend\models\Roles;
 use backend\models\Twig;
 use fedemotta\datatables\DataTables;
+use backend\models\BackEndMenus;
+use backend\models\BackEndMenuRole;
+
 
 
 class PagesController extends Controller{
-
+public function behaviors()
+{
+    if(Settings::find()->where(['setting_name'=>'use_custom_backend_menus'])->one()->setting_value=="on" && !Yii::$app->user->isGuest):
+    $can_access=1;
+    $route = "/".Yii::$app->request->get("r");
+    //check to see if route exists in our system
+    $menu_rec = BackEndMenus::find()->where(['url'=>$route])->one();
+    if($menu_rec!=null):
+        //we now check that the current role has rights to use it
+        $role_access = BackEndMenuRole::find()->where(['menu_id'=>$menu_rec->id,'role_id'=>Yii::$app->user->identity->role_id])->one();
+        if(!$role_access):
+            //let's take a step further if there is a custom module
+            $can_access=0;            
+        endif;
+    endif;
+    if($can_access < 1):
+        echo "You do not have permission to view this page";
+        exit;
+    endif;
+    endif;
+    
+    return [
+        'access' => [
+            'class' => \yii\filters\AccessControl::className(),
+            'only' => ['create', 'update'],
+            'rules' => [
+                // deny all POST requests
+                [
+                    'allow' => false,
+                    'verbs' => ['POST']
+                ],
+                // allow authenticated users
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                ],
+                // everything else is denied
+            ],
+        ],
+    ];
+}
 public function actionIndex()
     {
         $b = new Pages();        
@@ -106,8 +149,16 @@ public function actionIndex()
         $cr = array_merge($cr,$b);
                      
         $template_list = Templates::find()->where(['NOT IN','route',$cr])->andWhere('internal_route_stat="N"')->orderBy('name')->all();
+        $template_option=[];
+        $attributes = [
+            'attrib1' => 'valueA',
+            'attrib2' => 'valueB',
+        ];
+        foreach($template_list as $index):
+            $template_option[0] = $index['route'];
+        endforeach;
         $tag_map =  yii\helpers\ArrayHelper::map($template_list, 'id', 'name');
-        $page['template'] = \yii\helpers\Html::dropDownList("template",$page['rs']['template'],$tag_map,['prompt'=>'Select a template','class'=>'form-control']);
+        $page['template'] = \yii\helpers\Html::dropDownList("template",$page['rs']['template'],$tag_map,['prompt'=>'Select a template','class'=>'form-control','id'=>'template']);
         
              
         $page['sidebar'] = \yii\helpers\Html::dropDownList("sidebar",$sidebar,['default'=>'Default Sidebar','contact'=>'Contact Page'],['class'=>'form-control']);

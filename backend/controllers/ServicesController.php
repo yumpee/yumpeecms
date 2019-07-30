@@ -36,11 +36,55 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-
 use backend\models\ServicesIncoming;
 use backend\models\ServicesOutgoing;
+use backend\models\BackEndMenus;
+use backend\models\BackEndMenuRole;
+use backend\models\Settings;
 
 class ServicesController extends Controller{
+    public function behaviors()
+{
+    if(Settings::find()->where(['setting_name'=>'use_custom_backend_menus'])->one()->setting_value=="on" && !Yii::$app->user->isGuest):
+    $can_access=1;
+    $route = "/".Yii::$app->request->get("r");
+    //check to see if route exists in our system
+    $menu_rec = BackEndMenus::find()->where(['url'=>$route])->one();
+    if($menu_rec!=null):
+        //we now check that the current role has rights to use it
+        $role_access = BackEndMenuRole::find()->where(['menu_id'=>$menu_rec->id,'role_id'=>Yii::$app->user->identity->role_id])->one();
+        if(!$role_access):
+            //let's take a step further if there is a custom module
+            $can_access=0;            
+        endif;
+    endif;
+    if($can_access < 1):
+        echo "You do not have permission to view this page";
+        exit;
+    endif;
+    endif;
+    
+    return [
+        'access' => [
+            'class' => \yii\filters\AccessControl::className(),
+            'only' => ['create', 'update'],
+            'rules' => [
+                // deny all POST requests
+                [
+                    'allow' => false,
+                    'verbs' => ['POST']
+                ],
+                // allow authenticated users
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                ],
+                // everything else is denied
+            ],
+        ],
+    ];
+}  
+
     public function actionIncoming(){
         $page=[];
         $page['id']= Yii::$app->request->get('id',null);
@@ -72,6 +116,7 @@ class ServicesController extends Controller{
     }
     public function actionEmulator(){
         $page=[];
+        
         if(Yii::$app->request->post("authentication")=="0"):
             $ch = curl_init(Yii::$app->request->post('url')); 
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, Yii::$app->request->post("ptype"));                                                                     
@@ -82,11 +127,14 @@ class ServicesController extends Controller{
                     $nr = array();
                     $nr = $post_arr;
                     $count = count($post_arr);
-                    $nr[$count + 1]='Content-Type: application/json';                    
-                   curl_setopt($ch, CURLOPT_HTTPHEADER, $nr );
-                  //curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")),'NETOAPI_USERNAME:NetoAPI','Accept:application/json','NETOAPI_KEY:o1lZClvfWa4jePs7SZ4bT5LbBDD8BYm4','NETOAPI_ACTION:GetOrder'));
+                    if(Yii::$app->request->post("format_type")=="json"):
+                        $nr[$count + 1]='Content-Type: application/json';                    
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $nr );
+                    endif;                   
             else:
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")), ) );
+                    if(Yii::$app->request->post("format_type")=="json"):
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")), ) );
+                    endif;
             endif;
             $result = curl_exec($ch);
             if(curl_exec($ch) === false)
@@ -99,27 +147,41 @@ class ServicesController extends Controller{
             }
         endif;
         if(Yii::$app->request->post("authentication")=="Basic"):                
-                $encoded_credentials= base64_encode(Yii::$app->request->post('client_id').":".Yii::$app->request->post('client_key')); 
+                $encoded_credentials= base64_encode(Yii::$app->request->post('client_id').":".Yii::$app->request->post('client_key'));                 
                 $ch = curl_init(Yii::$app->request->post('url')); 
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, Yii::$app->request->post("ptype"));                                                                     
-                curl_setopt($ch, CURLOPT_POSTFIELDS, Yii::$app->request->post("body"));                                                                  
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);  
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, Yii::$app->request->post("ptype"));   
+                curl_setopt($ch, CURLOPT_POST,true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, Yii::$app->request->post("body"));
+                if(Yii::$app->request->post("use_passwd")=="on"):
+                    curl_setopt($ch, CURLOPT_USERPWD,Yii::$app->request->post('client_id').":".Yii::$app->request->post('client_key'));
+                endif;
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);   
+                if(Yii::$app->request->post("format_type")=="json"):
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(                                                                          
                     'Content-Type: application/json',                                                                                
                     'Content-Length: ' . strlen(Yii::$app->request->post("body")),
                     'Authorization: Basic '.$encoded_credentials,
                 )                                                                       
                 ); 
+                endif;
                 if(Yii::$app->request->post("header")!=""):
                     $post_arr = explode(",",Yii::$app->request->post("header"));
                     $nr = array();
                     $nr = $post_arr;
                     $count = count($post_arr);
-                    $nr[$count + 1]='Content-Type: application/json';
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, $nr);
+                    if(Yii::$app->request->post("format_type")=="json"):
+                        $nr[$count + 1]='Content-Type: application/json';
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $nr);
+                    endif;
                 else:
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")), ) );
+                    if(Yii::$app->request->post("format_type")=="json"):
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen(Yii::$app->request->post("body")), ) );
+                    endif;
+                    
                 endif;
+                
                 $result = curl_exec($ch);
                 if(curl_exec($ch) === false):
                         return 'Curl error: ' . curl_error($ch);

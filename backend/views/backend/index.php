@@ -79,6 +79,15 @@ $(".submenus").each(function(){
            //alert(source + " appends "  + destination);
             
 })
+
+            
+$(".child").each(function(){
+            var par = $(this).attr("parent_id");
+            var c = $("#" + par);
+            $(this).html("&nbsp;&nbsp;&nbsp;" + $(this).html());
+            $(this).detach().appendTo(c);
+            })
+   
 EOT_JS
 );  
 
@@ -148,12 +157,33 @@ endif;
     <form action="index.php?r=blocks/index" method="post" id="frmApply">
     <table class="table">
         <tr><td>Select Role<td><?=$roles?>
-        <tr><td>Menus<td><?=$menus_list?>
+        <?php
+        if(Yii::$app->request->get("role_id")!=null):
+        ?>     
+        <tr><td>Menu<td><div id="menu_listing">
+                    <?php
+                    foreach($menu_parents as $m):
+                    if(in_array($m->id,$selected)):
+                        $checked=" checked";
+                    else:
+                        $checked="";
+                    endif;
+                    if($m->parent_id==null  || $m->parent_id==""):
+                        echo "<div id='M".$m->id."'><br><div  class='col-md-12'><input type='checkbox' ".$checked." value='".$m->id."' name='menu_permission_id[]'> <b>".$m->label."</b></div></div><br>";
+                    else:
+                        echo "<div class='child' parent_id='M".$m->parent_id."' id='M".$m->id."'><input type='checkbox' value='".$m->id."' ".$checked." name='menu_permission_id[]'> ".$m->label."</div>";
+                    endif;
+                    endforeach
+                    ?>
+            
+                </div>
                 
                 
                 
         <tr><td colspan="2"><button type="button" id="btnApply" class="btn btn-success">Apply</button> <input type="hidden" name="processor" value="true" /> <input type="hidden" name="role_id" id="role_id" value="<?=Yii::$app->request->get("role_id")?>" /><input type="hidden" name="cont" id="cont"/></td>
-        
+        <?php
+        endif;
+        ?> 
         
     </table>
     </form> 

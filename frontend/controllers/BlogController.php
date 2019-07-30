@@ -346,7 +346,41 @@ public function behaviors()
          * Yii::$app->request->get('search-type') - if this is feedback then we call the feedback function to return feedback
          * Yii::$app->request->get('params') - if this is set we pass the name=value pairs to the called widget e.g name1=val1&name2=val2 etc
          */
-		 
+	$page =[];
+        $page_url =  ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl());
+            if (strpos($page_url, '?') !== false):
+                list($page_url,$search)= explode("?",$page_url);
+            endif;
+       $article = Pages::find()->where(['url'=>$page_url])->one();
+       
+       //if it requires log in and we are not logged in then redirect to login page
+       if(($article['require_login']=="Y")&&(Yii::$app->user->isGuest)):       
+            $page =[];
+            $form['callback'] = $page_url;
+            $page_url =  ContentBuilder::getURLByRoute("accounts/login");
+            $article = Pages::find()->where(['url'=>$page_url])->one();          
+            $form['login_url'] = Yii::$app->request->getBaseUrl()."/".$article['url'];
+            $form['message'] = "You have to login to view this page";
+            $form['param'] = Yii::$app->request->csrfParam;
+            $form['token'] = Yii::$app->request->csrfToken;
+                    if(ContentBuilder::getSetting("twig_template")=="Yes"):
+                        //we handle the loading of twig template if it is turned on
+							$themes = new Themes();
+							$theme_id=$themes->dataTheme;
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
+                        $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>'accounts/login','renderer_type'=>'V'])->one();
+                        if(($codebase!=null)&& ($codebase['code']<>"")):
+                            $loader = new Twig();
+                            $twig = new \Twig_Environment($loader);
+                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
+                            return $this->render('@frontend/views/layouts/html',['data'=>$content]);
+                        endif;
+                    endif;                         
+                    return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/account/login',['form'=>$form,'page'=>$article]);
+       endif;
+       
         if(Yii::$app->request->get('search-type')=="feedback"):		
 			return BlogController::actionFeedback();      
         endif;
@@ -375,8 +409,7 @@ public function behaviors()
                         return Yii::$app->api->sendSuccessResponse(["Invalid route object request"]);
                     endif;
                     return $this->renderPartial('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/standard/error');
-                endif;
-                
+                endif;                
         endif;
         $renderer="blog/index";
         //let us handle a request based on renderers
@@ -595,12 +628,35 @@ public function behaviors()
             $data_query->all();
         endif;
         
-        
-        if(Yii::$app->request->get('search-field')!=null):
+        if(Yii::$app->request->get('relations')!=null):
+            //we implement the relations parameter here if call decides to be relational data specific
+            $relation_with=[];
+            $qr = new \frontend\models\Articles();
+            $relations = $qr->getRelationData();            
+            if(Yii::$app->request->get('relations')=="all"):
+                foreach($relations as $a):                
+                    $query->with($a['name']);
+                endforeach;
+            else:
+                $relations = explode(",",Yii::$app->request->get('relations'));
+                $relation_with=[];
+                foreach($relations as $a):                
+                    $query->with($a);
+                endforeach;
+            endif;
+            if(Yii::$app->request->get('search-field')!=null):
+                $query->asArray();
+            else:
+                $query->asArray();
+            endif;
+        else:
+            if(Yii::$app->request->get('search-field')!=null):
                 $query->with('details','file','author','author.displayImage')->asArray();
             else:
                 $query->with('details','file','author','author.displayImage')->asArray();
+            endif;
         endif;
+        
         if(Yii::$app->request->get('published')==null):
             $query->andWhere('published="1"');
         endif;

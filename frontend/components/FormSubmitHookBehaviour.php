@@ -34,6 +34,7 @@ use backend\models\Forms;
 use frontend\components\ContentBuilder;
 use frontend\models\FormSubmit;
 use frontend\models\FormData;
+use frontend\models\ProfileDetails;
 
 class FormSubmitHookBehaviour extends Behavior{
     public function events()
@@ -121,13 +122,24 @@ class FormSubmitHookBehaviour extends Behavior{
                             foreach($jsonArray as $key => $value):
                             
                                 if($value<>""):
-                                    $form_data = FormData::find()->where(['form_submit_id'=>$endpoint_obj[3]])->andWhere('param="'.$key.'"')->one();
+                                    if($form_id_obj->form_type=="form-profile"):
+                                        $form_data = ProfileDetails::find()->where(['profile_id'=>$endpoint_obj[3]])->andWhere('param="'.$key.'"')->one();
+                                    else:
+                                        $form_data = FormData::find()->where(['form_submit_id'=>$endpoint_obj[3]])->andWhere('param="'.$key.'"')->one();
+                                    endif;
+                                    
                                     if($form_data!=null):
                                         $form_data->setAttribute('param_val',$value);
                                         $form_data->save();
                                     else:
-                                        $form_data = new FormData();
-                                        $form_data->setAttribute("form_submit_id",$endpoint_obj[3]);
+                                        if($form_id_obj->form_type=="form-profile"):
+                                            $form_data = new ProfileDetails();
+                                            $form_data->setAttribute("profile_id",$endpoint_obj[3]);
+                                        else:
+                                            $form_data = new FormData();
+                                            $form_data->setAttribute("form_submit_id",$endpoint_obj[3]);
+                                        endif;
+                                        
                                         $form_data->setAttribute("param",$key);
                                         $form_data->setAttribute("param_val",$value);
                                         $form_data->save();

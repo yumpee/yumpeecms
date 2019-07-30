@@ -33,6 +33,7 @@ use frontend\components\ContentBuilder;
 use backend\models\Users;
 use backend\models\Forms;
 use backend\models\Relationships;
+use backend\models\FormRoles;
 
 class FormSubmit extends \yii\db\ActiveRecord
 {
@@ -110,5 +111,34 @@ class FormSubmit extends \yii\db\ActiveRecord
         return $return_val;
  }
  
+
+public function getRelationData() {
+        $ARMethods = get_class_methods('\yii\db\ActiveRecord');
+        $modelMethods = get_class_methods('\yii\base\Model');
+        $reflection = new \ReflectionClass($this);
+        $i = 0;
+        $stack = [];
+        /* @var $method \ReflectionMethod */
+        foreach ($reflection->getMethods() as $method) {
+            if (in_array($method->name, $ARMethods) || in_array($method->name, $modelMethods)) {
+                continue;
+            }
+            if($method->name === 'bindModels')  {continue;}
+            if($method->name === 'attachBehaviorInternal')  {continue;}
+            if($method->name === 'getRelationData')  {continue;}
+            try {
+                $rel = call_user_func(array($this,$method->name));
+                if($rel instanceof \yii\db\ActiveQuery){
+                    $stack[$i]['name'] = lcfirst(str_replace('get', '', $method->name));
+                    $stack[$i]['method'] = $method->name;
+                    $stack[$i]['ismultiple'] = $rel->multiple;
+                    $i++;
+                }
+            } catch (\yii\base\ErrorException $exc) {
+//                
+            }
+        }
+        return $stack;
+    }
     
 }

@@ -44,6 +44,7 @@ use frontend\models\Twig;
 use frontend\models\Users;
 use frontend\models\ProfileDetails;
 use frontend\models\Themes;
+use frontend\models\Media;
 
 class GUIBehavior extends Behavior
 {
@@ -86,6 +87,7 @@ class GUIBehavior extends Behavior
         $pattern_page="/{yumpee_page}(.*?){\/yumpee_page}/";
         $pattern_comment="/{yumpee_comment}(.*?){\/yumpee_comment}/";
         $pattern_gallery="/{yumpee_gallery}(.*?){\/yumpee_gallery}/";
+        $pattern_media="/{yumpee_media}(.*?){\/yumpee_media}/";
         
 		
 		$themes = new Themes();
@@ -206,7 +208,8 @@ class GUIBehavior extends Behavior
                                 $data_query = FormData::find()->select('form_submit_id');
                                 $search_params=explode("|",$params);
                                 $counter=0;
-                                
+                                $search_succeed=0;
+                                if(sizeof($search_params) > 1):
                                 foreach($search_params as $param):
                                     list($p,$v)=explode("=",$param);
                                     if(trim($p)=="url"):
@@ -224,6 +227,75 @@ class GUIBehavior extends Behavior
                                     endif;
                                     $counter++;
                                 endforeach;
+                                $search_succeed=1;
+                                endif;
+                                if($search_succeed < 1):
+                                    $search_params=explode("&",$params);
+                                    if(sizeof($search_params) > 1):
+                                        $form_arr= array();
+                                        $int_count=0;
+                                        foreach($search_params as $param):                    
+                                            $pn = explode("=",$param);
+                                            if(count($pn) > 1):
+                                                list($p,$v)=explode("=",$param);
+                                            endif;
+                                            $pl=explode("<",$param);
+                                            $pg=explode(">",$param);
+                                            $plq=explode("<=",$param);
+                                            $pgq=explode(">=",$param);
+                                            //this is used to search based on submit id
+                                            if($p=="form_submit_id"):
+                                                $data_query->andWhere('form_submit_id="'.$v.'"');
+                                                continue;
+                                            endif;
+                                            if(count($pgq) > 1):
+                                                $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$pgq[0]])->andWhere('param_val >="'.$pgq[1].'"')->column();
+                                                $int_count++;
+                                                continue;
+                                            endif;
+                                            if(count($plq) > 1):
+                                                $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$plq[0]])->andWhere('param_val <="'.$plq[1].'"')->column();
+                                                $int_count++;
+                                                continue;
+                                            endif;
+                                            if(count($pg) > 1):
+                                                $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$pg[0]])->andWhere('param_val >"'.$pg[1].'"')->column();
+                                                $int_count++;
+                                                continue;
+                                            endif;
+                                            if(count($pl) > 1):
+                                                $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$pl[0]])->andWhere('param_val <"'.$pl[1].'"')->column();
+                                                $int_count++;
+                                                continue;
+                                            endif;
+                                            $form_arr[$int_count] = FormData::find()->select('form_submit_id')->where(['param'=>$p])->andWhere(['like','param_val',$v])->column();
+                                            $int_count++;
+                                        endforeach;
+                                        $form_submit_arr = $form_arr[0];
+                                        foreach ($form_arr as $form_submit_item):
+                                            $form_submit_arr = array_intersect($form_submit_arr,$form_submit_item);
+                                        endforeach;
+                                        $data_query->where(['IN','form_submit_id',$form_submit_arr]);
+                                        $search_succeed=1;
+                                    endif;            
+                                endif;
+                                if($search_succeed < 1):
+                                    foreach($search_params as $param):
+                                        list($p,$v)=explode("=",$param);                
+                                        //this is used to search based on submit id
+                                        if($p=="form_submit_id"):
+                                            $data_query->orWhere('form_submit_id="'.$v.'"');
+                                            continue;
+                                        endif;
+                
+                                        if(count($search_params)==1):
+                                            $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v])->andFilterCompare('param_val',$v);
+                                        else:                    
+                                            $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v]);                    
+                                        endif;
+                                    endforeach;
+                                endif;
+                                
                                 $data_query->all();
                             endif;
                             $submit_query = FormSubmit::find();
@@ -320,18 +392,18 @@ class GUIBehavior extends Behavior
                                 $limit = $sent_data[2];
                             endif;                            
                             
-                            $andWhere="";
+                            $andWhere="";                            
                             if($params!=null):
                                 $data_query = ProfileDetails::find()->select('profile_id');
                                 $search_params=explode("|",$params);
                                 $counter=0;
-                                $search_criteria=array('username','first_name','last_name','title','role_id','email','status','created_at','updated_at');
+                                $search_criteria=array('id','username','first_name','last_name','title','role_id','email','status','created_at','updated_at');
                                 
                                 foreach($search_params as $param):
                                     list($p,$v)=explode("=",$param);
                                     if(in_array($p,$search_criteria)):
                                         //we add this to the submit query condition later on
-                                        $andWhere=$p."='".$v."'";
+                                        $andWhere=$p."='".$v."'";    
                                         continue;
                                     endif;
                                     if($counter==0):
@@ -343,23 +415,36 @@ class GUIBehavior extends Behavior
                                 endforeach;
                                 $data_query->all();
                             endif;
-                            $submit_query = Users::find();
                             
+                            $submit_query = Users::find();
+                            $order_sorted=0;
                             if($order!=""):
+                                $order_arr= explode(" ",$order);
+                                $ordering="";
+                                $order_sorted=0;
+                                if(sizeof($order_arr) > 1):
+                                    $ordering = $order_arr[1];
+                                    $order=$order_arr[0];
+                                endif;
                                 if($order=="random"):
                                     $submit_query->orderBy(new Expression('rand()'));
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="last"):
                                     $submit_query->orderBy(['created_at'=>SORT_DESC]);
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="first"):
                                     $submit_query->orderBy(['created_at'=>SORT_ASC]);
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="views"):
                                     $submit_query->orderBy(['no_of_views'=>SORT_DESC]);
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="user"):
                                     $submit_query->orderBy(['username'=>SORT_ASC]);
+                                    $order_sorted=1;
                                 endif;
                                 if($order=="count"):
                                     if($andWhere!=""):
@@ -372,6 +457,13 @@ class GUIBehavior extends Behavior
                                     $elements = $submit_query->count();
                                     $replacer = \yii\helpers\Json::encode($elements);
                                     return $replacer;
+                                endif;
+                                if($order_sorted==0): 
+                                   if(trim($ordering)=="DESC"):
+                                        $submit_query->orderBy([$order=>SORT_DESC]);
+                                    else:
+                                        $submit_query->orderBy([$order=>SORT_ASC]);
+                                    endif; 
                                 endif;
                             endif;
                             if($limit!=""):
@@ -423,6 +515,15 @@ class GUIBehavior extends Behavior
                             endif;
                             
                             return \yii\helpers\Json::encode($gallery_arr);
+                    },$content);
+        $content = preg_replace_callback($pattern_media,function ($matches) {
+                            $replacer="";
+                            $media_arr=[];
+                            if($matches[1]<>"all"):
+                                $media_arr=Media::find()->with('publisher')->asArray()->where(['id'=>$matches[1]])->one();                            
+                            endif;
+                            
+                            return \yii\helpers\Json::encode($media_arr);
                     },$content);
         //process page calls
         $content = preg_replace_callback($pattern_page,function ($matches) { 

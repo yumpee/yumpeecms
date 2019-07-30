@@ -46,7 +46,8 @@ class Twig extends \common\models\Twig
     public function getIsCustom(){
         return $this->hasOne(CustomWidget::className(),['name'=>'renderer']);
     }
-    public function afterFind(){
+    
+    public function afterFind(){        
         if(substr($this->filename, 0, strlen("twig/")) === "twig/"):
             $this->code = file_get_contents(__DIR__ .'/../themes/'.ContentBuilder::getThemeFolder().'/'.$this->filename);           
         endif; 

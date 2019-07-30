@@ -56,8 +56,10 @@ EOT_JS
         <tr><td>Host URL<td><input name="url" id="url" value="" class="form-control" type="text" />
         <tr><td>Client ID<td><input name="client_id" id="client_id" value="" class="form-control" type="text" />
         <tr><td>Client Key<td><input name="client_key" id="client_key" value="" class="form-control" type="text" />
-        <tr><td>Authentication Type<td><select name="authentication" class="form-control"><option value="0">None</option><option value="Basic">Basic</option></select>
+        <tr><td>Authentication Type<td><select name="authentication" class="form-control"><option value="0">None</option><option value="Basic">Basic</option></select><br>
+                <input type="checkbox" name="use_passwd"> Do not encrypt user / password
         <tr><td>Submission Type<td><select name="ptype" class="form-control"><option>POST</option><option>GET</option></select>
+        <tr><td>Format Type<td><select name="format_type" class="form-control"><option value='json'>JSON</option><option value='plain'>Plain</option></select>
         <tr><td>Header<td><textarea class="form-control" name="header"></textarea>       
         <tr><td>Body<td><textarea class="form-control" name="body" rows="8" ></textarea>
         <tr><td><td style="display:none" id="result_id"><b>Result</b><br><textarea class="form-control" id="result" rows="8" readonly></textarea>

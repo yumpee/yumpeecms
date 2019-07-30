@@ -30,9 +30,52 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use backend\models\Menus;
 use backend\models\MenuProfile;
+use backend\models\BackEndMenus;
+use backend\models\BackEndMenuRole;
+use backend\models\Settings;
 
 class MenusController extends Controller{
-
+public function behaviors()
+{
+    if(Settings::find()->where(['setting_name'=>'use_custom_backend_menus'])->one()->setting_value=="on" && !Yii::$app->user->isGuest):
+    $can_access=1;
+    $route = "/".Yii::$app->request->get("r");
+    //check to see if route exists in our system
+    $menu_rec = BackEndMenus::find()->where(['url'=>$route])->one();
+    if($menu_rec!=null):
+        //we now check that the current role has rights to use it
+        $role_access = BackEndMenuRole::find()->where(['menu_id'=>$menu_rec->id,'role_id'=>Yii::$app->user->identity->role_id])->one();
+        if(!$role_access):
+            //let's take a step further if there is a custom module
+            $can_access=0;            
+        endif;
+    endif;
+    if($can_access < 1):
+        echo "You do not have permission to view this page";
+        exit;
+    endif;
+    endif;
+    
+    return [
+        'access' => [
+            'class' => \yii\filters\AccessControl::className(),
+            'only' => ['create', 'update'],
+            'rules' => [
+                // deny all POST requests
+                [
+                    'allow' => false,
+                    'verbs' => ['POST']
+                ],
+                // allow authenticated users
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                ],
+                // everything else is denied
+            ],
+        ],
+    ];
+}
 public function actionIndex()
     {
         $page=[];      

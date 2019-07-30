@@ -34,10 +34,8 @@ class RouteManager extends Object implements URLRuleInterface
                         return false;
 	}
 		
-	public function parseRequest($manager, $request){
-                        
-			$pathInfo = $request->getPathInfo();
-                        
+	public function parseRequest($manager, $request){                        
+			$pathInfo = $request->getPathInfo();                        
                         $params=[];  
                         $page=[];
 			

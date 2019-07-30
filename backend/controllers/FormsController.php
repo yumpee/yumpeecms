@@ -54,8 +54,53 @@ use frontend\components\ContentBuilder;
 use backend\models\Relationships;
 use backend\models\RelationshipDetails;
 use backend\models\Media;
+use backend\models\BackEndMenus;
+use backend\models\BackEndMenuRole;
+use backend\models\Settings;
 
 class FormsController extends Controller{
+    public function behaviors()
+{
+    if(Settings::find()->where(['setting_name'=>'use_custom_backend_menus'])->one()->setting_value=="on" && !Yii::$app->user->isGuest):
+    $can_access=1;
+    $route = "/".Yii::$app->request->get("r");
+    //check to see if route exists in our system
+    $menu_rec = BackEndMenus::find()->where(['url'=>$route])->one();
+    if($menu_rec!=null):
+        //we now check that the current role has rights to use it
+        $role_access = BackEndMenuRole::find()->where(['menu_id'=>$menu_rec->id,'role_id'=>Yii::$app->user->identity->role_id])->one();
+        if(!$role_access):
+            //let's take a step further if there is a custom module
+            $can_access=0;            
+        endif;
+    endif;
+    if($can_access < 1):
+        echo "You do not have permission to view this page";
+        exit;
+    endif;
+    endif;
+    
+    return [
+        'access' => [
+            'class' => \yii\filters\AccessControl::className(),
+            'only' => ['create', 'update'],
+            'rules' => [
+                // deny all POST requests
+                [
+                    'allow' => false,
+                    'verbs' => ['POST']
+                ],
+                // allow authenticated users
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                ],
+                // everything else is denied
+            ],
+        ],
+    ];
+}
+
     public function actionIndex(){
         $page['id']= Yii::$app->request->get('id',null);
         $page['notify_send_data']="";
@@ -95,7 +140,7 @@ class FormsController extends Controller{
         $role_map =  yii\helpers\ArrayHelper::map($roles, 'id', 'name');
         $client_profile= ServicesOutgoing::find()->orderBy(['name'=>SORT_ASC])->all();
         $page['client_profiles'] = ArrayHelper::map($client_profile, 'id', 'name');
-        $page['roles'] = \yii\helpers\Html::checkboxList("roles",$page_arr,$role_map);
+        $page['roles'] = \yii\helpers\Html::checkboxList("roles",$page_arr,$role_map,['itemOptions' => ['class' => 'role_permit','labelOptions' => ['class' => 'role_permit_label']]]);
         $page['records'] = Forms::find()->orderBy('name')->all();
         $page['forms'] = ArrayHelper::map($page['records'], 'id', 'title');
         $widget = CustomWidget::find()->orderBy('name')->all();
@@ -122,8 +167,10 @@ class FormsController extends Controller{
                 $model->setAttribute('published',$published);
                 $model->setAttribute('show_in_menu',Yii::$app->request->post('show_in_menu'));
                 $model->update(false);
-                FormRoles::deleteAll(['form_id'=>Yii::$app->request->post("id")]);
                 $roles = Yii::$app->request->post("roles");
+                FormRoles::deleteAll(['AND','form_id ="'.Yii::$app->request->post("id").'"',['NOT IN','role_id',$roles]]);              
+                
+                
                 $counter=0;
                 foreach($roles as $selected):
                     $insert_id = md5(date("Hims").$counter);
@@ -674,5 +721,47 @@ class FormsController extends Controller{
     public function actionDeleteAttachment(){
     FormFiles::deleteAll(['form_submit_id'=>Yii::$app->request->get('article_id'),'id'=>Yii::$app->request->get('id')]);
     echo "Record successfully deleted";
+    }
+    public function actionPermissions(){
+        $page=[];
+        $page_arr="";
+        $page["can_create"]="";
+        $update_roles="";
+        $view_roles="";
+        $delete_roles="";
+        $page['selected_role'] = Yii::$app->request->get("role");
+        $page['role_id'] = Yii::$app->request->get("role_id");
+        $page['form_id'] = Yii::$app->request->get("form_id");
+        $roles=Roles::find()->orderBy(['name'=>SORT_ASC])->all();
+        $role_map =  yii\helpers\ArrayHelper::map($roles, 'id', 'name');
+        $perm_obj = FormRoles::find()->where(['form_id'=>Yii::$app->request->get("form_id"),'role_id'=>Yii::$app->request->get("role_id")])->one();
+        if($perm_obj!==null):
+            $page_arr = unserialize($perm_obj->permissions);
+            if(isset($page_arr['can_create_record'])):
+                $page['can_create'] = $page_arr['can_create_record'];
+            endif;
+            if(isset($page_arr['view_roles'])):
+                $view_roles = $page_arr['view_roles'];
+            endif;
+            if(isset($page_arr['delete_roles'])):
+                $delete_roles = $page_arr['delete_roles'];
+            endif;
+            if(isset($page_arr['update_roles'])):
+                $update_roles = $page_arr['update_roles'];
+            endif;
+        endif;
+        $page['update_roles'] = \yii\helpers\Html::checkboxList("update_roles",$update_roles,$role_map,['itemOptions' => ['class' => 'role_permit','labelOptions' => ['class' => 'role_permit_label']]]);
+        $page['view_roles'] = \yii\helpers\Html::checkboxList("view_roles",$view_roles,$role_map,['itemOptions' => ['class' => 'role_permit','labelOptions' => ['class' => 'role_permit_label']]]);
+        $page['delete_roles'] = \yii\helpers\Html::checkboxList("delete_roles",$delete_roles,$role_map,['itemOptions' => ['class' => 'role_permit','labelOptions' => ['class' => 'role_permit_label']]]);
+        return $this->renderPartial('permissions',$page);
+    }
+    public function actionAddPermissions(){
+        $frm_role = FormRoles::find()->where(['form_id'=>Yii::$app->request->post("permission_form_id"),'role_id'=>Yii::$app->request->post("permission_role_id")])->one();
+        if($frm_role!==null):
+            $encode = print_r(Yii::$app->request->post());
+            $frm_role->setAttribute("permissions",serialize(Yii::$app->request->post()));
+            $frm_role->update(false);
+        endif;
+        return "Permission successfully added";
     }
 }

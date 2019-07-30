@@ -197,9 +197,9 @@ endif;
         <tr><td>Include Header<td><?=$show_header_image?></td>  
         <tr><td>Include Footer<td><?=$show_footer_image?></td>
         <tr><td>Template<td><?=$template?>
-        <tr><td>Select Form (Form templates only)<td><?=$forms?>
-        <tr><td>List for Role (Users Index only)<td><?=$roles?>
-        <tr><td>Role Renderer (Users Index only)<td><?=$renderer?>
+        <tr id="form_templates_visible"><td>Select Form (Form templates only)<td><?=$forms?>
+        <tr id="list_role_visible"><td>List for Role (Users Index only)<td><?=$roles?>
+        <tr id="role_renderer_visible"><td>Role Renderer (Users Index only)<td><?=$renderer?>
         <tr><td>Sort Order<td><input name="sort_order" id="sort_order" value="<?=$rs['sort_order']?>" class="form-control"type="text" />
         <tr><td><td><input type="checkbox" /> Editable
         <tr><td>Show in main Menu</td><td><?=$rs['show_in_menu']?></td>

@@ -87,7 +87,11 @@ if(image_sel!=""){
  $('#documentModal').modal('toggle');     
    
 });
-                            
+      
+$("#btnCustomAdd").click(function(){
+        $("#custom_form_header").html($("#custom_form_header").html() + "<tr><td>" + $("#yumpee_custom_field").val() + "<td><input class='form-control' type='text' name='"  + $("#yumpee_custom_field").val() + "'>")  ;    
+});
+            
 $('.documents').click(function (element) {  
       localStorage.setItem("image_caller",$(this).attr('id')); //store who is calling this dialog 
       
@@ -127,18 +131,40 @@ EOT_JS
     font-size:100px;
 }
 </style>
+<div id="addfield" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add field to form</h4>
+      </div>
+      <div class="modal-body">
+        <p>Enter field name</p>
+        <input type="text" class="form-control" id="yumpee_custom_field" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="btnCustomAdd">Add</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <form id="frmSubmit">
+    <div class="pull-right"><button data-toggle="modal" data-target="#addfield" type="button">+ Add Field</button></div>
 <table class="table table-bordered table-striped">
     <thead>
     <tr><td width="30%">Published<td><?=\yii\helpers\Html::dropDownList("published",$info['published'],['0'=>'No','1'=>'Yes'],['class'=>'form-control'])?></td>
     <tr><td>Rating<td><input type="text" name="rating" value="<?=$info['rating']?>" class="form-control" />
     <tr><td>No of views<td><?=$info['no_of_views']?><input type="hidden" name="id" value="<?=Yii::$app->request->get('id')?>">
-    
+    </thead>
 </table>
 </form>
 <form id="frmData">
 <table  class="table table-bordered table-striped">
-    <thead>
+    <thead  id="custom_form_header">
     
                 
 <?php

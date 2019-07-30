@@ -45,6 +45,4 @@ class Widgets extends \yii\db\ActiveRecord{
             return $this->hasOne(Twig::className(),['renderer'=>'short_name'])->andWhere('theme_id="'.\frontend\components\ContentBuilder::getSetting("current_theme").'"');;
         endif;
     }
-    
-    
 }

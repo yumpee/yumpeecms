@@ -57,7 +57,7 @@ class Pages extends \backend\models\Pages
             if($this->require_login=="Y"):
                 if(Yii::$app->user->isGuest):
                     //throw new \yii\web\HttpException(404, 'You do not have sufficient rights to view this page. Consult with your administrator.');
-                elseif (strpos($this->permissions,Yii::$app->user->identity->role_id) === false) :    
+                elseif (strpos($this['permissions'],Yii::$app->user->identity->role_id) === false && $this->url==str_replace("/","",Yii::$app->request->url)) :    
                     $this->description="<font color='red'>You do not have access to view this content. Consult the Administrator</font>";                    
                     echo "<center>You do not have permissions to view this page. Consult the Administrator</center>";
                     exit;

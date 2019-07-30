@@ -32,9 +32,11 @@ $deleteURL = \Yii::$app->getUrlManager()->createUrl('articles/delete');
 $eventURL =  \Yii::$app->getUrlManager()->createUrl('articles/search-event');
 $unsetFeature = \Yii::$app->getUrlManager()->createUrl('articles/unset-feature');
 $tagURL =  \Yii::$app->getUrlManager()->createUrl('tags/search-tags');
+$addTagURL =  \Yii::$app->getUrlManager()->createUrl('articles/add-tag');
 $mediaURL =  \Yii::$app->getUrlManager()->createUrl('media/featured-media');
 $documentURL =  \Yii::$app->getUrlManager()->createUrl('media/insert-media');
 $deleteAttachmentURL = \Yii::$app->getUrlManager()->createUrl('articles/delete-attachment');
+$detailsURL = \Yii::$app->getUrlManager()->createUrl('articles/details');
 $image_home = Yii::getAlias('@image_dir/');
 $document_div="";
 $document_listing="";
@@ -71,10 +73,12 @@ $this->registerJs( <<< EOT_JS
             
         
         //below is jquery for when the tag field is triggered
-        $('#search_tag').on('input',function(e){            
+        $('#search_tag').on('input',function(e){ 
+            
             $.get(
                 '{$tagURL}',{search:$("#search_tag").val()},
-                function(data) {                    
+                function(data) {     
+                    //alert(data);
                     $('#tag_list').find('option').remove().end().append(data);
                     $('#tag_list').css("display","block");
                 }    
@@ -254,7 +258,44 @@ $('.delete_attachment').click(function(element){
 });
   
   $("#datalisting").DataTable();
+                            
+ $("#search_tag").keyup(function(e){
+        var search_tag_val = $(this).val();
+        if($(this).val()==""){
+            $("#tag_list").css("display","none");             
+        }else{
+            var code = e.which; 
+            if(code==13)e.preventDefault();
+            if(code==32||code==13||code==188||code==186){
+                //add this tag and also add it into the form
+                $.get(  
+                            '{$addTagURL}',{tag:$(this).val()},
+                            function(data) {                                
+                                $("#selected_tag").append("<span id='" + data + "'>" + search_tag_val + " <a href='#' onClick=\"javascript:remTag('" + data + "');return false\">Remove</a><br></span>");
+                            }
+                        )
+                $(this).val("");
+                $("#tag_list").css("display","none");
+                return;
+            }
+            $("#tag_list").css("display","block");         
+        }
+    }) 
+ 
+$("#lnkDetails").click(function(){
+   $.get(
+                '{$detailsURL}',{article:$(this).attr("account_id")},
+                function(data) {                    
+                    $("#details-content").html(data);
+                }    
+            )  
+ })
    
+$("#btnCustomAdd").click(function(){
+                $("#custom_form_header").append("<tr><td>" + $("#yumpee_custom_field").val() + "<td><input class='form-control' type='text' name='" + $("#yumpee_custom_field").val() + "' id='" + $("#yumpee_custom_field").val() + "'>");    
+})
+    
+                
 EOT_JS
 );
 
@@ -283,6 +324,71 @@ EOT_JS
     font-size:100px;
 }
 </style>
+<style>
+    .modal-dialog{
+    position: relative;
+    display: table; /* This is important */ 
+    overflow-y: auto;    
+    overflow-x: auto;
+    width: auto;
+    min-width: 300px; 
+    z-index:999;
+}
+
+
+
+ /* The sidepanel menu */
+.sidepanel {
+  height: 1000px; /* Specify a height */
+  width: 0; /* 0 width - change this with JavaScript */
+  position: fixed; /* Stay in place */
+  z-index: 10; /* Stay on top */
+  top: 200;
+  left: 200;
+  background-color: #ffffff; /* Black*/
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 60px; /* Place content 60px from the top */
+  transition: 0.5s; /* 0.5 second transition effect to slide in the sidepanel */
+}
+
+/* The sidepanel links */
+.sidepanel a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidepanel a:hover {
+  color: #f1f1f1;
+}
+
+/* Position and style the close button (top right corner) */
+.sidepanel .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+/* Style the button that is used to open the sidepanel */
+.openbtn {
+  font-size: 20px;
+  cursor: pointer;
+  background-color: #111;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+}
+
+.openbtn:hover {
+  background-color: #444;
+} 
+</style>
+
 <?php
 $display_image_path="";
 $thumbnail_image_path="";
@@ -298,6 +404,13 @@ foreach($selected_tags as $st):
 endforeach;
 
 ?>
+<div id="mySidepanel" class="sidepanel">
+    <div class="container">
+     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+     <div id="details-content"></div>
+    </div>
+</div>
+
 <div class="container-fluid">
 
 <?php
@@ -316,8 +429,22 @@ endif;
 <div class="tab-content">    
 <div id="addNews" class="tab-pane fade in active">
     <form action="index.php?r=news/index" method="post" name="frm1" id="frm1" class="form-group">
-    <table class="table">
-        <tr><td>Title *<td><input name="title" id="title" value="<?=$rs['title']?>" class="form-control" type="text" />
+     <?php
+        if(Yii::$app->request->get("id")!=null):
+        ?>
+        <div class="pull-right"><a href='#' onclick="openNav()" id="lnkDetails" account_id="<?=Yii::$app->request->get("id")?>"><i class="fa fa-info-circle"></i> Additional Details</a> | <a href='#' data-toggle="modal" data-dismiss="modal" data-target="#addfield">+ Add Field</a></div>
+             
+         
+        <?php
+        endif;
+        ?>
+    <table class="table" >
+        
+    </table>
+    <table class="table">  
+        <thead id="custom_form_header"></thead>
+        <tr><td>Title *<td><input name="title" id="title" value="<?=$rs['title']?>" class="form-control" type="text"/>
+                
         <tr><td>Article Header Type<td><?= \yii\helpers\Html::dropDownList("article_type",$rs['article_type'],['1'=>'Standard Article','2'=>'Generic Video','3'=>'Youtube Video','4'=>'Generic Audio'],['class'=>'form-control'])?>
         <tr><td>Video URL/Youtube Identifier/Audio URL<td><input type="text" class="form-control" name="featured_media" id="featured_media" value="<?=$rs['featured_media']?>"/>
         <tr><td>Feature Image<td><img id='my_display_image' src='<?=$image_home?>/<?=$display_image_path?>' height='100px' align='top' width='200px' style='border:1px solid #233388' HSPACE='20' VSPACE='20'/> <a href='#' class='media' id='set_feature'>Set Feature Image</a> | <a href='#' id='unset_feature'>Unset Feature Image</a> <input type="hidden" name="display_image_id" id="display_image_id" value="<?=$rs['display_image_id']?>"/>
@@ -344,7 +471,7 @@ endif;
         <tr><td>Role Permission<td><?=$permissions?>    
         <tr><td>Disable comments on Article<td><?=\yii\helpers\Html::dropDownList("disable_comments",$rs['disable_comments'],['N'=>'No','Y'=>'Yes'],['class'=>'form-control'])?></td>    
         <tr><td>Attach Feedback Form<td><?=$feedback?>
-        <tr><td>Tags<td>Type to drop down tags. Remember to save form if you delete tags.
+        <tr><td>Tags<td>Type to drop down tags or press enter key to add new. Remember to save the article form if you delete tags for this article
         <tr><td>Search for a tags<td><input class="form-control"type="text" placeholder="Type tag" name="search_tag" id="search_tag" /> <select size=5 name=tag_list id=tag_list style="width:300px;display:none;height:100px" onChange="javascript:selectTag()" list='tag_listing'></select><span id="selected_tag">
                     <?php
                         foreach($selected_tags as $rec):
@@ -493,3 +620,36 @@ endforeach;
 
   </div>
 </div>
+
+<div id="addfield" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add field to article</h4>
+      </div>
+      <div class="modal-body">
+        <p>Enter field name</p>
+        <input type="text" class="form-control" id="yumpee_custom_field" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="btnCustomAdd">Add</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+    /* Set the width of the sidebar to 250px (show it) */
+function openNav() {
+  document.getElementById("mySidepanel").style.width = "1000px";
+}
+
+/* Set the width of the sidebar to 0 (hide it) */
+function closeNav() {
+  document.getElementById("mySidepanel").style.width = "0";
+}
+</script>

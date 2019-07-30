@@ -31,6 +31,7 @@ use backend\models\Forms;
 use backend\models\ClassSetup;
 use backend\models\ClassElement;
 use backend\models\ClassAttributes;
+use backend\models\FormRoles;
 use frontend\models\Articles;
 use frontend\models\FormSubmit;
 use frontend\models\FormData;
@@ -89,7 +90,7 @@ public function behaviors()
     public function actionIndex(){
         Yii::$app->api->sendSuccessResponse(['Yumpee CMS Hook active']);
     }
-    public function actionForms(){
+    public function actionForms(){        
         $uri = substr(Yii::$app->request->url,strlen(Yii::$app->homeUrl));
         $request = explode("/",$uri);
         $query_request = Yii::$app->request; 
@@ -101,6 +102,25 @@ public function behaviors()
                 FormData::deleteAll(['form_submit_id'=>$request[4]]);
                 FormFiles::deleteAll(['form_submit_id'=>$request[4]]);
                 Yii::$app->api->sendSuccessResponse(['Delete successful']);
+            else:
+                //we need to enforce the delete permission on roles here
+                $frmSubmit = FormSubmit::find()->where(['id'=>$request[4]])->one();
+                if($frmSubmit==null):
+                    Yii::$app->api->sendFailedResponse("Operation cannot be performed");
+                    return;
+                endif;
+                $role_id = Yii::$app->user->identity->role_id;
+                $frmRole = FormRoles::find()->where(['form_id'=>$frmSubmit->form_id,'role_id'=>$role_id])->one();
+                if($frmRole!=null):
+                    $page_arr = unserialize($frmRole->permissions);
+                    if(isset($page_arr['delete_roles']) && in_array($frmSubmit->user->role_id,$page_arr['delete_roles'])):
+                       FormSubmit::deleteAll(['id'=>$request[4]]);
+                       FormData::deleteAll(['form_submit_id'=>$request[4]]);
+                       FormFiles::deleteAll(['form_submit_id'=>$request[4]]);
+                       Yii::$app->api->sendSuccessResponse(['Delete successful']); 
+                    endif;
+                endif;
+            
             endif;
             Yii::$app->api->sendFailedResponse("Operation cannot be performed");
             return;
@@ -110,6 +130,22 @@ public function behaviors()
             if($check!=null):                
                 FormFiles::deleteAll(['form_submit_id'=>$request[4],'id'=>$request[5]]);
                 Yii::$app->api->sendSuccessResponse(['Delete successful']);
+            else:
+                //we need to enforce the delete permission on roles here
+                $frmSubmit = FormSubmit::find()->where(['id'=>$request[4]])->one();
+                if($frmSubmit==null):
+                    Yii::$app->api->sendFailedResponse("Operation cannot be performed");
+                    return;
+                endif;
+                $role_id = Yii::$app->user->identity->role_id;
+                $frmRole = FormRoles::find()->where(['form_id'=>$frmSubmit->form_id,'role_id'=>$role_id])->one();
+                if($frmRole!=null):
+                    $page_arr = unserialize($frmRole->permissions);
+                    if(isset($page_arr['delete_roles']) && in_array($frmSubmit->user->role_id,$page_arr['delete_roles'])):                       
+                       FormFiles::deleteAll(['form_submit_id'=>$request[4],'id'=>$request[5]]);
+                       Yii::$app->api->sendSuccessResponse(['Delete successful']); 
+                    endif;
+                endif;
             endif;
             Yii::$app->api->sendFailedResponse("Operation cannot be performed");
             return;

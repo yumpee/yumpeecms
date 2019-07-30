@@ -40,6 +40,7 @@ use backend\models\Forms;
 use backend\models\ArticlesCategories;
 use backend\models\Media;
 use backend\models\CustomWidget;
+use backend\models\FormRoles;
 use common\components\ResizeImage;
 use common\components\CSVManager;
 use yii\web\Response;
@@ -59,6 +60,7 @@ use frontend\models\FeedbackFiles;
 use frontend\models\WebHook;
 use frontend\models\Domains;
 use frontend\models\Themes;
+
 
 use yii\helpers\FileHelper;
 use yii\db\Expression;
@@ -267,9 +269,10 @@ public function behaviors()
        if(ContentBuilder::getTemplateRouteByURL($page_url)=="forms/view"):
            //we get the form ID used for this template
             $page['article'] = $article;
-            $form = Forms::find()->where(['id'=>$article->form_id])->one();    
+            $form = Forms::find()->where(['id'=>$article->form_id])->one();  
+            $limit=ContentBuilder::getSetting("page_size");
             
-                    $page['records'] = FormSubmit::find()->where(['form_id'=>$article->form_id])->andWhere('published="1"')->limit(200)->all();
+                    $page['records'] = FormSubmit::find()->where(['form_id'=>$article->form_id])->andWhere('published="1"')->limit($limit)->all();
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):
                         //we handle the loading of twig template if it is turned on
 						$themes = new Themes();
@@ -373,7 +376,41 @@ public function behaviors()
          * Yii::$app->request->get('search-type') - if this is feedback then we call the feedback function to return feedback
          * Yii::$app->request->get('params') - if this is set we pass the name=value pairs to the called widget e.g name1=val1&name2=val2 etc
          */
-		 
+        $page =[];
+        $page_url =  ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl());
+            if (strpos($page_url, '?') !== false):
+                list($page_url,$search)= explode("?",$page_url);
+            endif;
+       $article = Pages::find()->where(['url'=>$page_url])->one();
+       
+       //if it requires log in and we are not logged in then redirect to login page
+       if(($article['require_login']=="Y")&&(Yii::$app->user->isGuest)):       
+            $page =[];
+            $form['callback'] = $page_url;
+            $page_url =  ContentBuilder::getURLByRoute("accounts/login");
+            $article = Pages::find()->where(['url'=>$page_url])->one();          
+            $form['login_url'] = Yii::$app->request->getBaseUrl()."/".$article['url'];
+            $form['message'] = "You have to login to view this page";
+            $form['param'] = Yii::$app->request->csrfParam;
+            $form['token'] = Yii::$app->request->csrfToken;
+                    if(ContentBuilder::getSetting("twig_template")=="Yes"):
+                        //we handle the loading of twig template if it is turned on
+							$themes = new Themes();
+							$theme_id=$themes->dataTheme;
+							if($theme_id=="0"):
+								$theme_id = ContentBuilder::getSetting("current_theme");
+							endif;
+                        $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>'accounts/login','renderer_type'=>'V'])->one();
+                        if(($codebase!=null)&& ($codebase['code']<>"")):
+                            $loader = new Twig();
+                            $twig = new \Twig_Environment($loader);
+                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
+                            return $this->render('@frontend/views/layouts/html',['data'=>$content]);
+                        endif;
+                    endif;                         
+                    return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/account/login',['form'=>$form,'page'=>$article]);
+       endif;
+       
         if(Yii::$app->request->get('search-type')=="feedback"):		
 			return FormsController::actionFeedback();      
         endif;
@@ -385,10 +422,10 @@ public function behaviors()
             return $this->renderPartial('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/standard/error');
         endif;
         $query = FormSubmit::find();
+        
         //apply filter on no of records
         
-        
-            
+                  
         
         if(Yii::$app->request->get('limit')!=null):
             $query->limit(Yii::$app->request->get('limit'));
@@ -571,6 +608,7 @@ public function behaviors()
             endif;
             $criteria_found=1;            
         endif;
+        
         if(Yii::$app->request->get('excludes')!=null):  
             if($criteria_found < 1):
                 $data_query = FormData::find()->select('form_submit_id');            
@@ -598,12 +636,37 @@ public function behaviors()
             $data_query->all();
         endif;
         
-        
-        if(Yii::$app->request->get('search-field')!=null):
+         
+        if(Yii::$app->request->get('relations')!=null):
+            //we implement the relations parameter here if call decides to be relational data specific
+            $relation_with=[];
+            $qr = new FormSubmit();
+            $relations = $qr->getRelationData();            
+            if(Yii::$app->request->get('relations')=="all"):
+                foreach($relations as $a):                
+                    //array_push($relation_with,$a['name']);
+                    $query->with($a['name']);
+                endforeach;
+            else:
+                $relations = explode(",",Yii::$app->request->get('relations'));
+                $relation_with=[];
+                foreach($relations as $a):  
+                    $query->with($a);
+                endforeach;
+            endif;
+            if(Yii::$app->request->get('search-field')!=null):
+                $query->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$article->id.'"');
+            else:
+                $query->asArray()->where(['form_id'=>$article->id]);
+            endif;
+        else:
+            if(Yii::$app->request->get('search-field')!=null):
                 $query->with('data','data.element','data.elementVal','data.property','data.propertyVal','data.setupVal','data.setup','file','ratingdetails','user','user.displayImage')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$article->id.'"');
             else:
                 $query->with('data','data.element','data.elementVal','data.property','data.propertyVal','data.setupVal','data.setup','file','ratingdetails','user','user.displayImage')->asArray()->where(['form_id'=>$article->id]);
+            endif;
         endif;
+        
         if(Yii::$app->request->get('published')==null):
             $query->andWhere('published="1"');
         endif;
@@ -643,7 +706,8 @@ public function behaviors()
         if(Yii::$app->request->get('return-type')=="count"):
             return \yii\helpers\Json::encode($query->count());
         endif;
-		
+	
+        
         
         if(Yii::$app->request->get('return-type')=="json"):
             $data = $query->all();
@@ -1103,7 +1167,8 @@ public function behaviors()
                                 $usrname="";
                             else:
                                 //we need to check here what the form submission limit is for this form entry
-                                $record = FormSubmit::find()->where(['id'=>Yii::$app->request->post("id")])->andWhere('usrname="'.Yii::$app->user->identity->username.'"')->one();
+                                //$record = FormSubmit::find()->where(['id'=>Yii::$app->request->post("id")])->andWhere('usrname="'.Yii::$app->user->identity->username.'"')->one();
+                                $record = FormSubmit::find()->where(['id'=>Yii::$app->request->post("id")])->one();
                                 $usrname = Yii::$app->user->identity->username;
                                 $record_limit_arr = Forms::find()->where(['id'=>Yii::$app->request->post("form_id")])->one();
                                 if($record_limit_arr->form_fill_entry_type=='S' && $record==null):
@@ -1120,6 +1185,8 @@ public function behaviors()
                         
                         $form = Forms::find()->where(['id'=>Yii::$app->request->post("form_id")])->one();
                         if($record==null):
+                            //check if person can create records
+                            
                             $form_submit = new FormSubmit();
                             if($form->published=="Y"):
                                 $form_submit->setAttribute('published',"1");
@@ -1141,16 +1208,42 @@ public function behaviors()
                             endif;
                             
                         else:
+                            //check if this person can update a record using role permissions
+                            if(Yii::$app->user->isGuest):
+                                return "You do not have enough privileges to update record";
+                            endif;
+                            if($record->usrname!=Yii::$app->user->identity->username): //assuming someone other than original owner tries to update
+                                $role_id = Yii::$app->user->identity->role_id;
+                                $frmRole = FormRoles::find()->where(['form_id'=>$record->form_id,'role_id'=>$role_id])->one();
+                                if($frmRole!=null):
+                                    $page_arr = unserialize($frmRole->permissions);
+                                    if(isset($page_arr['update_roles']) && in_array($record->user->role_id,$page_arr['update_roles'])):                        
+                                        //return true;
+                                    else:
+                                        return "You do not have enough privileges to update record";
+                                    endif;                                                    
+                                else:
+                                    return "You do not have enough privileges to update record";
+                                endif;
+                            endif;
+                            
                             if($form->published=="Y"):
                                 $record->setAttribute('published',"1");
                             else:
                                 $record->setAttribute('published',"0");
                             endif;
                             $record->setAttribute("form_id",Yii::$app->request->post("form_id"));
-                            $record->setAttribute("usrname",$usrname);
-                            $record->setAttribute("token",Yii::$app->request->post("_csrf-frontend"));
-                            $record->setAttribute("date_stamp",date("Y-m-d H:i:s"));
-                            $record->setAttribute("ip_address",Yii::$app->getRequest()->getUserIP());
+                            if(Yii::$app->request->post("yumpee_override_usrname")=="true"):
+                                $record->setAttribute("usrname",$usrname); //we have to keep the original creator 
+                            endif;
+                            if(Yii::$app->request->post("yumpee_override_date_stamp")=="true"):
+                                $record->setAttribute("date_stamp",date("Y-m-d H:i:s"));
+                            endif;
+                            if(Yii::$app->request->post("yumpee_override_ip_address")=="true"):
+                                $record->setAttribute("ip_address",Yii::$app->getRequest()->getUserIP());
+                            endif;
+                            $record->setAttribute("token",Yii::$app->request->post("_csrf-frontend"));                           
+                            
                             //we deal with override of url here. Check to see that no one else has the URL and also ensure that you replace space with '-'
                             if(Yii::$app->request->post("url")!==null && Yii::$app->request->post("url")!=""):
                                 $nurl = str_replace(" ","-",Yii::$app->request->post("url"));
@@ -1164,8 +1257,6 @@ public function behaviors()
                                             //do not save the data
                                         else:
                                             $record->save();
-                                            
-
                             endif;
                             if(Yii::$app->request->post("id")):
                                 $id = Yii::$app->request->post("id");

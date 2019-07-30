@@ -228,4 +228,7 @@ class User extends ActiveRecord implements IdentityInterface
             endif;
         endif;
     }
+    public function getUserVal($field,$val){
+        return \frontend\models\Users::find()->where([$field=>$val])->one();
+    }
 }
