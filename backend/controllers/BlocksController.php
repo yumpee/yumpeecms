@@ -99,7 +99,7 @@ public function actionIndex()
         if($page['id']!=null){             
             $page['rs'] = Blocks::find()->where(['id' => $page['id']])->one();            
             $page['edit']=true;
-            if(count($page['rs']) > 0):
+            if($page['rs']!=null):
             $title_level = $page['rs']['title_level'];
             $position = $page['rs']['position'];
             $wposition = $page['rs']['widget'];

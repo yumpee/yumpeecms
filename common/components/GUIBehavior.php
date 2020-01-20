@@ -38,6 +38,7 @@ use backend\models\Templates;
 use frontend\models\FormData;
 use frontend\models\FormSubmit;
 use backend\models\Forms;
+use frontend\models\FormFiles;
 use backend\models\Roles;
 use frontend\components\ContentBuilder;
 use frontend\models\Twig;
@@ -68,6 +69,7 @@ class GUIBehavior extends Behavior
         $pattern_login_to_view="/{yumpee_login_to_view}(.*?){\/yumpee_login_to_view}/";
         $pattern_hide_on_login="/{yumpee_hide_on_login}(.*?){\/yumpee_hide_on_login}/";
         $pattern_setting= "/{yumpee_setting}(.*?){\/yumpee_setting}/";
+        $pattern_setting_extra= "/{yumpee_setting:(.*?)}(.*?){\/yumpee_setting}/";
         $pattern_twig= "/{yumpee_include}(.*?){\/yumpee_include}/";
         $pattern_get= "/{yumpee_get}(.*?){\/yumpee_get}/";
         $pattern_post= "/{yumpee_post}(.*?){\/yumpee_post}/";
@@ -88,6 +90,7 @@ class GUIBehavior extends Behavior
         $pattern_comment="/{yumpee_comment}(.*?){\/yumpee_comment}/";
         $pattern_gallery="/{yumpee_gallery}(.*?){\/yumpee_gallery}/";
         $pattern_media="/{yumpee_media}(.*?){\/yumpee_media}/";
+        $pattern_download="/{yumpee_download}(.*?){\/yumpee_download}/";
         
 		
 		$themes = new Themes();
@@ -100,7 +103,7 @@ class GUIBehavior extends Behavior
         foreach($this->owner->fields as $field):
         $content = $this->owner->{$field};  
         //$content = str_replace("\r\n","",$content);
-        $content = preg_replace_callback($pattern_setting,function ($matches) use($theme_id){
+        $content = preg_replace_callback($pattern_setting,function ($matches) use($theme_id){                            
                             $replacer = ContentBuilder::getSetting($matches[1],$theme_id);                            
                             return $replacer;
                     },$content); 
@@ -133,15 +136,23 @@ class GUIBehavior extends Behavior
                             $replacer=null;
                             if($matches[1]=="pathInfo"):
                                 $replacer=Yii::$app->request->pathInfo;
+                                return $replacer;
                             endif;
                             if($matches[1]=="url"):
                                 $replacer=ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl());
+                                return $replacer;
                             endif;
                             if($matches[1]=="username" && Yii::$app->user->identity!=null):
                                 $replacer=Yii::$app->user->identity->username;
+                                return $replacer;
                             endif;
                             if($matches[1]=="role_id" && Yii::$app->user->identity!=null):
                                 $replacer=Yii::$app->user->identity->role_id;
+                                return $replacer;
+                            endif;                            
+                            if(isset($_SERVER[$matches[1]])):
+                                $a = $matches[1];
+                                $replacer = $_SERVER[$a];
                             endif;
                             return $replacer;
                     },$content);  
@@ -154,7 +165,7 @@ class GUIBehavior extends Behavior
                                 if($id=="*"):
                                         $elements = ClassSetup::find()->with('displayImage','parent','child','list')->asArray()->where(['parent_id'=>$class_setup->id])->orderBy(['display_order'=>SORT_ASC,'alias'=>SORT_ASC])->all();
                                     else:
-                                        $elements = ClassSetup::find()->where(['name'=>$id])->orderBy(['display_order'=>'SORT_ASC'])->one();
+                                        $elements = ClassSetup::find()->with('displayImage','parent','child','list')->asArray()->where(['name'=>$id])->orderBy(['display_order'=>'SORT_ASC'])->one();
                                 endif;
                                 
                             endif;
@@ -184,6 +195,7 @@ class GUIBehavior extends Behavior
                             $replacer="";
                             $order="";
                             $limit="";
+							$relations="";
                             $params=null;
                             $data_query=[];
                             $sent_data = explode(":",$matches[1]);
@@ -199,12 +211,52 @@ class GUIBehavior extends Behavior
                             if(count($sent_data) > 3):
                                 $limit = $sent_data[3];
                             endif;
+							if(count($sent_data) > 4):
+								$relations=$sent_data[4];
+							endif;
+							
                             //list($name,$params) = explode(":",$matches[1]);
                             $form = Forms::find()->select('id')->where(['name'=>$name])->one();
                             //we handle filtering of data search parameters
+							$search_succeed=0;
                             
                             $andWhere="";
-                            if($params!=null):
+							$search_params_pipe=explode("|",$params);
+							$search_params_amp=explode("&",$params);
+							
+							if((sizeof($search_params_pipe)==1)&& (sizeof($search_params_amp)==1) && $params!=null):
+										$data_query = FormData::find()->select('form_submit_id');
+										$counter=0;
+										foreach($search_params_pipe as $param):
+                                        list($p,$v)=explode("=",$param);                
+                                        //this is used to search based on submit id
+                                        if($p=="form_submit_id"):
+                                            $data_query->orWhere('form_submit_id="'.$v.'"');
+											$search_succeed=1;
+                                            continue;
+                                        endif;
+                                        if((trim($p)=="url") && (trim($v)!="")):
+                                            $andWhere="url='".$v."'";
+											$search_succeed=1;
+                                            continue;
+                                        endif;
+                                        if((trim($p)=="usrname") && (trim($v)!="")):
+                                            $andWhere="usrname='".$v."'";
+											$search_succeed=1;
+                                            continue;
+                                        endif;
+                
+                                        if(count($search_params_pipe)==1):
+                                            $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v])->andFilterCompare('param_val',$v);
+                                        else:                    
+                                            $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v]);                    
+                                        endif;
+										$search_succeed=1;
+										endforeach;
+                                    
+                               endif;
+								
+                            if(($params!=null) && ($search_succeed==0)):
                                 $data_query = FormData::find()->select('form_submit_id');
                                 $search_params=explode("|",$params);
                                 $counter=0;
@@ -279,22 +331,7 @@ class GUIBehavior extends Behavior
                                         $search_succeed=1;
                                     endif;            
                                 endif;
-                                if($search_succeed < 1):
-                                    foreach($search_params as $param):
-                                        list($p,$v)=explode("=",$param);                
-                                        //this is used to search based on submit id
-                                        if($p=="form_submit_id"):
-                                            $data_query->orWhere('form_submit_id="'.$v.'"');
-                                            continue;
-                                        endif;
-                
-                                        if(count($search_params)==1):
-                                            $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v])->andFilterCompare('param_val',$v);
-                                        else:                    
-                                            $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v]);                    
-                                        endif;
-                                    endforeach;
-                                endif;
+                                
                                 
                                 $data_query->all();
                             endif;
@@ -366,9 +403,21 @@ class GUIBehavior extends Behavior
                             endif;
 							
                             if($andWhere!=""){
-				$elements = $submit_query->with('data','file','user','user.displayImage','data.setup','data.setupVal','data.element','data.elementVal','data.property','data.propertyVal')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->andWhere($andWhere)->all();
-				}else{
-				$elements = $submit_query->with('data','file','user','user.displayImage','data.setup','data.setupVal','data.element','data.elementVal','data.property','data.propertyVal')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->all();
+								if($relations=="basic"):
+										$elements = $submit_query->with('data','user','user.displayImage')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->andWhere($andWhere)->all();
+                                                                elseif($relations=="file"):
+                                                                                $elements = $submit_query->with('data','user','user.displayImage','file')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->andWhere($andWhere)->all();
+								else:
+										$elements = $submit_query->with('data','file','user','user.displayImage','data.setup','data.setupVal','data.element','data.elementVal','data.property','data.propertyVal')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->andWhere($andWhere)->all();
+								endif;
+							}else{
+								if($relations=="basic"):
+										$elements = $submit_query->with('data','user','user.displayImage')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->all();
+                                                                elseif($relations=="file"):
+                                                                                $elements = $submit_query->with('data','user','user.displayImage','file')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->andWhere($andWhere)->all();
+								else:
+										$elements = $submit_query->with('data','file','user','user.displayImage','data.setup','data.setupVal','data.element','data.elementVal','data.property','data.propertyVal')->asArray()->where(['IN','id',$data_query])->andWhere('form_id="'.$form->id.'"')->all();
+								endif;
                             }
                             $replacer = \yii\helpers\Json::encode($elements);
                             return $replacer;
@@ -381,7 +430,8 @@ class GUIBehavior extends Behavior
                             $params=null;
                             $data_query=[];
                             $sent_data = explode(":",$matches[1]);
-                            
+                            $search_succeed=0;
+                            $submit_query = Users::find();
                             if($sent_data[0]!=null):
                                 $params = $sent_data[0];
                             endif;
@@ -398,12 +448,26 @@ class GUIBehavior extends Behavior
                                 $search_params=explode("|",$params);
                                 $counter=0;
                                 $search_criteria=array('id','username','first_name','last_name','title','role_id','email','status','created_at','updated_at');
+                                if(sizeof($search_params)==1):
+                                    
+                                    list($p,$v)=explode("=",$search_params[0]);
+                                    if(in_array($p,$search_criteria)):  
+                                        //echo $v;
+                                        //exit;
+                                        $submit_query->where(['$p=>$v']);
+                                        $search_succeed=1;
+                                        $counter++;                                        
+                                    endif;
+                                endif;
                                 
+                                if(sizeof($search_params) > 1 ):
+                                    
                                 foreach($search_params as $param):
                                     list($p,$v)=explode("=",$param);
-                                    if(in_array($p,$search_criteria)):
-                                        //we add this to the submit query condition later on
-                                        $andWhere=$p."='".$v."'";    
+                                    if(in_array($p,$search_criteria)):  
+                                        $submit_query->andWhere($p.'="'.$v.'"')->orWhere(['like',$p,$v]);
+                                        $search_succeed=1;
+                                        $counter++;
                                         continue;
                                     endif;
                                     if($counter==0):
@@ -414,9 +478,89 @@ class GUIBehavior extends Behavior
                                     $counter++;
                                 endforeach;
                                 $data_query->all();
+                                $search_succeed=1;
+                                endif;
+                                
+                                if($search_succeed < 1):
+                                    
+                                    $search_params=explode("&",$params);
+                                    $search_criteria=array('id','username','first_name','last_name','title','role_id','email','status','created_at','updated_at');
+                                    if(sizeof($search_params) > 1):
+                                        $form_arr= array();
+                                        $int_count=0;
+                                        foreach($search_params as $param):
+                                            list($p,$v)=explode("=",$param);
+                                            if(in_array($p,$search_criteria)):
+                                            //we add this to the submit query condition later on                                                
+                                                $andWhere=$p."='".$v."'";    
+                                                continue;
+                                            endif;
+                                            $pn = explode("=",$param);
+                                            if(count($pn) > 1):
+                                                list($p,$v)=explode("=",$param);
+                                            endif;
+                                            $pl=explode("<",$param);
+                                            $pg=explode(">",$param);
+                                            $plq=explode("<=",$param);
+                                            $pgq=explode(">=",$param);
+                                            //this is used to search based on submit id
+                                            if($p=="profile_id"):
+                                                $data_query->andWhere('profile_id="'.$v.'"');
+                                                continue;
+                                            endif;
+                                            if(count($pgq) > 1):
+                                                $form_arr[$int_count] = ProfileDetails::find()->select('profile_id')->where(['param'=>$pgq[0]])->andWhere('param_val >="'.$pgq[1].'"')->column();
+                                                $int_count++;
+                                                continue;
+                                            endif;
+                                            if(count($plq) > 1):
+                                                $form_arr[$int_count] = ProfileDetails::find()->select('profile_id')->where(['param'=>$plq[0]])->andWhere('param_val <="'.$plq[1].'"')->column();
+                                                $int_count++;
+                                                continue;
+                                            endif;
+                                            if(count($pg) > 1):
+                                                $form_arr[$int_count] = ProfileDetails::find()->select('profile_id')->where(['param'=>$pg[0]])->andWhere('param_val >"'.$pg[1].'"')->column();
+                                                $int_count++;
+                                                continue;
+                                            endif;
+                                            if(count($pl) > 1):
+                                                $form_arr[$int_count] = ProfileDetails::find()->select('profile_id')->where(['param'=>$pl[0]])->andWhere('param_val <"'.$pl[1].'"')->column();
+                                                $int_count++;
+                                                continue;
+                                            endif;
+                                            $form_arr[$int_count] = ProfileDetails::find()->select('profile_id')->where(['param'=>$p])->andWhere(['like','param_val',$v])->column();
+                                            $int_count++;
+                                        endforeach;
+                                        $form_submit_arr = $form_arr[0];
+                                        foreach ($form_arr as $form_submit_item):
+                                            $form_submit_arr = array_intersect($form_submit_arr,$form_submit_item);
+                                        endforeach;
+                                        $data_query->where(['IN','profile_id',$form_submit_arr]);
+                                        $search_succeed=1;
+                                    endif;
+                                endif;
+                                if($search_succeed < 1):                                    
+                                    $search_criteria=array('id','username','first_name','last_name','title','role_id','email','status','created_at','updated_at');
+                                    foreach($search_params as $param):
+                                    list($p,$v)=explode("=",$param);
+                                    if(in_array($p,$search_criteria)):
+                                        
+                                        //we add this to the submit query condition later on
+                                        $andWhere=$p."='".$v."'";    
+                                        continue;
+                                    endif;
+                                    if($counter==0):
+                                        $data_query->andWhere('param="'.$p.'"')->andFilterCompare('param_val',$v);
+                                    else:
+                                        $data_query->andWhere('param="'.$p.'"')->orWhere(['like','param_val',$v])->andFilterCompare('param_val',$v);
+                                    endif;
+                                    $counter++;
+                                    endforeach;
+                                    $data_query->all();
+                                endif;
                             endif;
                             
-                            $submit_query = Users::find();
+                            
                             $order_sorted=0;
                             if($order!=""):
                                 $order_arr= explode(" ",$order);
@@ -520,8 +664,41 @@ class GUIBehavior extends Behavior
                             $replacer="";
                             $media_arr=[];
                             if($matches[1]<>"all"):
-                                $media_arr=Media::find()->with('publisher')->asArray()->where(['id'=>$matches[1]])->one();                            
+                                $media_arr=Media::find()->with('publisher')->asArray()->where(['id'=>$matches[1]])->one();    
+                            else:
+                                $media_arr=Media::find()->with('publisher')->asArray()->all();
                             endif;
+                            
+                            return \yii\helpers\Json::encode($media_arr);
+                    },$content);
+        //we process downloads
+        $content = preg_replace_callback($pattern_download,function ($matches) {
+                            //download single file
+                            //download a group of files by their id and set their archive format
+                            //download file as - download as file name
+                            
+                            $replacer="";
+                            $sent_data = explode(":",$matches[1]);
+                            $media_arr=[];
+                            if($sent_data[0]<>"all"):
+                                $media_arr=FormFiles::find()->where(['id'=>$sent_data[0]])->one();  
+                            endif;
+                            $download_name=basename(Yii::getAlias('@uploads/uploads/').$media_arr["file_path"]);
+                            if($sent_data[1]!=null):
+                                $download_name=$sent_data[1];
+                            endif;
+                            header('Content-Description: File Transfer');
+                            header('Content-Type: '.$media_arr["file_type"]);
+                            header('Content-Disposition: attachment; filename='.$download_name);
+                            header('Content-Transfer-Encoding: binary');
+                            header('Expires: 0');
+                            header('Cache-Control: must-revalidate');
+                            header('Pragma: public');
+                            header('Content-Length: ' . filesize(Yii::getAlias('@uploads/uploads/').$media_arr["file_path"]));
+                            ob_clean();
+                            flush();
+                            readfile(Yii::getAlias('@uploads/uploads/').$media_arr["file_path"]);
+                            exit;
                             
                             return \yii\helpers\Json::encode($media_arr);
                     },$content);
@@ -530,7 +707,9 @@ class GUIBehavior extends Behavior
             if($matches[1]=="*"):
                 $page_arr = \frontend\models\Pages::find()->all();
             else:
+                if (strpos($matches[1], ':') !== false) :
                 $params = explode(":",$matches[1]);
+                
                 if($params[0]!=null):
                     $submit_query = \frontend\models\Pages::find();
                      $filter = explode("|",$params[0]);
@@ -539,7 +718,9 @@ class GUIBehavior extends Behavior
                                     if($v=="route"):
                                         $template = \backend\models\Templates::find()->where(['route'=>$p])->one();
                                         $submit_query->where(['template'=>$template['id']]);
-                                    endif;
+                                    else:
+					$submit_query->andWhere($v.'='.$p);
+                                    endif;                                      
                                 endforeach;
                                 if($params[1]!=null):
                                     $limit = $params[1];
@@ -572,6 +753,7 @@ class GUIBehavior extends Behavior
                                 $page_arr = $submit_query->all();
                                 return \yii\helpers\Json::encode($page_arr);
                 endif;
+                endif;
                 $page_arr = \frontend\models\Pages::find()->where(['url'=>$matches[1]])->one();
             endif;
             return \yii\helpers\Json::encode($page_arr);
@@ -582,6 +764,9 @@ class GUIBehavior extends Behavior
                             $submit_query = \backend\models\Articles::find();
                             $params = explode(":",$matches[1]);
                             if($params[0]!=null):
+                                if($params[0]=="*"):
+								
+				else:
                                 $filter = explode("|",$params[0]);
                                 foreach ($filter as $filter_rec):
                                     list($v,$p)=explode("=",$filter_rec);
@@ -595,7 +780,8 @@ class GUIBehavior extends Behavior
                                         $blog_index_articles = \backend\models\ArticlesCategoryRelated::find()->select('articles_id')->where(['category_id'=>$page['id']])->column();
                                         $submit_query->where(['IN','id',$blog_index_articles]);
                                     endif;
-                                endforeach; 
+                                endforeach;
+                                endif;
                             endif;
                             if($params[1]!=null):
                                 $limit = $params[1];
@@ -624,7 +810,6 @@ class GUIBehavior extends Behavior
                                         $submit_query->orderBy([$orderby=>SORT_ASC]);
                                     endif;
                                 endif;
-                                
                             endif;
                             $article_arr = $submit_query->with('documents','feedback','details','approvedComments','displayImage','blogIndex','blogIndex.page','author')->asArray()->all();                            
                             return \yii\helpers\Json::encode($article_arr);
@@ -679,13 +864,29 @@ class GUIBehavior extends Behavior
                         endif;
                     },$content);
         $array=$content;           
-        $array = preg_replace_callback($pattern_setting,function ($matches) {
+        $array = preg_replace_callback($pattern_setting,function ($matches) use($theme_id){
                             if($matches[1]=="yumpee_role_home_page"):
                                 return ContentBuilder::getRoleHomePage();
                             endif;
-                            $replacer = ContentBuilder::getSetting($matches[1]);                            
+                            if($matches[1]=="*" || $matches[1]=="~*"):
+                                return \yii\helpers\Json::encode(ContentBuilder::getSetting($matches[1],$theme_id));
+                            endif;
+                            $replacer = ContentBuilder::getSetting($matches[1],$theme_id);                            
                             return $replacer;
                     },$array); 
+        $array = preg_replace_callback($pattern_setting_extra,function ($matches) {
+                            if($matches[2]=="yumpee_role_home_page"):
+                                return ContentBuilder::getRoleHomePage();
+                            endif;
+                            if($matches[2]=="*" || $matches[2]=="~*"):
+                                return \yii\helpers\Json::encode(ContentBuilder::getSetting($matches[2],$theme_id));
+                            endif;
+                            $replacer = ContentBuilder::getSetting($matches[2]);  
+                            if($replacer==""||$replacer==null):
+				return $matches[1];
+                            endif;
+                            return $replacer;
+                    },$array); 	
         $array = preg_replace_callback($pattern_widget,function ($matches) {
                             $replacer = "<div class=\"yumpee_custom_widget:".$matches[1]."\"></div>";                            
                             return $replacer;
@@ -721,10 +922,25 @@ class GUIBehavior extends Behavior
                             $twig = new \Twig_Environment($loader); 
                             $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
                             $metadata['param'] = Yii::$app->request->csrfParam;
-                            $metadata['token'] = Yii::$app->request->csrfToken;      
+                            $metadata['token'] = Yii::$app->request->csrfToken;    
+                            $params = explode(":",$matches[1]);        
                             
-                            $content= $twig->render(Twig::find()->where(['renderer'=>$matches[1],'theme_id'=>$theme_id])->one()->filename,['app'=>Yii::$app,'metadata'=>$metadata]);
-                            return $content;
+                            if(count($params) > 1):
+                                    $a = Twig::find()->where(['renderer'=>$params[0],'theme_id'=>$theme_id])->one();
+                                    parse_str($params[1], $output);
+                                    $content = $twig->render($a->filename,['app'=>Yii::$app,'metadata'=>$metadata,'params'=>$output]);
+                                    return $content;
+                            endif;
+                            $a = Twig::find()->where(['renderer'=>$matches[1],'theme_id'=>$theme_id])->one();
+                            if($a!=null):                                
+                                    $content = $twig->render($a->filename,['app'=>Yii::$app,'metadata'=>$metadata]);
+                                    return $content;
+                               
+                            else:
+                                return "";
+                            endif;
+                            //$content= $twig->render(Twig::find()->where(['renderer'=>$matches[1],'theme_id'=>$theme_id])->one()->filename,['app'=>Yii::$app,'metadata'=>$metadata]);
+                            //return $content;
                             //return $replacer;
                     },$array); 
         

@@ -96,7 +96,6 @@ public function behaviors()
         $pages = Roles::find()->orderBy('name')->all();
         $page_map =  yii\helpers\ArrayHelper::map($pages, 'id', 'name');
         $page['permissions'] = \yii\helpers\Html::checkboxList("permissions",$perm_arr,$page_map);
-        
         $page['records'] = Widgets::find()->orderBy('name')->all();
         return $this->render('index',$page);
     }

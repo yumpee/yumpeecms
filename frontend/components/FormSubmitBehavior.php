@@ -89,12 +89,21 @@ class FormSubmitBehavior extends Behavior{
                     $message.="<br>".$key.":".Yii::$app->request->getBodyParam($key);
                 endforeach;
             endif;
-            Yii::$app->mailer->compose()
-            ->setFrom([$from_email=>$from_name])
-            ->setTo($webhook_email->email)
-            ->setSubject($webhook_email->subject)
-            ->setHtmlBody($message)
-            ->send();
+            if(ContentBuilder::getSetting("outgoing_mail_processor")=="Local"):
+                $to = $webhook_email->email;
+		$headers = "From: " . [$from_email=>$from_name] . "\r\n";
+		$headers .= "Reply-To: ". [$from_email=>$from_name] . "\r\n";				
+		$headers .= "MIME-Version: 1.0\r\n";
+		$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                mail($to, $webhook_email->subject, $message, $headers);
+            else:
+                Yii::$app->mailer->compose()
+                ->setFrom([$from_email=>$from_name])
+                ->setTo($webhook_email->email)
+                ->setSubject($webhook_email->subject)
+                ->setHtmlBody($message)
+                ->send();
+            endif;
             endif;
           
         
@@ -135,12 +144,22 @@ class FormSubmitBehavior extends Behavior{
                         $message.="<br>".$key.":".Yii::$app->request->getBodyParam($key);
                     endforeach;
                 endif;    
-                Yii::$app->mailer->compose()
-                ->setFrom([$from_email=>$from_name])
-                ->setTo($to_email)
-                ->setSubject($webhook_email->subject)
-                ->setHtmlBody($message)
-                ->send();
+                if(ContentBuilder::getSetting("outgoing_mail_processor")=="Local"):
+                    $to = $to_email;
+                    $headers = "From: " . [$from_email=>$from_name] . "\r\n";
+                    $headers .= "Reply-To: ". [$from_email=>$from_name] . "\r\n";				
+                    $headers .= "MIME-Version: 1.0\r\n";
+                    $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                    mail($to, $webhook_email->subject, $message, $headers);
+                else:
+                    Yii::$app->mailer->compose()
+                    ->setFrom([$from_email=>$from_name])
+                    ->setTo($to_email)
+                    ->setSubject($webhook_email->subject)
+                    ->setHtmlBody($message)
+                    ->send();
+                endif;
+                
             
         endif;
         //we attend to the webhook response email
@@ -176,12 +195,23 @@ class FormSubmitBehavior extends Behavior{
                         $message.="<br>".$key.":".Yii::$app->request->getBodyParam($key);
                     endforeach;
                 endif;    
-                Yii::$app->mailer->compose()
-                ->setFrom([$from_email=>$from_name])
-                ->setTo($to_email)
-                ->setSubject($webhook_email->subject)
-                ->setHtmlBody($message)
-                ->send();
+                
+                if(ContentBuilder::getSetting("outgoing_mail_processor")=="Local"):
+                    $to = $to_email;
+                    $headers = "From: " . [$from_email=>$from_name] . "\r\n";
+                    $headers .= "Reply-To: ". [$from_email=>$from_name] . "\r\n";				
+                    $headers .= "MIME-Version: 1.0\r\n";
+                    $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                    mail($to, $webhook_email->subject, $message, $headers);
+                else:
+                    Yii::$app->mailer->compose()
+                    ->setFrom([$from_email=>$from_name])
+                    ->setTo($to_email)
+                    ->setSubject($webhook_email->subject)
+                    ->setHtmlBody($message)
+                    ->send();
+                endif;
+                
             endif;
         endif;
        endif;

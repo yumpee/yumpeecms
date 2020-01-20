@@ -27,6 +27,8 @@ $this->title='Media';
 $saveURL = \Yii::$app->getUrlManager()->createUrl('media/save');
 $deleteURL = \Yii::$app->getUrlManager()->createUrl('media/delete');
 $editURL = \Yii::$app->getUrlManager()->createUrl('media/edit');
+$searchURL = \Yii::$app->getUrlManager()->createUrl('media/search');
+$galleryURL = \Yii::$app->getUrlManager()->createUrl('media/gallery');
 $home_image_url= \frontend\components\ContentBuilder::getSetting("website_image_url");
 $this->registerJs( <<< EOT_JS
        
@@ -81,6 +83,11 @@ $this->registerJs( <<< EOT_JS
                     )
                     
   });
+  $('.page_links').click(function(){
+     var page = $(this).attr("page_no");
+     $("#page_no").val(page);     
+     $("#btnSearch").click();
+  });
   $('.detailsImage').click(function (element) {                    
                     var id = $(this).attr('linkid');
                     $.get(  
@@ -100,19 +107,33 @@ $this->registerJs( <<< EOT_JS
                     )
                     
   });
+  $('#btnSearch').click(function(){
+     $.post('{$searchURL}',$('#frmSearch').serialize())
+      .done(function(data){
+                  $("#image_display_panel").html(data);              
+            });
+  });
+     
+  $('#btnSaveGallery').click(function(){
+     $.post('{$galleryURL}',$('#frmGallery').serialize())
+      .done(function(data){
+                  alert(data);              
+            });
+  });
                             
  if($("#name").val()!=""){
   $('#vlibrary').trigger('click')        
  }
-           
+  
+
 
 $("#datalisting").DataTable();                            
 EOT_JS
 );  
-                            
-
 ?>
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 <style>
     .images {
     border: double;
@@ -182,13 +203,23 @@ EOT_JS
 <div id="library" class="tab-pane fade">
     <p>
     <div class="row col-md-12">
+        <form id="frmSearch" method="post">
+        <div class="row"><input type="text" name="search_text" class="form-control" placeholder="Search file"></div><br>
+        <div class="row">
+            <div class="col-md-6"><input type="checkbox"> Images <input type="checkbox"> Videos <input type="checkbox"> Audio <input type="checkbox"> Documents </div>
+            <div class="col-md-6"><p align="right"<button type="button" class="btn btn-success" id="btnSearch">Search</button></div>
+            <input type="hidden" name="total_count" value="<?=$total_count?>" /><input type="hidden" name="page_count" value="<?=$page_count?>" /> <input type="hidden" name="page_no" id="page_no" value="1" />
+            <input type="hidden" name="search_view" value="search" id="search_view" />
+        </div>
+        </form>
+        <br><br>
+        <div class="row" id="image_display_panel" style="border-style:solid">
         <?php
       $row_count=0;
-      foreach ($records as $user) :
-          
+      foreach ($records as $user) :          
           $file_type="";
           if($user['media_type']=='1'):
-              $file_type="Images";
+              $file_type="Image";
           endif;
           if($user['media_type']=='2'):
               $file_type="Video";
@@ -196,10 +227,34 @@ EOT_JS
           if($user['media_type']=='3'):
               $file_type="Audio";
           endif;
+          if($user['media_type']=='4'):
+              $file_type="Document";
+          endif;
+          if($user['media_type']=='5'):
+              $file_type="Application";
+          endif;
+          if($user['media_type']=='6'):
+              $file_type="Others";
+          endif;
           
       ?>
-        <div class="col-md-3 col-xs-3 images" id="im<?=$user['id']?>"><span class="border border-primary"><img src="<?=$home_image_url?>/<?=$user['path']?>" height="200px" width="100%" class="rounded"></img><br>Name :<?=$user['name']?><br>Tag:<?=$user['alt_tag']?>
-                <br><br><a href='#' data-toggle="modal" data-target="#detailsModal" class="detailsImage" linkid="<?=$user['id']?>">Details </a> |<a href='#' data-toggle="modal" data-target="#myModal" class="editImage" linkid="<?=$user['id']?>">Edit </a> | <a href='#' class='delete_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>'>Delete</a></span></div>
+        <div class="col-md-3 col-xs-3 images" id="im<?=$user['id']?>">
+            <span class="border border-primary">
+                <?php
+                if($file_type=="Video"):
+                ?>
+                <a href="<?=$home_image_url?>/<?=$user['path']?>" target="_blank"><video height="200px" width="100%" poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"></video></a>
+                <?php
+                else:
+                ?>
+                    <img src="<?=$home_image_url?>/<?=$user['path']?>" height="200px" width="100%" class="rounded"></img>
+                <?php
+                
+                endif;
+                ?>
+                <br>Name :<?=$user['name']?><br>Tag:<?=$user['alt_tag']?><br>Type:<?=$file_type?>
+                <br><br><center><a href='#' data-toggle="modal" data-target="#detailsModal" class="detailsImage" linkid="<?=$user['id']?>"><i class="fa fa-info-circle" aria-hidden="true"></i> Details </a> |<a href='#' data-toggle="modal" data-target="#myModal" class="editImage" linkid="<?=$user['id']?>"> <i class="fa fa-pencil"></i> Edit </a> | <a href='#' class='delete_event' id='<?=$user['id']?>' event_name='<?=$user['name']?>'> <i class="fa fa-trash"></i> Delete</a> | <a href='#' onClick='resize();' data-toggle='modal' data-target='#modalResize'><i class='fa fa-camera'></i> Resize</a> | <a href='#' onClick='rotate()' data-toggle='modal' data-target='#modalRotate'><i class='fa fa-rotate-right'></i> Rotate</a> | <a href='#' onClick='saveNew()' data-toggle='modal' data-target='#modalSaveAsNew' id='tgSave'><i class='fa fa-save'></i>Save as</a> | <a href='#'  img_id="<?=$user["id"]?>" onClick='addGallery();' class="gallery" data-toggle='modal' data-target='#modalGallery'><i class='fa fa-folder'></i> Gallery</a></center>
+                </span></div>
         <?php
         $row_count++;
         if($row_count >3):
@@ -210,7 +265,30 @@ EOT_JS
         
         endforeach;
         ?>
-        
+            
+      
+
+<?php
+$no_of_pages = ceil($total_count /$page_count);
+?>
+<div class="row"> 
+    <div class="col-md-12">
+    <ul class="pagination">
+     <?php
+     for($i=1;$i<=$no_of_pages;$i++):  
+         if($i==1):
+             echo '<li class="active"><a href="#" class="page_links" page_no="<?=$i?>">'.$i.'</a></li>';
+         else:
+     ?>
+            <li><a href="#" class="page_links" page_no="<?=$i?>"><?=$i?></a></li>
+    <?php
+        endif;
+    endfor;
+    ?>
+    </ul>  
+    </div>
+</div>
+</div>
     </div>
 </div>
 </div>
@@ -293,8 +371,102 @@ EOT_JS
 
   </div>
 </div>
+    
+<div id="modalResize" class="modal fade" role="dialog">
+  <div class="modal-dialog">
 
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Resize Image</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
 
+  </div>
+</div>
+<div id="modalSaveAsNew" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Save as new</h4>
+      </div>
+      <div class="modal-body">
+          <p><input type="text" name="new_file_save_name" class="form-control" placeholder="Save new name"></p>
+      </div>
+      <div class="modal-footer">
+        <button type='button' class='btn btn-success' id="btnSaveAsNew">Save</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div id="modalGallery" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+        <form id="frmGallery">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Save to Gallery</h4>
+      </div>
+      <div class="modal-body">
+        <p>Select which gallery to add this image</p>
+        <?php
+        foreach($gallery as $a):
+            echo "<input type='checkbox' name='g".$a->id."'> ".$a->title."<br>";
+        endforeach;
+        
+        ?>
+      </div>
+      <div class="modal-footer">
+          <button type='button' class='btn btn-success' id="btnSaveGallery">Save</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="hidden" name="gallery_image_id" id="gallery_image_id" />
+      </div>
+        </form>
+    </div>
+
+  </div>
+</div>
+<div id="modalRotate" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Rotate Image</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover({html:"true"});   
+});
+
+$(".gallery").click(function(){    
+    $("#gallery_image_id").val($(this).attr("img_id"));
+})
+</script>
 
 
     

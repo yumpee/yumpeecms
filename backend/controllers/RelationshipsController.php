@@ -91,7 +91,7 @@ public function behaviors()
         else:
                 $page['rs'] = new Relationships();
         endif;
-        $page['records'] = Relationships::find()->all();
+        $page['records'] = Relationships::find()->orderBy('title')->all();
         $source_arr = Forms::find()->all();
         $page['source_arr'] =  yii\helpers\ArrayHelper::map($source_arr, 'name', 'title');
         $target_arr = Forms::find()->all();

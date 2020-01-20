@@ -28,6 +28,170 @@ $customURL = \Yii::$app->getUrlManager()->createUrl('settings/custom-save');
 $mediaURL =  \Yii::$app->getUrlManager()->createUrl('media/featured-media');
 $deleteCustomURL =  \Yii::$app->getUrlManager()->createUrl('settings/delete-custom');
 
+
+     
+$display_image_id="";
+$display_image_path_info="";
+$fav_icon_path_info="";
+$fav_icon="";
+$smtp_connection="";
+$time_zone_sel="";
+$outgoing_mail_processor="SMTP";
+
+
+if(isset($display_image_path)):
+    $display_image_path_info = $display_image_path->path;
+endif;
+if(isset($fav_icon_path)):
+    $fav_icon_path_info = $fav_icon_path->path;
+endif;
+foreach($records as $record):
+    if($record['setting_name']=="current_theme"):
+        $current_theme = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="website_name"):
+        $website_name = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="website_short_name"):
+        $website_short_name = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="time_zone"):
+        $time_zone_sel = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="website_logo"):
+        $display_image_id = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="fav_icon"):
+        $fav_icon = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="website_image_url"):
+        $website_image_url = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="website_home_page"):
+        $website_home_page = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="error_page"):
+        $error_page = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="contact_us_email"):
+        $contact_us_email = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="contact_us_address"):
+        $contact_us_address = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="google_map_key"):
+        $google_map_key = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="date_format"):
+        $date_format = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="time_format"):
+        $time_format = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="breadcrumbs"):
+        $breadcrumbs = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="page_size"):
+        $page_size = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="smtp_host"):
+        $smtp_host = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="smtp_port"):
+        $smtp_port = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="seo_meta_tags"):
+        $seo_meta_tags = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="smtp_connection"):
+        $smtp_connection = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="smtp_username"):
+        $smtp_username = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="smtp_password"):
+        $smtp_password = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="smtp_sender_email"):
+        $smtp_sender_email = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="smtp_sender_name"):
+        $smtp_sender_name = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="smtp_use_smtp"):
+        $smtp_use_smtp = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="auto_approve_comments"):
+        $auto_approve_comments = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="current_theme_header"):
+        $current_theme_header = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="current_theme_footer"):
+        $current_theme_footer = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="container_display_type"):
+        $container_display_type = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="home_url"):
+        $home_url = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="twig_template"):
+        $twig_template = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="registration_role"):
+        $registration_role = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="registration_page"):
+        $registration_page = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="auto_approve_post"):
+        $auto_approve_post = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="maintenance_mode"):
+        $maintenance_mode = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="maintenance_page"):
+        $maintenance_page = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="captcha"):
+        $captcha = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="captcha_private"):
+        $captcha_private = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="captcha_public"):
+        $captcha_public = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="minify_javascript"):
+        $minify_javascript = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="minify_css"):
+        $minify_css = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="minify_twig"):
+        $minify_twig = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="use_custom_backend_menus"):
+        $use_custom_backend_menus = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="backend_home_page"):
+        $backend_home_page = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="allow_multiple_domains"):
+        $allow_multiple_domains = $record['setting_value'];
+    endif;
+    if($record['setting_name']=="outgoing_mail_processor"):
+        $outgoing_mail_processor = $record['setting_value'];
+    endif;
+endforeach;
+
+    $custom_name="";
+    $pos = strpos($custom_rs['setting_name'], "custom_");
+        if ($pos !== false) {
+            $custom_name = substr_replace($custom_rs['setting_name'], "", $pos, strlen("custom_"));
+        }
+
 $this->registerJs( <<< EOT_JS
        tinymce.init({
   selector: 'a.editable',
@@ -153,161 +317,12 @@ $(document).ready(function(){
     $('[data-toggle="popover"]').popover();
 });
 
+$("#time_zone").val("{$time_zone_sel}");
 EOT_JS
-); 
-     
-$display_image_id="";
-$display_image_path_info="";
-$fav_icon_path_info="";
-$fav_icon="";
-$smtp_connection="";
-if(isset($display_image_path)):
-    $display_image_path_info = $display_image_path->path;
-endif;
-if(isset($fav_icon_path)):
-    $fav_icon_path_info = $fav_icon_path->path;
-endif;
-foreach($records as $record):
-    if($record['setting_name']=="current_theme"):
-        $current_theme = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="website_name"):
-        $website_name = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="website_short_name"):
-        $website_short_name = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="website_logo"):
-        $display_image_id = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="fav_icon"):
-        $fav_icon = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="website_image_url"):
-        $website_image_url = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="website_home_page"):
-        $website_home_page = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="error_page"):
-        $error_page = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="contact_us_email"):
-        $contact_us_email = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="contact_us_address"):
-        $contact_us_address = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="google_map_key"):
-        $google_map_key = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="date_format"):
-        $date_format = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="time_format"):
-        $time_format = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="breadcrumbs"):
-        $breadcrumbs = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="page_size"):
-        $page_size = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="smtp_host"):
-        $smtp_host = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="smtp_port"):
-        $smtp_port = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="seo_meta_tags"):
-        $seo_meta_tags = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="smtp_connection"):
-        $smtp_connection = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="smtp_username"):
-        $smtp_username = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="smtp_password"):
-        $smtp_password = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="smtp_sender_email"):
-        $smtp_sender_email = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="smtp_sender_name"):
-        $smtp_sender_name = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="smtp_use_smtp"):
-        $smtp_use_smtp = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="auto_approve_comments"):
-        $auto_approve_comments = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="current_theme_header"):
-        $current_theme_header = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="current_theme_footer"):
-        $current_theme_footer = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="container_display_type"):
-        $container_display_type = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="home_url"):
-        $home_url = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="twig_template"):
-        $twig_template = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="registration_role"):
-        $registration_role = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="registration_page"):
-        $registration_page = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="auto_approve_post"):
-        $auto_approve_post = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="maintenance_mode"):
-        $maintenance_mode = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="maintenance_page"):
-        $maintenance_page = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="captcha"):
-        $captcha = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="captcha_private"):
-        $captcha_private = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="captcha_public"):
-        $captcha_public = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="minify_javascript"):
-        $minify_javascript = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="minify_css"):
-        $minify_css = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="minify_twig"):
-        $minify_twig = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="use_custom_backend_menus"):
-        $use_custom_backend_menus = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="backend_home_page"):
-        $backend_home_page = $record['setting_value'];
-    endif;
-    if($record['setting_name']=="allow_multiple_domains"):
-        $allow_multiple_domains = $record['setting_value'];
-    endif;
-endforeach;
-
-    $custom_name="";
-    $pos = strpos($custom_rs['setting_name'], "custom_");
-        if ($pos !== false) {
-            $custom_name = substr_replace($custom_rs['setting_name'], "", $pos, strlen("custom_"));
-        }
-
+);         
+        
+        
+        
 ?>
 <style>
     .modal-dialog{
@@ -393,7 +408,9 @@ endforeach;
         <tr><td colspan="2"><h4>Date and Time </h4></td>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: date_format">Date Format</a><td><?= \yii\helpers\Html::dropDownList("date_format",$date_format,['F j, Y'=>'December 28, 2017','Y-m-d'=>'2017-12-28','m/d/Y'=>'12/28/2017'],['class'=>'form-control'])?>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: time_format">Time Format</a><td><?= \yii\helpers\Html::dropDownList("time_format",$time_format,['h:m a'=>'5:16 am','h:m A'=>'5:16 AM','H:m'=>'05:16'],['class'=>'form-control'])?>
-        <tr><td colspan="2"><h4>SMTP Integration</h4>
+        <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: time_zone">Time Zone</a><td><?=$time_zone?>       
+        <tr><td colspan="2"><h4>Mail Integration</h4>
+        <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: outgoing_mail_processor">Mailer Type</a><td><?= \yii\helpers\Html::dropDownList("outgoing_mail_processor",$outgoing_mail_processor,['SMTP'=>'SMTP','Local'=>'Local'],['class'=>'form-control'])?>        
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: smtp_host">SMTP Host</a><td><input type='text' class='form-control' name="smtp_host" value="<?=$smtp_host?>"></td>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: smtp_port">SMTP Port</a><td><input type='text' class='form-control' name="smtp_port" value="<?=$smtp_port?>"></td>
         <tr><td><a href="#" onclick="return false;" data-toggle="popover" title="Info" data-content="Setting name: smtp_use_smtp">Use SMTP Port</a><td><?= \yii\helpers\Html::dropDownList("smtp_use_smtp",$smtp_use_smtp,['Yes'=>'Yes','No'=>'No'],['class'=>'form-control'])?>
@@ -475,3 +492,7 @@ endforeach;
 
   </div>
 </div>
+    
+<script>
+        
+</script>

@@ -131,9 +131,7 @@ $this->registerJs( <<< EOT_JS
                 $("#display_image_id").val(my_id);
                 $("#my_display_image").attr("src","{$image_home}" + img_src);
                 localStorage.removeItem("image_caller");
-       }
-       
-                
+       } 
        $('#myModal').modal('toggle');     
    });
                 
@@ -145,7 +143,34 @@ $this->registerJs( <<< EOT_JS
                         $("#my_display_image").attr("src","0");
                     }            
   });
-  
+                
+ $("#template").change(function(){
+                $("#form_templates_visible").hide();              
+                $("#list_role_visible").hide();
+                $("#role_renderer_visible").hide();       
+                var obj = JSON.parse($("#template_option").val());
+                var c= $(this).val();                
+                var i=0;
+                for(var key in obj){
+                    //alert(key + " " + obj[key]);                    
+                    i++;
+                    if(c==key){                        
+                        if(obj[key]=="forms/display" || obj[key]=="forms/view"){
+                            $("#form_templates_visible").show();  
+                        }
+                        if(obj[key]=="roles/index"){
+                            $("#list_role_visible").show();
+                            $("#role_renderer_visible").show();   
+                        }
+                    }
+                }
+                
+ })
+  $("#form_templates_visible").hide();              
+  $("#list_role_visible").hide();
+  $("#role_renderer_visible").hide();              
+  $("#template").trigger("change");
+   
    $("#datalisting").DataTable();
                             
 EOT_JS
@@ -183,7 +208,9 @@ if($id!=null):
      <p align="right"><button class="btn btn-primary" data-toggle="collapse" onClick="javascript:window.open('<?=$home_url['setting_value']."/".$rs['url']?>','_blank')">Preview</button> <button class="btn btn-info" data-toggle="collapse" id="btnDuplicate">Save As New</button> 
 <?php
 endif;
+
 ?>
+        
 <div id="addPage">
     <form action="index.php?r=pages/index" method="post" id="frm1">
     <table class="table">
@@ -197,7 +224,7 @@ endif;
         <tr><td>Include Header<td><?=$show_header_image?></td>  
         <tr><td>Include Footer<td><?=$show_footer_image?></td>
         <tr><td>Template<td><?=$template?>
-        <tr id="form_templates_visible"><td>Select Form (Form templates only)<td><?=$forms?>
+        <tr id="form_templates_visible"><td>Select Form (Form templates only)<td><?=$forms?></tr>
         <tr id="list_role_visible"><td>List for Role (Users Index only)<td><?=$roles?>
         <tr id="role_renderer_visible"><td>Role Renderer (Users Index only)<td><?=$renderer?>
         <tr><td>Sort Order<td><input name="sort_order" id="sort_order" value="<?=$rs['sort_order']?>" class="form-control"type="text" />
@@ -226,6 +253,7 @@ endif;
                     ?>
                 </span>
         <tr><td colspan="2"><button type="button" class="btn btn-success" id="btnSubmit">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="processor" value="true" /><input type="hidden" name="id" value="<?=$id?>" /><input type="hidden" name="tag_array" id="tag_array" value="<?=$selected_tags[0]['id']?>" />
+                <input type="hidden" id="template_option" value='<?=json_encode($template_option)?>' />
             
             </td>
     </table>
@@ -299,6 +327,7 @@ endif;
         $('#' + id).remove();        
         $("#tag_array").val($("#tag_array").val().replace(id,''));        
     }
+    
 </script>
 <div id="myModal" class="modal fade" role="dialog">
   <div class="modal-dialog">

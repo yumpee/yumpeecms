@@ -39,6 +39,7 @@ use common\models\LoginForm;
 use common\models\User;
 use frontend\models\Domains;
 use frontend\models\ProfileDetails;
+use frontend\models\Themes;
 
 
 class AccountsController extends Controller{
@@ -80,6 +81,10 @@ public function behaviors()
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
+        
+        
+        
+        
 
         if(Yii::$app->request->post()):
             $model = new LoginForm();
@@ -231,6 +236,14 @@ public function behaviors()
                     $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
                     return $this->render('@frontend/views/layouts/html',['data'=>$content]);
             endif;
+            if((Yii::$app->request->post("reset-password-widget")!=null) && ($twig_set=="Yes")):
+                    $theme_id = ContentBuilder::getSetting("current_theme");
+                    $codebase=Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>Yii::$app->request->post("reset-password-widget"),'renderer_type'=>'I'])->one();
+                    $loader = new Twig();
+                    $twig = new \Twig_Environment($loader);
+                    $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
+                    return $this->render('@frontend/views/layouts/html',['data'=>$content]);
+            endif;
             return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/account/reset-password',['form'=>$form,'page'=>$article]);
         endif;
         
@@ -255,18 +268,30 @@ public function behaviors()
                     $loader = new Twig();
                     $twig = new \Twig_Environment($loader);
                     $content= $twig->render($codebase['filename'], ['token_url'=>Yii::$app->request->getAbsoluteUrl()."?token=".$token."&email=".$email,'app'=>Yii::$app]);
-                    $message = $this->render('@frontend/views/layouts/html',['data'=>$content]);
+                    $message = $this->renderPartial('@frontend/views/layouts/html',['data'=>$content]);
                 else:
                     $message="Hi, <br><br>Click on the link below to reset your lost password.<br><a href='".Yii::$app->request->getAbsoluteUrl()."?token=".$token."&email=".$email."'>".Yii::$app->request->getAbsoluteUrl()."?token=".$token."&email=".$email."</a>";
                 endif;
                 
                 $from_email = ContentBuilder::getSetting("smtp_sender_email");
-                Yii::$app->mailer->compose()
-            ->setFrom($from_email)
-            ->setTo(Yii::$app->request->post("email"))
-            ->setSubject($subject)
-            ->setHtmlBody($message)
-            ->send();
+				
+				$to = Yii::$app->request->post("email");
+				$headers = "From: " . $from_email . "\r\n";
+				$headers .= "Reply-To: ". $from_email . "\r\n";				
+				$headers .= "MIME-Version: 1.0\r\n";
+				$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                                
+				if(ContentBuilder::getSetting("outgoing_mail_processor")=="Local"):
+                                    mail($to, $subject, $message, $headers);
+                                else:
+                                    Yii::$app->mailer->compose()
+                                    ->setFrom($from_email)
+                                    ->setTo(Yii::$app->request->post("email"))
+                                    ->setSubject($subject)
+                                    ->setHtmlBody($message)
+                                    ->send();
+                                endif;
+                
                 Yii::$app->session->setFlash('success', "An email has been set with a link to reset your password");
                 $form["message"] = "An email has been set with a link to reset your password";
                 //we need to finish off the password reset here after SMTP has been completed
@@ -596,10 +621,20 @@ public function behaviors()
                     $query->with($a['name']);
                 endforeach;
             else:
-                $relations = explode(",",Yii::$app->request->get('relations'));
+                $relations_str = explode(",",Yii::$app->request->get('relations'));
                 $relation_with=[];
-                foreach($relations as $a):                
-                    $query->with($a);
+                foreach($relations_str as $a):  
+                    $found_rel=0;
+                    foreach($relations as $b):
+                        if($b['name']==$a):
+                            $found_rel=1;
+                        endif;
+                    endforeach;
+                    if($found_rel >0):
+                        $query->with($a);
+                    else:
+                        $relation_with = array_merge($relation_with,$qr->getRelationships($a));
+                    endif;
                 endforeach;                
             endif;
             if(Yii::$app->request->get('search-field')!=null):
@@ -628,7 +663,7 @@ public function behaviors()
             $query->andWhere('username<>"'.Yii::$app->user->identity->username.'"');            
         endif;
         if(Yii::$app->request->get('user_id')!=null):
-            $user_arr = Users::find()->where(['id'=>Yii::$app->request->get('user_id')])->one();
+            $user_arr = User::find()->where(['id'=>Yii::$app->request->get('user_id')])->one();
             if($user_arr!=null):
                 $query->andWhere('username="'.$user_arr['username'].'"');
             endif;

@@ -109,6 +109,8 @@ class SettingsController extends Controller{
         $page['maintenance_pages'] = ArrayHelper::map($pages_list_home, 'id', 'menu_title');
         $page['backend_home_pages'] = ArrayHelper::map($back_pages_list, 'id', 'menu_title');
         
+        $page['time_zone'] = $this::TimeZone();
+        
         array_push($page['pages'],"Default Home Page");
         array_push($page['error_pages'],"Default Error Page");
         array_push($page['maintenance_pages'],"Select Default Maintenance Page");
@@ -125,7 +127,22 @@ class SettingsController extends Controller{
         $page['custom_records'] =CustomSettings::find()->where(['theme_id'=>NULL])->all();
         return $this->render('index',$page);  
     }
+    
     public function actionSave(){
+        //we carter for thos who may not be in the settings table here
+        foreach($_POST as $key => $value):
+            if($key=="id" || $key=="processor"):
+                continue;
+            endif;
+            $settings_obj = Settings::find()->where(['setting_name'=>$key])->one();
+            if($settings_obj==null):
+                $model = new Settings();
+                $model->setAttribute('setting_name',$key);
+                $model->setAttribute('setting_value',$value);
+                $model->save();
+            endif;
+        endforeach;
+        
         $settings_obj = Settings::find()->all();
         foreach($settings_obj as $setting_val):
             $setting_val->setting_value = Yii::$app->request->post($setting_val->setting_name);
@@ -158,6 +175,21 @@ class SettingsController extends Controller{
         $a = CustomSettings::findOne($id);
         $a->delete();
         echo "Record successfully deleted";
+    }
+    
+    public static function TimeZone($selected=''){
+        
+    $OptionsArray = timezone_identifiers_list();
+        $select= '<select name="time_zone" id="time_zone" class="form-control">';
+        while (list ($key, $row) = each ($OptionsArray) ){
+            $select .='<option value="'.$row.'"';
+            $select .= ($key == $selected ? ' selected' : '');
+            $select .= '>'.$row.'</option>';
+        }  // endwhile;
+        $select.='</select>';
+return $select;
+
+        
     }
 }
 

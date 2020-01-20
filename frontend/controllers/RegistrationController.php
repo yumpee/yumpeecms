@@ -101,12 +101,26 @@ public function behaviors()
                     $twig = new \Twig_Environment($loader);
                     $content= $twig->render($codebase['filename'], ['form'=>$form,'app'=>Yii::$app]);
                     $mail_content = $this->render('@frontend/views/layouts/html',['data'=>$content]);
-                     Yii::$app->mailer->compose()
-                    ->setFrom(ContentBuilder::getSetting("smtp_sender_email"))
-                    ->setTo(Yii::$app->request->post("email"))
-                    ->setSubject(Yii::$app->request->post("mail-subject")!==null ? Yii::$app->request->post("mail-subject") : "Thank you for registration")
-                    ->setHtmlBody($mail_content)
-                    ->send();
+                    
+                    
+                    if(ContentBuilder::getSetting("outgoing_mail_processor")=="Local"):
+                        $to = Yii::$app->request->post("email");
+                        $subject=Yii::$app->request->post("mail-subject")!==null ? Yii::$app->request->post("mail-subject") : "Thank you for registration";
+                        $headers = "From: " . ContentBuilder::getSetting("smtp_sender_email") . "\r\n";
+                        $headers .= "Reply-To: ". ContentBuilder::getSetting("smtp_sender_email") . "\r\n";				
+                        $headers .= "MIME-Version: 1.0\r\n";
+                        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                        mail($to, $subject, $mail_content, $headers);
+                    else:
+                        Yii::$app->mailer->compose()
+                        ->setFrom(ContentBuilder::getSetting("smtp_sender_email"))
+                        ->setTo(Yii::$app->request->post("email"))
+                        ->setSubject(Yii::$app->request->post("mail-subject")!==null ? Yii::$app->request->post("mail-subject") : "Thank you for registration")
+                        ->setHtmlBody($mail_content)
+                        ->send();
+                    endif;
+                
+                    
                 endif;
                 if(Yii::$app->request->post("auto-login")=="true"):
                     
@@ -161,6 +175,7 @@ public function behaviors()
      $form['param'] = Yii::$app->request->csrfParam;
      $form['token'] = Yii::$app->request->csrfToken;
      $form['saveURL'] = \Yii::$app->getUrlManager()->createUrl(ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl()));
+     $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
      $page_url =  ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl());
      $article = Pages::find()->where(['url'=>$page_url])->one();
      
@@ -179,7 +194,7 @@ public function behaviors()
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new Twig();
                             $twig = new \Twig_Environment($loader);
-                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app]);
+                            $content= $twig->render($codebase['filename'], ['form'=>$form,'page'=>$article,'app'=>Yii::$app,'metadata'=>$metadata]);
                             return $this->render('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
                     endif;

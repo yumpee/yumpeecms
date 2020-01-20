@@ -40,8 +40,9 @@ use backend\models\MenuPage;
 use backend\models\Roles;
 use frontend\models\Domains;
 use common\models\FormSubmit;
+
 class ContentBuilder {
-    
+    const APPLICATION_VERSION ="2.0";
     public static function ArticleFilter($query,$filter){
         $filter_list = explode("|",$filter);
         
@@ -93,14 +94,16 @@ class ContentBuilder {
         
         $sql = "SELECT id FROM tbl_templates WHERE route='".$route."'";
         $records = Templates::findBySql($sql)->one();
-        if(count($records) > 0){
+        
+        if($records!=null){
             $template =  $records->id;
         }else{
             return "";
         }
         $sql = "SELECT url FROM tbl_page WHERE template='".$template."'";
         $records = Pages::findBySql($sql)->one();
-        if(count($records) > 0){
+       
+        if($records!=null){
             return $records->url;
         }else{
             return "";
@@ -113,6 +116,7 @@ class ContentBuilder {
         return $my_theme_object->folder;
     }
     public static function getTemplateRouteByURL($url,$exact_route=true){
+        
         //the exact_route variable is used to return the root route for the template. When set to false will return the absolute route
         if($url=="widget"):
             return "widget/ajax";
@@ -158,8 +162,8 @@ class ContentBuilder {
             else:
                 return "api/".$request[1];
             endif;
-            
         endif;
+        
         $records = Pages::findOne(['url'=>$url]);
         if($records!=null){
             $template= $records->template;
@@ -179,11 +183,26 @@ class ContentBuilder {
                     $page = Pages::findOne(['form_id'=>$form->form_id]);
                     ContentBuilder::getTemplateRouteByURL($page['url']);
                   endif;
+                  
+                //what if it is a theme URL transform we can check here                
+                /*$url_obj=CustomSettings::find()->where(['setting_value'=>$url])->one();
+                if($url_obj!=null):
+                    $records = Pages::findOne(['url'=>"{yumpee_setting}".$url_obj['setting_name']."{/yumpee_setting}"]);
+                    if($records!=null):
+                        $template= $records->template;
+                        
+                    else:
+                        return "blog/details";                        
+                    endif;
+                else:
+                    return "blog/details";
+                endif;*/
                     
             return "blog/details";
             endif;
         }
         $records = Templates::findOne(['id'=>$template]);
+        
         if($records!=null){
             if(empty($records->parent_id)):
                 return $records->route;
@@ -252,8 +271,16 @@ class ContentBuilder {
         if($setting_name=="yumpee_role_home_page"):
             return ContentBuilder::getRoleHomePage();
         endif;
+        
         if(substr($setting_name,0,1)=="~"):
             $setting_name=substr($setting_name,1);
+                        if($setting_name=="*"):
+                                if($theme_id!=0):
+                                        return CustomSettings::find()->where(['theme_id'=>$theme_id])->all();
+                                else:
+                                        return CustomSettings::find()->where(['theme_id'=>ContentBuilder::getSetting("current_theme")])->all();
+                                endif;
+                        endif;
 			if($theme_id!=0):
 				$setting = CustomSettings::find()->where(['setting_name'=>$setting_name])->andWhere('theme_id="'.$theme_id.'"')->one();
 			else:
@@ -283,6 +310,15 @@ class ContentBuilder {
             
             return $setting->setting_value;  
         endif;
+        
+        if($setting_name=="*"):
+            if($theme_id!=0):
+                return CustomSettings::find()->where(['theme_id'=>$theme_id])->all();
+            else:
+                return CustomSettings::find()->all();
+            endif;
+        endif;
+        
         $setting = CustomSettings::find()->where(['setting_name'=>$setting_name])->one();
         if($setting!=null):
             if($setting_name=="website_home_page"):
@@ -290,7 +326,7 @@ class ContentBuilder {
                 if($page!=null):
                     return $page->id;
                 endif;
-            endif;
+            endif;            
             return $setting->setting_value;
         else:
             return "";
@@ -376,6 +412,10 @@ public static function getBreadCrumbTrail($page){
     }
     endif;
    return $breadcrumb;
+}
+
+public static function getVersion(){
+    return ContentBuilder::APPLICATION_VERSION;
 }
 
 public static function getMenus(){

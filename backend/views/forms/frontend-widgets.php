@@ -36,8 +36,13 @@ $this->registerJs( <<< EOT_JS
 });      
        $(document).on('click', '#btnNew',
        function(ev) {   
-        location.href='?r=widgets/index';
+        location.href='?r=widgets/index';       
         
+  }); 
+        
+  $(document).on('click', '#btnNewWidget',
+       function(ev) {   
+        location.href='?r=forms/fwidgets&t=new';       
         
   }); 
   
@@ -107,6 +112,9 @@ $('.delete_event').click(function (element) {
   });
                 
     if($("#custom_id").val()!=""){
+        $('#widget').trigger('click')        
+    }
+    if($("#t").val()!=""){
         $('#widget').trigger('click')        
     }
                 
@@ -227,7 +235,7 @@ EOT_JS
         <tr><td>Require Login to view<td><?=\yii\helpers\Html::dropDownList("require_login",$rs['require_login'],['N'=>'No','Y'=>'Yes'],['class'=>'form-control'])?></td>
         <tr><td>Role Permission<td><?=$permissions?>
         
-        <tr><td colspan="2"><button type="submit" id="btnWidgetSubmit" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button><input type="hidden" name="processor" value="true" /><input type="hidden" name="id" id="custom_id" value="<?=$id?>" /></td>
+        <tr><td colspan="2"><button type="submit" id="btnWidgetSubmit" class="btn btn-success">Save</button> <button type="button" id="btnNewWidget" class="btn btn-primary">New</button><input type="hidden" name="processor" value="true" /><input type="hidden" name="id" id="custom_id" value="<?=$id?>" /><input type="hidden" id="t" value="<?=$t?>" /></td>
     </table>
     </form>
 </div>

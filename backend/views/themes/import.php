@@ -33,16 +33,54 @@ $("#source_theme").change(function(){
             function(data) {
                 var twigs = JSON.parse(data);
                 var html="";
+                var counter=0;
+                var curr_renderer="";
+                var cclass="";
                 for (var key in twigs) {
                 if (twigs.hasOwnProperty(key)) {
                     //alert(key + " -> " + twigs[key]["renderer"]);
-                    html = html + "<input type='checkbox' name='c" + twigs[key]["id"] + "'> " + twigs[key]["renderer"] + "<br />";
+                    if(curr_renderer!=twigs[key]["renderer_type"]){
+                        counter=0;
+                    }
+                    if(counter==0){
+                        if(twigs[key]["renderer_type"]=="V"){
+                            html = html + "<br><b>View Templates</b> <a href='#' onClick=\"javascript:check('cview')\">Select All</a><br>";
+                            cclass="cview";
+                        }
+                        if(twigs[key]["renderer_type"]=="W"){
+                            html = html + "<br><b>Standard Widget</b> <a href='#' onClick=\"javascript:check('cstandard')\">Select All</a><br>";
+                            cclass="cstandard";
+                        }
+                        if(twigs[key]["renderer_type"]=="I"){
+                            html = html + "<br><b>Form Custom Widget</b> <a href='#' onClick=\"javascript:check('ccustom')\">Select All</a><br>";
+                            cclass="ccustom";
+         
+                        }
+                        if(twigs[key]["renderer_type"]=="F"){
+                            html = html + "<br><b>Form Post</b> <a href='#' onClick=\"javascript:check('cpost')\"'>Select All</a><br>";
+                            cclass="cpost";
+                        }
+                        if(twigs[key]["renderer_type"]=="R"){
+                            html = html + "<br><b>Form Summary View</b> <a href='#' onClick=\"javascript:check('csummary')\">Select All</a><br>";
+                            cclass="csummary";
+                        }
+                        if(twigs[key]["renderer_type"]=="Z"){
+                            html = html + "<br><b>Form Details View</b> <a href='#' onClick=\"javascript:check('cdetails')\">Select All</a><br>";
+                            cclass="cdetails";
+                        }   
+                    }
+                    curr_renderer=twigs[key]["renderer_type"];
+                    html = html + "<input type='checkbox' name='c" + twigs[key]["id"] + "' class='" + cclass + "'> " + twigs[key]["renderer"] + " <br />";
+                    counter++;
                 }
                 }
                 $("#source_twig").html(html);
             }
         )
 });
+
+
+   
             
 $(document).on('click', '#btnSubmit',
        function(ev) {   
@@ -75,3 +113,12 @@ EOT_JS
     
 </form>
 </div>
+
+<script>
+function check(view){
+    $("." + view).each(function(){
+        $(this).attr("checked","checked");
+    })
+    
+}    
+</script>

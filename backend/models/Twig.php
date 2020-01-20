@@ -31,5 +31,19 @@ use frontend\components\ContentBuilder;
 class Twig extends \common\models\Twig
 {
    
-    
+public function getForm(){
+    return $this->hasOne(\backend\models\Forms::className(),["id"=>"renderer"]);
+} 
+public function getPage(){
+    return $this->hasOne(\backend\models\Pages::className(),["id"=>"renderer"]);
+} 
+public function getTemplates(){
+    return $this->hasOne(\backend\models\Templates::className(),["route"=>"renderer"]);
+}
+public function getCustomWidget(){
+    return $this->hasOne(\backend\models\CustomWidget::className(),["name"=>"renderer"]);
+}
+public function getWidget(){
+    return $this->hasOne(\backend\models\Widgets::className(),["short_name"=>"renderer"]);
+}
 }

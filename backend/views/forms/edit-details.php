@@ -172,7 +172,7 @@ foreach($records as $rec):
     if(strlen($rec['param_val']) > 100):
             echo "<tr><td width='30%'>".DBComponent::parseField($rec,$info['form_id'])."<td><textarea class='form-control' type=text name='".$rec['param']."'>".$rec['param_val']."</textarea>";
         else:
-            echo "<tr><td width='30%'>".DBComponent::parseField($rec,$info['form_id'])."<td><input class='form-control' type=text name='".$rec['param']."' value='".$rec['param_val']."'>";
+            echo "<tr><td width='30%'>".DBComponent::parseField($rec,$info['form_id'])."<td><input class='form-control' type=text name='".$rec['param']."' value=\"".$rec['param_val']."\">";
     endif;
     
 endforeach;

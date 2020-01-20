@@ -33,6 +33,8 @@ use frontend\components\ContentBuilder;
 use backend\models\Users;
 use backend\models\Forms;
 use backend\models\Relationships;
+use backend\models\RelationshipDetails;
+use frontend\models\FormData;
 use backend\models\FormRoles;
 
 class FormSubmit extends \yii\db\ActiveRecord
@@ -102,8 +104,8 @@ class FormSubmit extends \yii\db\ActiveRecord
  public function getRatingdetails(){        
         return $this->hasMany(\backend\models\RatingDetails::className(),['target_id'=>'url'])->where(['target_type'=>'F']);
  }
- function getRelationships(){
-        $return_val=[];
+ function getRelationships($name=""){        
+        $return_val=[];        
         $forms = Relationships::find()->select('source_id')->where(['source_id'=>$this->form->name])->all();
         if($forms!=null):
             return Forms::find()->where(['IN','name',$forms])->all();
@@ -126,6 +128,8 @@ public function getRelationData() {
             if($method->name === 'bindModels')  {continue;}
             if($method->name === 'attachBehaviorInternal')  {continue;}
             if($method->name === 'getRelationData')  {continue;}
+            if($method->name ==='resetDependentRelations') {continue;}
+            if($method->name ==='setRelationDependencies') {continue;}
             try {
                 $rel = call_user_func(array($this,$method->name));
                 if($rel instanceof \yii\db\ActiveQuery){
@@ -139,6 +143,43 @@ public function getRelationData() {
             }
         }
         return $stack;
+}
+    
+//we handle dynamic relations below    
+    
+    public function hasMethod($name,$checkBehaviors=true)
+    {
+        
+        $attribute = strtolower(preg_replace('/^get(.*)/isU', '', $name));
+        if (isset($this->attributes[$attribute])) {
+            return true;
+        }
+        return parent::hasMethod($name,$checkBehaviors);
+    }
+
+    public function __call($name, $params)
+    {        
+        $attribute = strtolower(preg_replace('/^get(.*)/isU', '', $name));
+        if (isset($this->attributes[$attribute])) {
+            return $this->getRelationships($attribute);
+        }
+        return parent::__call($name, $params);
+    }
+
+    public function canGetProperty($name, $checkVars = true,$checkBehaviors = true)
+    {
+        if (isset($this->attributes[$name])) {
+            return true;
+        }
+        return parent::canGetProperty($name, $checkVars,$checkBehaviors);
+    }
+
+    public function __get($name)
+    {
+        if (isset($this->attributes[$name])) {
+            return $this->getRelationships($name);
+        }
+        return parent::__get($name);
     }
     
 }

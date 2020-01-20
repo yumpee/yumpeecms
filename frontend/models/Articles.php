@@ -263,6 +263,8 @@ public static function saveArticle($save_as_new=""){
             if($method->name === 'bindModels')  {continue;}
             if($method->name === 'attachBehaviorInternal')  {continue;}
             if($method->name === 'getRelationData')  {continue;}
+            if($method->name ==='resetDependentRelations') {continue;}
+            if($method->name ==='setRelationDependencies') {continue;}
             try {
                 $rel = call_user_func(array($this,$method->name));
                 if($rel instanceof \yii\db\ActiveQuery){

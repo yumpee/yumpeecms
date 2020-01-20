@@ -29,8 +29,14 @@ use common\models\LoginForm;
 use common\models\AuthorizationCodes;
 use common\models\AccessTokens;
 use backend\models\ServicesIncoming;
+use frontend\models\FormSubmit;
+use frontend\components\ContentBuilder;
+use frontend\models\Users;
+use backend\models\Forms;
 
 use backend\models\SignupForm;
+use backend\models\ClassSetup;
+use backend\models\ClassElement;
 use common\components\Verbcheck;
 use common\components\Apiauth;
 
@@ -52,7 +58,7 @@ class ApiController extends RestController
         return $behaviors + [
             'apiauth' => [
                 'class' => Apiauth::className(),
-                'exclude' => ['authorize', 'register', 'accesstoken','index','authenticate','forms','classes','profile','articles'],
+                'exclude' => ['authorize', 'register', 'accesstoken','index','authenticate','forms','classes','profile','articles','login'],
             ],
             'access' => [
                 'class' => AccessControl::className(),
@@ -86,8 +92,10 @@ class ApiController extends RestController
                     'forms'=>['GET'],
                     'articles'=>['GET'],
                     'classes'=>['GET'],
+                    'login'=>['GET'],
                 ],
             ],
+            
         ];
     }
 
@@ -282,7 +290,19 @@ class ApiController extends RestController
 			$rand_token=md5(date("YmdHis").$request['client_id']);
 			$token->setAttribute("authentication_token",$rand_token);
 			$token->save(false);
+                        
+                        //if a user authentication email was sent, then update the auth key
+                        if(isset($request['client_email'])):
+                            $user = Users::find()->where(['email'=>$request['client_email']])->one();
+                            if($user!=null):
+                                $auth_key = md5(date("YmdHis").rand(1000,100000000));
+                                $user->setAttribute("auth_key",$auth_key);
+                                $user->save(false);
+                                $rand_token = $rand_token."|".$auth_key;
+                            endif;
+                        endif;
 			Yii::$app->api->sendSuccessResponse([$rand_token]);
+                        
 		endif;
 		}else{
                         //return Yii::$app->api->sendFailedResponse($request["client_id"]);
@@ -416,6 +436,20 @@ class ApiController extends RestController
             endif;
         endif;
         Yii::$app->api->sendSuccessResponse(['Yumpee CMS Hook form active']);
+    }
+    public function actionLogin(){
+        $uri = substr(Yii::$app->request->url,strlen(Yii::$app->homeUrl));
+        $request = explode("/",$uri);
+        $query_request = Yii::$app->request;        
+        $user = \common\models\User::find()->where(['email'=>$request[3],'auth_key'=>$request[2]])->one();
+        if($user!=null):            
+            Yii::$app->user->login($user);         
+            $role_home=ContentBuilder::getSetting("home_url")."/".$request[4];   
+            return $this->redirect($role_home,302)->send();
+        else:
+            Yii::$app->api->sendFailedResponse("Invalid object request");
+        endif;
+        
     }
     public function actionProfile(){
         //this is used to check the profile information of users

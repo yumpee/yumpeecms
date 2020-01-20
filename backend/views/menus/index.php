@@ -25,6 +25,7 @@ $this->title = 'Menus';
 
 
 use kartik\sortable\Sortable;
+
 $saveURL = \Yii::$app->getUrlManager()->createUrl('menus/save');
 $saveMenuProfileURL = \Yii::$app->getUrlManager()->createUrl('menus/save-profile');
 $saveFooterURL = \Yii::$app->getUrlManager()->createUrl('menus/save-footer');
@@ -119,6 +120,7 @@ echo Sortable::widget([
 ]);
 
 ?>
+
 <style>
 		#demos section {
 			overflow: hidden;
@@ -275,5 +277,5 @@ echo Sortable::widget([
         </div>
     </div>
 </div>
-        
+   
               

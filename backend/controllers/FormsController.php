@@ -145,13 +145,10 @@ class FormsController extends Controller{
         $page['forms'] = ArrayHelper::map($page['records'], 'id', 'title');
         $widget = CustomWidget::find()->orderBy('name')->all();
         $page['widgets'] = ArrayHelper::map($widget, 'id', 'title');
-        
-        
-        
         return $this->render('index',$page);
     }
     
-    public function actionSave(){
+    public function actionSave(){            
             if(Yii::$app->request->post("published")=="on"):
                 $published="Y";
             else:
@@ -168,8 +165,8 @@ class FormsController extends Controller{
                 $model->setAttribute('show_in_menu',Yii::$app->request->post('show_in_menu'));
                 $model->update(false);
                 $roles = Yii::$app->request->post("roles");
-                FormRoles::deleteAll(['AND','form_id ="'.Yii::$app->request->post("id").'"',['NOT IN','role_id',$roles]]);              
                 
+                FormRoles::deleteAll(['AND','form_id ="'.Yii::$app->request->post("id").'"',['NOT IN','role_id',$roles]]); 
                 
                 $counter=0;
                 foreach($roles as $selected):
@@ -304,7 +301,8 @@ class FormsController extends Controller{
         $page_arr="";
         $perm_arr="";
         $template_list = Themes::find()->orderBy('name')->all();
-        $tag_map =  yii\helpers\ArrayHelper::map($template_list, 'id', 'name');        
+        $tag_map =  yii\helpers\ArrayHelper::map($template_list, 'id', 'name'); 
+        $page['t'] = Yii::$app->request->get('t',null);
         if(Yii::$app->request->get("reload")=="true"):
             $page['theme'] = \yii\helpers\Html::dropDownList("theme", Yii::$app->request->get("theme"),$tag_map,['prompt'=>'Select a theme','id'=>'theme']);
             $page['selected_theme'] = Yii::$app->request->get("theme"); 
@@ -314,15 +312,12 @@ class FormsController extends Controller{
         endif;
         $form_view_route = Templates::find()->where(['route'=>'forms/view'])->one();
         $page['records'] = CustomWidget::find()->orderBy('title')->all();
-        
         $page['id']= Yii::$app->request->get('id',null);
-        
-        
         
         if($page['id']!=null):
                 $page['rs'] = CustomWidget::find()->where(['id' => $page['id']])->one();
                 $perm_arr = explode(" ",$page['rs']['permissions']);
-            else:
+        else:
                 $page['rs'] = CustomWidget::find()->where(['id' => "0"])->one();
         endif;
         $form_map =  yii\helpers\ArrayHelper::map(Forms::find()->all(), 'id', 'title');
@@ -343,7 +338,6 @@ class FormsController extends Controller{
         else:
             return "";
         endif;
-        
     }
     public function actionSaveTwigTheme(){
         $theme_id = Yii::$app->request->post('theme');
@@ -536,31 +530,35 @@ class FormsController extends Controller{
     }
     public function actionData(){
         $page=[];
-        
         if(Yii::$app->request->get('owner')!==null):
-            //we process the filters here
             $subquery = FormData::find()->select('form_submit_id');
             $source = Relationships::find()->where(['source_id'=>Yii::$app->request->get('source'),'target_id'=>Yii::$app->request->get('target')])->one();
             if($source==null):
-                $source = Relationships::find()->where(['source_id'=>Yii::$app->request->get('target'),'target_id'=>Yii::$app->request->get('source')])->one();
-            endif;
-            $relation_obj = RelationshipDetails::find()->where(['relationship_id'=>$source['id']])->all();
-            $form_submit_param = FormData::find()->where(['form_submit_id'=>Yii::$app->request->get('owner')])->all();
-            foreach($relation_obj as $param):
-                
-                foreach($form_submit_param as $field):
-                    $target_field=0;           
-                    if($field['param']==$param['source_field'] && $param['target_field']=="form_submit_id"): 
-                            $subquery->orWhere('form_submit_id="'.$field['param_val'].'"');    
-                    else:  
-                            if($param['target_field']=="form_submit_id"):                                
-                                $subquery->orWhere('param_val="'.$field['form_submit_id'].'"');
-                            endif;
-                    endif;
+                $source = Relationships::find()->where(['source_id'=>Yii::$app->request->get('target'),'target_id'=>Yii::$app->request->get('source')])->one();               
+                $relation_obj = RelationshipDetails::find()->where(['relationship_id'=>$source['id']])->all();
+                $form_submit_param = FormData::find()->where(['form_submit_id'=>Yii::$app->request->get('owner')])->all();
+                $rel_arr =[];
+                $rel_a=[];
+                foreach($relation_obj as $param): 
+                    $a = FormData::find()->select('param_val')->where(['form_submit_id'=>Yii::$app->request->get('owner'),'param'=>$param['target_field']])->asArray()->column();                                
+                    $rel_a = array_merge($rel_a,$a);
                 endforeach;
-            endforeach;
+                $b = FormData::find()->select('form_submit_id')->where(['IN','param_val',$rel_a])->andWhere('param="'.$param['source_field'].'"')->asArray()->column();
+                $rel_arr = array_merge($rel_arr,$b);
+            else:
+                $relation_obj = RelationshipDetails::find()->where(['relationship_id'=>$source['id']])->all();
+                $form_submit_param = FormData::find()->where(['form_submit_id'=>Yii::$app->request->get('owner')])->all();
+                $rel_arr =[];
+                $rel_a=[];
+                foreach($relation_obj as $param): 
+                    $a = FormData::find()->select('param_val')->where(['form_submit_id'=>Yii::$app->request->get('owner'),'param'=>$param['source_field']])->asArray()->column();                                
+                    $rel_a = array_merge($rel_a,$a);
+                endforeach;
+                $b = FormData::find()->select('form_submit_id')->where(['IN','param_val',$rel_a])->andWhere('param="'.$param['target_field'].'"')->asArray()->column();
+                $rel_arr = array_merge($rel_arr,$b);
+            endif;
             $target_query = $subquery->column();
-            $page['records'] = FormSubmit::find()->where(['IN','id',$target_query])->andWhere('form_id="'.Yii::$app->request->get('id').'"')->all();
+            $page['records'] = FormSubmit::find()->where(['IN','id',$rel_arr])->andWhere('form_id="'.Yii::$app->request->get('id').'"')->all();
             
         else:
             $page['records'] = $page['records'] = FormSubmit::find()->where(['form_id'=>Yii::$app->request->get('id')])->all();

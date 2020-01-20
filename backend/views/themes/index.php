@@ -144,7 +144,7 @@ EOT_JS
 </div>
 </div>
 </div>
-<script src="http://www.yumpeecms.com/yp-admin/js/ace-builds-master/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://www.yumpeecms.com/yp-admin/js/ace-builds-master/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
     var editor = ace.edit("yumpee_widget_content");
     editor.setTheme("ace/theme/monokai");

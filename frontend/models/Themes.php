@@ -31,8 +31,10 @@ namespace frontend\models;
  */
 use common\components\GUIBehavior;
 use backend\models\Settings;
+use backend\models\Roles;
 use frontend\components\ContentBuilder;
 use frontend\models\Domains;
+
 use Yii;
 
 
@@ -49,8 +51,7 @@ class Themes extends \backend\models\Themes{
         ];
     }
     public function getCurrentTheme(){
-        //this returns the current theme from the Settings Model class
-        
+        //this returns the current theme from the Settings Model class        
             $session = Yii::$app->session;
             $session->open(); // open a session
             $theme_id = $session->get('yumpee_preview_theme');
@@ -58,6 +59,19 @@ class Themes extends \backend\models\Themes{
          if($theme_id!=null):             
              return $theme_id;             
          endif;
+         
+         //if the role's theme has been set then use that
+         if(!Yii::$app->user->isGuest):
+            $table = Yii::$app->db->schema->getTableSchema('tbl_roles');
+            if (isset($table->columns['theme_id'])):
+                $role = Roles::find()->where(['id'=>Yii::$app->user->identity->role_id])->one();
+                if($role['theme_id']!=null && $role['theme_id']!="0"):
+                    return $role['theme_id'];
+                endif;
+            endif;
+         endif;
+         
+         
          //handle multiple domains here
          if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
             $install_domain = ContentBuilder::getSetting("home_url");
@@ -113,7 +127,7 @@ class Themes extends \backend\models\Themes{
          
         //this returns the current theme from the Settings Model class
          $theme = Settings::findOne(['setting_name'=>'current_theme']);
-         if($theme['setting_value']!=null):
+         if($theme['setting_value']!=null):             
              return $theme['setting_value'];
          else:
              return '0';

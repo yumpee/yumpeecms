@@ -91,6 +91,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
+        //return static::findOne(['auth_key' => $token, 'status' => self::STATUS_ACTIVE]);
         throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
     }
 
@@ -215,17 +216,34 @@ class User extends ActiveRecord implements IdentityInterface
     public function getDetails(){
         return $this->hasMany(\backend\models\ProfileDetails::className(),['profile_id'=>'id']);
     }
+    public function getUserFiles(){
+        return $this->hasMany(\backend\models\UserProfileFiles::className(),['profile_id'=>'id']);
+    }
     public function getDisplayImage(){
         return $this->hasOne(\backend\models\Media::className(),['id'=>'display_image_id']);
     }
     
     public function getFormVal($field,$val,$retval=null){        
         if($field=="form_submit_id"):
-            if($retval!=null):
+            $a = \frontend\models\FormData::find()->where(['form_submit_id'=>$val])->one();
+            if($a==null):
+		return null;
+            endif;
+            if($retval!=null):                
                 return \frontend\models\FormData::find()->where(['form_submit_id'=>$val])->andWhere('param="'.$retval.'"')->one();
             else:
                 return \frontend\models\FormData::find()->where(['form_submit_id'=>$val])->all();
             endif;
+        endif;
+    }
+    public function getFileVal($field,$val,$retval=null){        
+        if($field=="form_submit_id"):
+            $a = \frontend\models\FormFiles::find()->where(['form_submit_id'=>$val])->one();
+            if($a==null):
+		return null;
+            endif;
+           return \frontend\models\FormFiles::find()->where(['form_submit_id'=>$val])->all();
+            
         endif;
     }
     public function getUserVal($field,$val){

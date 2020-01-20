@@ -107,7 +107,7 @@ public function actionIndex()
             $page['rs'] = Pages::find()->where(['id' => $page['id']])->one();
             $page['edit']=true;
             $perm_arr = explode(" ",$page['rs']['permissions']);
-            if(count($page['rs']) > 0): // if we find any record then
+            if($page['rs']!=null): // if we find any record then
                 $layout = $page['rs']['layout'];
                 $template = $page['rs']['template'];
                 $sidebar = $page['rs']['sidebar'];
@@ -155,8 +155,16 @@ public function actionIndex()
             'attrib2' => 'valueB',
         ];
         foreach($template_list as $index):
-            $template_option[0] = $index['route'];
+            $route_id = $index['id'];
+            if($index['parent_id']!=null):
+                $parent_template = Templates::find()->where(['id'=>$index['parent_id']])->one();
+                $template_option[$route_id]=$parent_template['route'];
+            else:
+                $template_option[$route_id] = $index['route'];
+            endif;
+            
         endforeach;
+        $page['template_option'] = $template_option;
         $tag_map =  yii\helpers\ArrayHelper::map($template_list, 'id', 'name');
         $page['template'] = \yii\helpers\Html::dropDownList("template",$page['rs']['template'],$tag_map,['prompt'=>'Select a template','class'=>'form-control','id'=>'template']);
         

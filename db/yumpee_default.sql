@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 06, 2019 at 08:41 PM
+-- Generation Time: Jan 20, 2020 at 09:22 AM
 -- Server version: 5.7.14
 -- PHP Version: 7.0.10
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `yumpee_default`
+-- Database: `yum_install`
 --
 
 -- --------------------------------------------------------
@@ -101,8 +101,8 @@ CREATE TABLE `tbl_articles` (
 --
 
 INSERT INTO `tbl_articles` (`id`, `url`, `title`, `article_type`, `lead_content`, `body_content`, `featured_media`, `render_template`, `feedback`, `date`, `archive`, `display_image_id`, `thumbnail_image_id`, `master_content`, `published`, `updated`, `alternate_header_content`, `show_header_image`, `published_by_stat`, `usrname`, `require_login`, `disable_comments`, `rating`, `no_of_views`, `sort_order`, `permissions`) VALUES
-('4188c92e74d51fe8ac01e6f7d6051e7a', 'cms-article', 'CMS Article', 1, '<p>The US Centers for Medicare&nbsp;</p>', '<p>The US Centers for Medicare &amp; Medicaid Services (CMS) has released an online tool that enables consumers to compare Medicare payments and copayments for 114 procedures that are performed in both hospital outpatient departments (HOPDs) and ambulatory surgical centers (ASCs).</p>\r\n<p>Required by the 21st Century Cures Act, the Procedure Price Lookup tool displays national averages of the amounts Medicare pays hospitals and ASCs and the national average copayment a Medicare beneficiary with no Medigap insurance would pay.</p>\r\n<p>For example, a Medicare patient might want to know how much CMS would pay a hospital and an ASC and what part of that he\'d have to pay, on average, for electroremoval of the prostate through bladder canal (urethra) with control of bleeding using an endoscope. The person would enter "prostate" into the tool, select this procedure from a drop-down list, and see the average Medicare cost and the average patient cost in both care settings. For this particular procedure, the patient would pay $351 in an ASC and $741 in an HOPD. The cost to Medicare would be more than twice as high in the HOPD as in the ASC.</p>\r\n<p>In a blog post, CMS Administrator Seema Verma said, "Procedure Price Lookup will help patients with Medicare consider potential cost differences when choosing among safe and clinically appropriate settings to get the care that best meets their needs."</p>\r\n<p>The Procedure Price Lookup is needed, she said, because the CMS is required by law to pay HOPDs differently than it pays ASCs. As a result, the CMS and Medicare beneficiaries pay "vastly different amounts for the same service, depending on the site of care." She noted that although it would take Congress to change the law, CMS can now provide some transparency to patients under the 21st Century Cures Act.</p>\r\n<p><strong>Impact on Physicians</strong></p>\r\n<p>Depending on how many consumers use Procedure Price Lookup and whether the price differential prompts more of them to select ASCs, this new online tool could affect physicians in at least two ways. First, patients might ask about the price comparison when they discuss elective surgery with their physicians. Second, physicians who co-own ACSs might benefit if more patients choose to have their procedures performed in ASCs.</p>\r\n<p>A few years ago, hospitals had an incentive to acquire surgical practices in order to capture the higher payments for procedures in HOPDs. But in 2016, CMS stopped classifying certain employed physicians with off-campus ambulatory practices as part of an HOPD. At the same time, it began requiring "site-neutral" Medicare payments to ambulatory care practices owned by hospitals. As a result, hospitals received lower payments for those doctors\' services than before, because the physicians were paid under the Medicare fee schedule.</p>\r\n<p>Procedure Price Lookup is the latest in a series of patient-oriented transparency tools from CMS. For example, CMS recently overhauled its drug pricing and spending dashboards, vastly increasing the number of medications that patients can look up. The agency has also enhanced its interactive online decision support feature to help people better understand and evaluate their Medicare coverage options. And CMS now offers a mobile-optimized out-of-pocket cost calculator to provide beneficiaries with information on overall plan and drug costs.</p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-11-29', 112018, '7f93f664be067f94f6f662222c9f5cf39069', '', 1, 1, '2018-11-29 00:03:23', NULL, 1, 0, 'admin', 'N', 'N', 0, 22, NULL, NULL),
-('b660a897d58b8fb82249ecbf94c9c3e1', 'cms-launches-tool-that-prices-surgeries-for-patien', 'CMS launches tool', 1, '<p>The Centers for Medicare and Medicaid Services</p>', '<p>Nov. 27 (UPI) -- The Centers for Medicare and Medicaid Services, or CMS, on Tuesday unveiled a new online tool that gives consumers the power to compare Medicare payouts for various hospital procedures.</p>\r\n<p>The Procedure Price Lookup tool allows users to see the national averages for what Medicare pays to hospitals or ambulatory surgical centers, along with the national average copayment amounts that beneficiaries without Medicare supplemental insurance would pay the provider.</p>\r\n<p>"We must do something about rising cost, and a key pillar is to empower patients with the information they need to drive cost and quality by making our healthcare system evolve to one that competes for patients," Seema Verma, administrator of CMS, wrote in a blog post.</p>\r\n<p>The launch of the lookup tool comes almost two years after the passage of the 21st Century Cures Act to help sort out the difference in what Medicare patients and CMS pay for the same service.</p>\r\n<p>The rollout of the law is a part of CMS\' eMedicare initiative, designed to bring more overall price transparency to consumers who in need of prescription drugs and medical services.</p>\r\n<p>Included in the initiative are optimized drug pricing and spending dashboards, and a cost estimator for drugs and services not covered by Medicare.</p>\r\n<p>In the same spirit of transparency, President Trump also signed two bills into law in October removing "gag orders" that kept pharmacists from giving tips to customers on how to purchase cheaper prescription drugs. Later that month he floated a proposal to require pharmaceutical companies to disclose drug costs in television ads.</p>\r\n<p>"While the work we have done to empower patients by increasing the transparency of the Medicare program is unprecedented, we are just getting started as we work to increase price transparency throughout the healthcare system," Verma said.</p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-11-29', 112018, '7f93f664be067f94f6f662222c9f5cf31835', '', 1, 1, '2018-11-29 00:06:26', NULL, 1, 1, 'admin', 'N', 'N', 0, 6, NULL, NULL),
+('4188c92e74d51fe8ac01e6f7d6051e7a', 'cms-article', 'CMS Article', 1, '<p>The US Centers for Medicare&nbsp;</p>', '<p>The US Centers for Medicare &amp; Medicaid Services (CMS) has released an online tool that enables consumers to compare Medicare payments and copayments for 114 procedures that are performed in both hospital outpatient departments (HOPDs) and ambulatory surgical centers (ASCs).</p>\r\n<p>Required by the 21st Century Cures Act, the Procedure Price Lookup tool displays national averages of the amounts Medicare pays hospitals and ASCs and the national average copayment a Medicare beneficiary with no Medigap insurance would pay.</p>\r\n<p>For example, a Medicare patient might want to know how much CMS would pay a hospital and an ASC and what part of that he\'d have to pay, on average, for electroremoval of the prostate through bladder canal (urethra) with control of bleeding using an endoscope. The person would enter "prostate" into the tool, select this procedure from a drop-down list, and see the average Medicare cost and the average patient cost in both care settings. For this particular procedure, the patient would pay $351 in an ASC and $741 in an HOPD. The cost to Medicare would be more than twice as high in the HOPD as in the ASC.</p>\r\n<p>In a blog post, CMS Administrator Seema Verma said, "Procedure Price Lookup will help patients with Medicare consider potential cost differences when choosing among safe and clinically appropriate settings to get the care that best meets their needs."</p>\r\n<p>The Procedure Price Lookup is needed, she said, because the CMS is required by law to pay HOPDs differently than it pays ASCs. As a result, the CMS and Medicare beneficiaries pay "vastly different amounts for the same service, depending on the site of care." She noted that although it would take Congress to change the law, CMS can now provide some transparency to patients under the 21st Century Cures Act.</p>\r\n<p><strong>Impact on Physicians</strong></p>\r\n<p>Depending on how many consumers use Procedure Price Lookup and whether the price differential prompts more of them to select ASCs, this new online tool could affect physicians in at least two ways. First, patients might ask about the price comparison when they discuss elective surgery with their physicians. Second, physicians who co-own ACSs might benefit if more patients choose to have their procedures performed in ASCs.</p>\r\n<p>A few years ago, hospitals had an incentive to acquire surgical practices in order to capture the higher payments for procedures in HOPDs. But in 2016, CMS stopped classifying certain employed physicians with off-campus ambulatory practices as part of an HOPD. At the same time, it began requiring "site-neutral" Medicare payments to ambulatory care practices owned by hospitals. As a result, hospitals received lower payments for those doctors\' services than before, because the physicians were paid under the Medicare fee schedule.</p>\r\n<p>Procedure Price Lookup is the latest in a series of patient-oriented transparency tools from CMS. For example, CMS recently overhauled its drug pricing and spending dashboards, vastly increasing the number of medications that patients can look up. The agency has also enhanced its interactive online decision support feature to help people better understand and evaluate their Medicare coverage options. And CMS now offers a mobile-optimized out-of-pocket cost calculator to provide beneficiaries with information on overall plan and drug costs.</p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-11-29', 112018, '7f93f664be067f94f6f662222c9f5cf39069', '', 1, 1, '2018-11-29 00:03:23', NULL, 1, 0, 'admin', 'N', 'N', 0, 23, NULL, NULL),
+('b660a897d58b8fb82249ecbf94c9c3e1', 'cms-launches-tool-that-prices-surgeries-for-patien', 'CMS launches tool', 1, '<p>The Centers for Medicare and Medicaid Services</p>', '<p>Nov. 27 (UPI) -- The Centers for Medicare and Medicaid Services, or CMS, on Tuesday unveiled a new online tool that gives consumers the power to compare Medicare payouts for various hospital procedures.</p>\r\n<p>The Procedure Price Lookup tool allows users to see the national averages for what Medicare pays to hospitals or ambulatory surgical centers, along with the national average copayment amounts that beneficiaries without Medicare supplemental insurance would pay the provider.</p>\r\n<p>"We must do something about rising cost, and a key pillar is to empower patients with the information they need to drive cost and quality by making our healthcare system evolve to one that competes for patients," Seema Verma, administrator of CMS, wrote in a blog post.</p>\r\n<p>The launch of the lookup tool comes almost two years after the passage of the 21st Century Cures Act to help sort out the difference in what Medicare patients and CMS pay for the same service.</p>\r\n<p>The rollout of the law is a part of CMS\' eMedicare initiative, designed to bring more overall price transparency to consumers who in need of prescription drugs and medical services.</p>\r\n<p>Included in the initiative are optimized drug pricing and spending dashboards, and a cost estimator for drugs and services not covered by Medicare.</p>\r\n<p>In the same spirit of transparency, President Trump also signed two bills into law in October removing "gag orders" that kept pharmacists from giving tips to customers on how to purchase cheaper prescription drugs. Later that month he floated a proposal to require pharmaceutical companies to disclose drug costs in television ads.</p>\r\n<p>"While the work we have done to empower patients by increasing the transparency of the Medicare program is unprecedented, we are just getting started as we work to increase price transparency throughout the healthcare system," Verma said.</p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-11-29', 112018, '7f93f664be067f94f6f662222c9f5cf31835', '', 1, 1, '2018-11-29 00:06:26', NULL, 1, 1, 'admin', 'N', 'N', 0, 7, NULL, NULL),
 ('dbfd606e6930a2512bff571b83a70f65', 'sample-article', 'Sample Article', 1, '<p>Sample Article with YumpeeCMS</p>', '<p>This is a sample article. Hope you have some fun building with Yumpee CMS.</p>\r\n<p>There are 13 different types of Page Template types in YumpeeCMS. A page template indicates how a<br />particular request will be routed and also how the information will be displayed. Every template type is<br />mapped to a specific route within the Yumpee framework.</p>\r\n<p><br />Within YumpeeCMS, you are also able to setup child templates from any of the core parent templates.<br />When a child template is setup, the system will route the URL call the same way it would have routed<br />the parent template but you now have the option of presenting the data in a different way. This means<br />that the same data can be presented in multiple page layouts using child templates. More of this will<br />be discussed in Chapter 12 &ndash; Extending Your Application</p>\r\n<p><em>An excerpt from Yumpee System Administrator Guide</em></p>', '', '83ebb876a836e3e9ca2ecdf74b236809', '', '2018-09-20', 92018, 'cf98487258357fddf6ceae69cd852a9c6359', '', 1, 1, '2018-11-22 23:08:52', NULL, 1, 1, 'admin', 'N', 'N', 0, 83, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -823,7 +823,8 @@ CREATE TABLE `tbl_form_files` (
 CREATE TABLE `tbl_form_roles` (
   `id` varchar(40) NOT NULL,
   `form_id` varchar(40) DEFAULT NULL,
-  `role_id` varchar(40) DEFAULT NULL
+  `role_id` varchar(40) DEFAULT NULL,
+  `permissions` text
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -1018,8 +1019,8 @@ CREATE TABLE `tbl_page` (
 INSERT INTO `tbl_page` (`id`, `title`, `menu_title`, `breadcrumb_title`, `url`, `description`, `meta_description`, `robots`, `parent_id`, `display_image_id`, `layout`, `template`, `form_id`, `role_id`, `css`, `menu_profile`, `published`, `show_in_menu`, `show_in_footer_menu`, `sidebar`, `sort_order`, `permissions`, `master_content`, `sort_order_footer`, `editable`, `updated`, `show_header_image`, `show_footer_image`, `alternate_header_content`, `tab_menu_title`, `tag_id`, `hideon_login`, `require_login`, `renderer`, `no_of_views`) VALUES
 ('1cededebf55c6f73069ff7a2e8621eab', 'Log Out', 'Log Out', '', 'logout', '<p>Thank you for using our system</p>', '', '', '', '', 'column1', 'b67c34b7887bf859242897740c736222', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 30, NULL, 1, 0, NULL, '2018-02-23 00:32:36', 1, NULL, NULL, NULL, '', 'N', 'Y', NULL, NULL),
 ('5e455ec9f9c9d21609d9d5345f2b890f', 'Login', 'Login', '', 'login', '<p>Please log into your account</p>\r\n<p>&nbsp;</p>\r\n<center></center>', '', '', '', '', 'column1', '9f67a476255de2c0afcff03b957ff146', NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 40, NULL, 0, NULL, NULL, '2018-02-22 23:50:01', 1, NULL, NULL, NULL, '', 'Y', 'N', NULL, NULL),
-('9d78bca98209b62fb94ae6cf2ea01090', '', 'Home Page', 'Home', 'intro', '<div class="Service section">\r\n<div style="padding: 60px 0 50px 0; background-color: #cdd1d1; width: 100%; height: auto;">\r\n<div class="container">\r\n<div class="row">\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText">\r\n<h4>Training &amp; Development</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText ">\r\n<h4>Research &amp; Development</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText ">\r\n<h4>Consultancy</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry..</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>', '', '', '', '', 'column1', '9efe43a6a77017df40ba28c6a13368c3', '', '', NULL, NULL, 1, 1, 0, NULL, 20, NULL, 1, 0, NULL, '2018-11-28 23:36:01', 1, NULL, '', NULL, '', 'N', 'N', '', 26),
-('a5ca6c34-db38-11e3-a2bd-52540079a862', 'Contact', 'Contact Us', 'Contact', 'contact-us', '<p>We would love to hear from you. Feel free to contact us with our contact information below</p>', '', 'INDEX FOLLOW', '', '150405157359a6017525c4d1-46832884', 'column1', '6e5c2c526e55c91f84958c5eba109b6b', '', '', NULL, NULL, 1, 1, 0, NULL, 40, NULL, 1, 0, NULL, '2018-11-28 22:45:35', 1, NULL, '', NULL, '', 'N', 'N', '', 3),
+('9d78bca98209b62fb94ae6cf2ea01090', '', 'Home Page', 'Home', 'intro', '<div class="Service section">\r\n<div style="padding: 60px 0 50px 0; background-color: #cdd1d1; width: 100%; height: auto;">\r\n<div class="container">\r\n<div class="row">\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText">\r\n<h4>Training &amp; Development</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText ">\r\n<h4>Research &amp; Development</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n<div class="co1-xs-12 col-md-6 col-lg-4">\r\n<div class="servicesContiner ">\r\n<div class="icon float-left">&nbsp;</div>\r\n<div class="ServicesText ">\r\n<h4>Consultancy</h4>\r\n<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry..</p>\r\n</div>\r\n<div class="clear-fix">&nbsp;</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>\r\n</div>', '', '', '', '', 'column1', '9efe43a6a77017df40ba28c6a13368c3', '', '', NULL, NULL, 1, 1, 0, NULL, 20, NULL, 1, 0, NULL, '2018-11-28 23:36:01', 1, NULL, '', NULL, '', 'N', 'N', '', 36),
+('a5ca6c34-db38-11e3-a2bd-52540079a862', 'Contact', 'Contact Us', 'Contact', 'contact-us', '<p>We would love to hear from you. Feel free to contact us with our contact information below</p>', '', 'INDEX FOLLOW', '', '150405157359a6017525c4d1-46832884', 'column1', '6e5c2c526e55c91f84958c5eba109b6b', '', '', NULL, NULL, 1, 1, 0, NULL, 40, NULL, 1, 0, NULL, '2018-11-28 22:45:35', 1, NULL, '', NULL, '', 'N', 'N', '', 5),
 ('bd22a42ed957ffd7a171501aa7886b48', 'Sign Up', 'Sign Up', 'Sign Up', 'signup', '', '', '', '', '', 'column1', 'de55671b11eac389d54450ae24b71653', '', '', NULL, NULL, 1, 0, 0, NULL, 50, NULL, 1, 0, NULL, '2018-11-19 23:13:11', 1, NULL, NULL, NULL, '', 'Y', 'N', '', NULL),
 ('d5f3d315b4ba211f11c5a06752898d1b', 'Blog Directory', 'Blog Listing', 'Blog Listing', 'blog-directory', '', '', '', '', '', 'column1', '0323a8564428391de276193808b48f45', '', '', NULL, NULL, 1, 0, 0, NULL, 20, NULL, 1, 0, NULL, '2018-11-22 22:57:08', 1, NULL, NULL, NULL, '', 'N', 'N', '', NULL),
 ('dc5f6b778e4d259ba74892c76acc63dd', 'Forgot Password', 'Forgot Password', 'Forgot Password', 'forgot-password', '<p>If you have forgotten your password, fill in the form below to change your password</p>', '', '', '', '', 'column1', '63aaa01fb0126e490547923279cbcf3f', '', '', NULL, NULL, 1, 0, 0, NULL, 70, NULL, 1, 0, NULL, '2018-04-16 14:10:16', 1, NULL, NULL, NULL, '', 'Y', 'N', NULL, NULL),
@@ -1176,16 +1177,17 @@ CREATE TABLE `tbl_roles` (
   `menu_id` tinyint(4) NOT NULL,
   `parent_role_id` varchar(30) DEFAULT NULL,
   `permissions` text,
-  `home_page` varchar(40) NOT NULL
+  `home_page` varchar(40) NOT NULL,
+  `theme_id` int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tbl_roles`
 --
 
-INSERT INTO `tbl_roles` (`id`, `name`, `description`, `access_type`, `menu_id`, `parent_role_id`, `permissions`, `home_page`) VALUES
-('996fcbfa34a4a905f49670b9689579', 'Users', '', 'F', 3, 'f2d16e5cedb1c39a8630b775974565', NULL, ''),
-('f2d16e5cedb1c39a8630b775974565', 'Administrator', 'This is the administrators side', 'B', 0, '', NULL, '');
+INSERT INTO `tbl_roles` (`id`, `name`, `description`, `access_type`, `menu_id`, `parent_role_id`, `permissions`, `home_page`, `theme_id`) VALUES
+('996fcbfa34a4a905f49670b9689579', 'Users', '', 'F', 3, 'f2d16e5cedb1c39a8630b775974565', NULL, '', NULL),
+('f2d16e5cedb1c39a8630b775974565', 'Administrator', 'This is the administrators side', 'B', 0, '', NULL, '', NULL);
 
 -- --------------------------------------------------------
 
@@ -1237,10 +1239,10 @@ CREATE TABLE `tbl_settings` (
 
 INSERT INTO `tbl_settings` (`id`, `setting_name`, `setting_value`) VALUES
 (1, 'current_theme', '10'),
-(2, 'website_name', 'My Website Name'),
-(3, 'website_short_name', ''),
+(2, 'website_name', 'E-commerce Website'),
+(3, 'website_short_name', 'Welcome to my website'),
 (4, 'website_logo', '310f5ba3feb90599690cc9302d0b263e6830'),
-(5, 'website_image_url', 'http://localhost/yumpeecms/uploads'),
+(5, 'website_image_url', 'http://localhost/yum_install/uploads'),
 (6, 'website_home_page', '9d78bca98209b62fb94ae6cf2ea01090'),
 (7, 'contact_us_email', 'myemail@myserver.com'),
 (8, 'google_map_key', ''),
@@ -1254,7 +1256,7 @@ INSERT INTO `tbl_settings` (`id`, `setting_name`, `setting_value`) VALUES
 (16, 'smtp_connection', 'ssl'),
 (17, 'smtp_username', 'yourname@gmail.com'),
 (18, 'smtp_password', 'password'),
-(19, 'smtp_sender_email', 'peter@gmail.com'),
+(19, 'smtp_sender_email', 'admin@myhouse.com'),
 (20, 'smtp_sender_name', 'Peter Odon'),
 (21, 'smtp_use_smtp', 'No'),
 (24, 'auto_approve_comments', 'on'),
@@ -1262,7 +1264,7 @@ INSERT INTO `tbl_settings` (`id`, `setting_name`, `setting_value`) VALUES
 (26, 'current_theme_footer', 'No'),
 (27, 'container_display_type', 'fluid'),
 (28, 'error_page', '0'),
-(29, 'home_url', 'http://localhost/yumpeecms/frontend/web'),
+(29, 'home_url', 'http://localhost/yum_install/frontend/web'),
 (30, 'twig_template', 'Yes'),
 (31, 'registration_role', '996fcbfa34a4a905f49670b9689579'),
 (32, 'registration_page', 'f0769958b0fba394ae53a0d261b445b9'),
@@ -1279,7 +1281,8 @@ INSERT INTO `tbl_settings` (`id`, `setting_name`, `setting_value`) VALUES
 (43, 'use_custom_backend_menus', 'on'),
 (44, 'seo_meta_tags', '<meta name="description" content="YumpeeCMS - An application development framework"/>\r\n'),
 (45, 'backend_home_page', ''),
-(46, 'allow_multiple_domains', 'No');
+(46, 'allow_multiple_domains', 'No'),
+(47, 'time_zone', '1');
 
 -- --------------------------------------------------------
 
@@ -1417,7 +1420,8 @@ INSERT INTO `tbl_templates` (`id`, `name`, `route`, `url`, `internal_route_stat`
 ('dadc8e0cf634000070259894ebd7ca5c', 'User Search', 'accounts/search', NULL, 'N', NULL, NULL),
 ('447db9c80080f1d51801d68be0812f79', 'Webservice Connector', 'webservice/connect', NULL, 'N', NULL, NULL),
 ('9efe43a6a77017df40ba28c6a13368c3', 'Home Page', 'standard/standard/home-page', '', 'N', 'e5a63fe92ede5dceadd0e88930567573', 'standard/standard/home-page'),
-('93edbd3fe13631ef096d18bd72a05634', 'Article Search', 'blog/search', NULL, 'N', NULL, NULL);
+('93edbd3fe13631ef096d18bd72a05634', 'Article Search', 'blog/search', NULL, 'N', NULL, NULL),
+('89fdbd3fe25821ef096f52bd72a035ed', 'Custom Settings', 'custom/index', NULL, 'N', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2323,7 +2327,7 @@ ALTER TABLE `tbl_rating_profile_details`
 -- AUTO_INCREMENT for table `tbl_settings`
 --
 ALTER TABLE `tbl_settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 --
 -- AUTO_INCREMENT for table `tbl_sliders`
 --

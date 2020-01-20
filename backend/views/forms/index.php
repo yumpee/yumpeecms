@@ -63,7 +63,19 @@ $this->registerJs( <<< EOT_JS
         ev.preventDefault();
   }); 
   $(document).on('click', '#btnNotify',
-       function(ev) {   
+       function(ev) {
+        if($("#notify_email").val()==""){
+            alert("Notification email cannot be blank");
+            return;
+        }
+        if($("#notify_subject").val()==""){
+            alert("Notification subject cannot be blank");
+            return;
+        }
+        if($("#notify_message").val()==""){
+            alert("Notification message cannot be blank");
+            return;
+        }
         $.post(
             '{$notifyURL}',$( "#frm1" ).serialize(),
             function(data) {
@@ -75,6 +87,18 @@ $this->registerJs( <<< EOT_JS
             
   $(document).on('click', '#btnFormNotify',
        function(ev) {   
+        if($("#form_email").val()==""){
+            alert("Notification email cannot be blank");
+            return;
+        }
+        if($("#form_subject").val()==""){
+            alert("Notification subject cannot be blank");
+            return;
+        }
+        if($("#form_message").val()==""){
+            alert("Notification message cannot be blank");
+            return;
+        }
         $.post(
             '{$formURL}',$( "#frm1" ).serialize(),
             function(data) {
@@ -86,6 +110,14 @@ $this->registerJs( <<< EOT_JS
             
   $(document).on('click', '#btnResponse',
        function(ev) {   
+        if($("#response_message").val()==""){
+            alert("Notification message cannot be blank");
+            return;
+        }
+        if($("#response_subject").val()==""){
+            alert("Notification subject cannot be blank");
+            return;
+        }
         $.post(
             '{$responseURL}',$( "#frm1" ).serialize(),
             function(data) {
@@ -202,11 +234,11 @@ EOT_JS
                                                 <p>Configure the email to notify on submission</p>
                                                 
                                                 <p>Email Address:
-                                                <input type="text" class="form-control" name='notify_email' value="<?=$notify_rs['email']?>"/>
+                                                <input type="text" class="form-control" name='notify_email' id='notify_email' value="<?=$notify_rs['email']?>"/>
                                                 <p>Email Subject:
-                                                <input type="text" class="form-control" name='notify_subject' value="<?=$notify_rs['subject']?>"/>
+                                                <input type="text" class="form-control" name='notify_subject' id='notify_subject' value="<?=$notify_rs['subject']?>"/>
                                                 Message:
-                                                <textarea class="form-control" rows="10" name="notify_message"><?=$notify_rs['message']?></textarea>
+                                                <textarea class="form-control" rows="10" name="notify_message" id="notify_message"><?=$notify_rs['message']?></textarea>
                                                 <p><input type="checkbox" name="notify_send_data" <?=$notify_send_data?>/> Include form data submitted
                                                 <p align="right"><input type="button" class="btn btn-success" id='btnNotify' value="Update" />
                                                 
@@ -214,11 +246,11 @@ EOT_JS
                                             <div id="w_nmail" class="tab-pane fade"> 
                                                 <p>Configure the response message on submission
                                                 <p>Enter form field to notify
-                                                    <input type="text" class="form-control" name='form_email' value="<?=$form_rs['email']?>"/>
+                                                    <input type="text" class="form-control" name='form_email' id='form_email' required value="<?=$form_rs['email']?>"/>
                                                 <p>Email Subject:
-                                                <input type="text" class="form-control" name='form_subject' value="<?=$form_rs['subject']?>"/>
+                                                <input type="text" class="form-control" name='form_subject' id='form_subject' required value="<?=$form_rs['subject']?>"/>
                                                 Message:
-                                                <textarea class="form-control" rows="10" name="form_message"><?=$form_rs['message']?></textarea>
+                                                <textarea class="form-control" rows="10" name="form_message" id="form_message" required><?=$form_rs['message']?></textarea>
                                                 <p><input type="checkbox" name="form_send_data" <?=$form_send_data?>> Include form data submitted
                                                 <p align="right"><input type="button" class="btn btn-success" id='btnFormNotify' value="Update" />
                                             </div>
@@ -227,9 +259,9 @@ EOT_JS
                                                 <p>Select email Address field:
                                                     <select class="form-control" name='response_email'><option value="0">From User Profile</option></select>
                                                 <p>Email Subject:
-                                                <input type="text" class="form-control" name='response_subject' value="<?=$response_rs['subject']?>"/>
+                                                <input type="text" class="form-control" name='response_subject' id='response_subject' value="<?=$response_rs['subject']?>"/>
                                                 Message:
-                                                <textarea class="form-control" rows="10" name="response_message"><?=$response_rs['message']?></textarea>
+                                                <textarea class="form-control" rows="10" name="response_message" id="response_message"><?=$response_rs['message']?></textarea>
                                                 <p><input type="checkbox" name="response_send_data" <?=$response_send_data?>> Include form data submitted
                                                 <p align="right"><input type="button" class="btn btn-success" id='btnResponse' value="Update" />
                                             </div>

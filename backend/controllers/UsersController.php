@@ -39,6 +39,9 @@ use yii\Helpers\ArrayHelper;
 use backend\models\BackEndMenus;
 use backend\models\BackEndMenuRole;
 use backend\models\Settings;
+use backend\models\CustomWidget;
+use backend\models\Themes;
+use yii\helpers\FileHelper;
 
 class UsersController extends Controller{
 public function behaviors()
@@ -88,6 +91,8 @@ public function actionIndex()
         $page=[]; 
         $page['rs']=[];        
         $page['id'] = Yii::$app->request->get('id',null);
+        $page['role_sel_page']=[];
+        $page['role_sel_widget']=[];
         
         if($page['id']!=null){            
             $page['rs'] = Users::find()->where(['id' => $page['id']])->one();
@@ -98,6 +103,8 @@ public function actionIndex()
         }
         if(Yii::$app->request->get("actions")=="edit_roles"):
             $page['role_rs'] = Roles::find()->where(['id'=>Yii::$app->request->get('role_id')])->one();
+            $page['role_sel_page']= Pages::find()->select('id')->where(['LIKE','permissions',' '.Yii::$app->request->get('role_id')])->column();
+            $page['role_sel_widget']= CustomWidget::find()->select('id')->where(['LIKE','permissions',' '.Yii::$app->request->get('role_id')])->column();
         else:
             $page['role_rs'] = Roles::find()->where(['id'=>'0'])->one();
         endif;
@@ -113,12 +120,19 @@ public function actionIndex()
         
         $role_list = Roles::find()->all();
         $role_map =  yii\helpers\ArrayHelper::map($role_list, 'id', 'name');
-        $page_list = Pages::find()->orderBy('menu_title')->all();
+        $page_list = Pages::find()->orderBy('menu_title')->all();        
         $page_map = yii\helpers\ArrayHelper::map($page_list, 'id', 'menu_title'); 
+        $theme_list = Themes::find()->orderBy('name')->all();
+        $theme_map = yii\helpers\ArrayHelper::map($theme_list, 'id', 'name'); 
+        $custom_widget= CustomWidget::find()->orderBy('title')->all();
+        $widget_map = yii\helpers\ArrayHelper::map($custom_widget, 'id', 'title'); 
+        $page['theme_dropdown'] = \yii\helpers\Html::dropDownList("theme_id",$page['role_rs']['theme_id'],$theme_map,['prompt'=>'Select a theme','class'=>'form-control']);
         $page['role_dropdown'] = \yii\helpers\Html::dropDownList("role_id",$page['rs']['role_id'],$role_map,['prompt'=>'Select a role','class'=>'form-control']);
         $page['home_page_dropdown'] = \yii\helpers\Html::dropDownList("home_page",$page['role_rs']['home_page'],$page_map,['prompt'=>'Select a page','class'=>'form-control']);
         $page['role_parent_dropdown'] = \yii\helpers\Html::dropDownList("parent_role_id",$page['role_rs']['parent_role_id'],$role_map,['prompt'=>'Select parent role','class'=>'form-control']);
         $page['access_type']=$page['role_rs']['access_type'];
+        $page['page_checkbox'] = \yii\helpers\Html::checkboxList("role_pages", $page['role_sel_page'], $page_map,['itemOptions'=>['class'=>'rolep']]);
+        $page['page_custom_widget'] = \yii\helpers\Html::checkboxList("role_widget", $page['role_sel_widget'], $widget_map,['itemOptions'=>['class'=>'rolew']]);
      
         $menu_list = MenuProfile::find()->orderBy('name')->all();
         if($menu_list==null):
@@ -166,6 +180,85 @@ public function actionProfile(){
 }
 public function actionSaveRegions(){
     return Users::saveRegions();
+}
+public function actionSaveFiles(){
+    if( strtolower( $_SERVER[ 'REQUEST_METHOD' ] ) == 'post' && !empty( $_FILES ) ) {
+                    
+                                $random = rand(1,10000);
+                                $session = md5(date('YmdHis')).$random;
+                                $directory = Yii::getAlias('@uploads/uploads/').$session;
+                                if (!is_dir($directory)) {
+                                                FileHelper::createDirectory($directory);
+                                }
+                                foreach ($_FILES as $k=>$v){
+                                    if(is_array($v)){
+                                        //for single files
+                                        if(is_array($v)){
+                                            if(!is_array($v['tmp_name']) && !empty($v['tmp_name'])){					
+                                                //echo $k." - ". $v['name']." - " .$v['tmp_name']." ".$v['size']."<br>";
+                                                //move_uploaded_file( $v['tmp_name'], $filePath."/".$v['name']);
+                                                $uid = uniqid(time(), true);   
+                                                $uid= str_replace(".","-",$uid);
+                                                $fileName = $uid . '_' . str_replace(" ","_",$v['name']);
+                                                $filePath = $directory;
+                                                if (strpos($k, 'yumpee-image') !== false) {
+                                                    list($label,$width,$height) = explode("_",$k);
+                                                    $resize = new ResizeImage($v['tmp_name']);
+                                                    $resize->resizeTo($width, $height, 'exact');
+                                                    $resize->saveImage($filePath."/".$fileName);
+                                                }else{
+                                                    move_uploaded_file( $v['tmp_name'], $filePath."/".$fileName); // move to new location perhaps?
+                                                }
+                                                $frmFiles = new UserProfileFiles();
+                                                $frmFiles->setAttribute("profile_id",Yii::$app->request->post("user_id"));
+                                                $frmFiles->setAttribute("file_name",$v['name']);
+                                                $frmFiles->setAttribute("file_path",$session ."/".$fileName);
+                                                $frmFiles->setAttribute("file_type",$v['type']);
+                                                $frmFiles->setAttribute("doc_name",$k);
+                                                if (file_exists($filePath."/".$fileName)):
+                                                    $frmFiles->setAttribute("file_size",filesize($filePath."/".$fileName));
+                                                    $frmFiles->save();
+                                                endif;
+                                            }
+				
+                                        }
+                                        $counter=0;
+                                        foreach ($v as $sk=>$sv){ 
+                                            $arr[$sk][$k]=$sv;
+                                            if(is_array($sv) && !empty($v['tmp_name'][$counter])){
+                                                    //echo $k." - ". $v['name'][$counter]." - ".$v['tmp_name'][$counter]."-".$v['type'][$counter]."<br>"	;
+                                                    //move_uploaded_file( $v['tmp_name'][$counter], $filePath."/".$v['name'][$counter]);
+                                                    $uid = uniqid(time(), true);   
+                                                    $uid= str_replace(".","-",$uid);
+                                                    $fileName = $uid . '_' . str_replace(" ","_",$v['name'][$counter]);
+                                                    $filePath = $directory;
+                                                    if (strpos($k, 'yumpee-image') !== false) {
+                                                        list($label,$width,$height) = explode("_",$k);
+                                                        $resize = new ResizeImage($v['tmp_name'][$counter]);
+                                                        $resize->resizeTo($width, $height, 'exact');
+                                                        $resize->saveImage($filePath."/".$fileName);
+                                                    }else{
+                                                        move_uploaded_file( $v['tmp_name'][$counter], $filePath."/".$fileName); // move to new location perhaps?
+                                                    }
+                                                    $frmFiles = new UserProfileFiles();
+                                                    $frmFiles->setAttribute("profile_id",Yii::$app->request->post("user_id"));
+                                                    $frmFiles->setAttribute("file_name",$v['name'][$counter]);
+                                                    $frmFiles->setAttribute("file_path",$session ."/".$fileName);
+                                                    $frmFiles->setAttribute("file_type",$v['type'][$counter]);
+                                                    $frmFiles->setAttribute("doc_name",$k);
+                                                    if (file_exists($filePath."/".$fileName)):
+                                                        $frmFiles->setAttribute("file_size",filesize($filePath."/".$fileName));
+                                                        $frmFiles->save();
+                                                    endif;
+                                            }
+                                            $counter++;
+				
+                                        }
+                                    }
+                                }
+                                
+                            }
+return "File(s) Upload complete";    
 }
 public function actionUpdateRegion(){
         //this function is used as a AJAX service
@@ -245,13 +338,62 @@ public function actionSaveRole(){
             if($model!=null):                
                 $model->attributes = Yii::$app->request->post();
                 $model->setAttribute('menu_id',$menu_id);
+                $table = Yii::$app->db->schema->getTableSchema('tbl_roles');
+                if (isset($table->columns['theme_id'])):
+                    $model->setAttribute('theme_id',Yii::$app->request->post("theme_id"));
+                endif;
                 $model->save();
+                
+                //let's update the page's permission field
+                $pages = Pages::find()->where(['LIKE','permissions',' '.Yii::$app->request->post("role_id")])->all();
+                foreach($pages as $page):
+                    $page_permissions = $page['permissions'];
+                    $role_str = str_replace(" ".Yii::$app->request->post("role_id"),"",$page_permissions);
+                    $m = Pages::findOne($page['id']);
+                    $m->setAttribute('permissions',$role_str);
+                    $m->save(false);
+                endforeach;
+                $pages_arr = Yii::$app->request->post("role_pages");
+                if(!empty($pages_arr)):        
+                    foreach($pages_arr as $selected):    
+                        $pages = Pages::find()->where(['id'=>$selected])->one();
+                        $new_permission = $pages['permissions']." ".Yii::$app->request->post("role_id");
+                        $m = Pages::findOne($pages['id']);
+                        $m->setAttribute('permissions',$new_permission);
+                        $m->save(false);
+                    endforeach;
+                endif;
+                
+                //let's update the custom widget
+                $pages = CustomWidget::find()->where(['LIKE','permissions',Yii::$app->request->post("role_id")])->all();
+                foreach($pages as $page):
+                    $page_permissions = $page['permissions'];
+                    $role_str = str_replace(" ".Yii::$app->request->post("role_id"),"",$page_permissions);
+                    $m = CustomWidget::findOne($page['id']);
+                    $m->setAttribute('permissions',$role_str);
+                    $m->save(false);
+                endforeach;
+                $pages_arr = Yii::$app->request->post("role_widget");
+                if(!empty($pages_arr)):        
+                    foreach($pages_arr as $selected):    
+                        $pages = CustomWidget::find()->where(['id'=>$selected])->one();
+                        $new_permission = $pages['permissions']." ".Yii::$app->request->post("role_id");
+                        $m = CustomWidget::findOne($pages['id']);
+                        $m->setAttribute('permissions',$new_permission);
+                        $m->save(false);
+                    endforeach;
+                endif;
+                
                 return "Roles successfully updated";
             else:   
                 $themes =  new Roles();
                 $themes->attributes = Yii::$app->request->post();
                 $themes->setAttribute('id',substr(md5(date("YmdHis")),0,30));
                 $themes->setAttribute('menu_id',$menu_id);
+                $table = Yii::$app->db->schema->getTableSchema('tbl_roles');
+                if (isset($table->columns['theme_id'])):
+                    $model->setAttribute('theme_id',Yii::$app->request->post("theme_id"));
+                endif;
                 $themes->save();
                 return "New role created";
             endif;

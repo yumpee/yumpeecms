@@ -44,4 +44,30 @@ class FormTwig extends \common\models\Twig
         ];
     }
     
+    public function getIsCustom(){
+        return $this->hasOne(CustomWidget::className(),['name'=>'renderer']);
+    }
+    
+    public function afterFind(){        
+        if(substr($this->filename, 0, strlen("twig/")) === "twig/"):
+            $this->code = file_get_contents(__DIR__ .'/../../frontend/themes/'.ContentBuilder::getThemeFolder().'/'.$this->filename);           
+        endif; 
+        
+        if($this->isCustom!=null):
+            if($this->isCustom->require_login=="Y"):
+                if(Yii::$app->user->isGuest):
+                    $this->code="";
+                elseif (strpos($this->isCustom->permissions,Yii::$app->user->identity->role_id) === false) :
+                    $this->code="";                
+                endif;
+            endif;
+        endif;
+        
+        parent::afterFind();
+        if(ContentBuilder::getSetting("minify_twig")=="on"):
+            $minify = new Minify();
+            $this->code = $minify->minify_html($this->code);
+        endif;       
+    }
+    
 }

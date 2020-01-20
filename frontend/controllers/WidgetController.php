@@ -121,8 +121,10 @@ public function behaviors()
                         $route = ContentBuilder::getTemplateRouteByURL(Yii::$app->request->get('page_id'),false);
                         $route_id = Templates::find()->where(['route'=>$route])->one();
                         $record = TemplateWidget::find()->where(['widget'=>$called_widget])->andWhere(['page_id'=>$route_id['id']])->one();
-                        $settings = json_decode($record->settings);
-                        $page['title']=$settings->widget_title;
+                        if($record!=null):
+                            $settings = json_decode($record->settings);
+                            $page['title']=$settings->widget_title;
+                        endif;
                 endif;
             break;
             

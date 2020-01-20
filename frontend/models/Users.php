@@ -25,6 +25,8 @@
 namespace frontend\models;
 use Yii;
 use frontend\models\ProfileDetails;
+use backend\models\Relationships;
+use backend\models\RelationshipDetails;
 
 class Users extends \backend\models\Users {
     
@@ -44,8 +46,7 @@ class Users extends \backend\models\Users {
     
 public static function saveUser(){
         $records = Users::find()->where(['id'=>Yii::$app->user->identity->id])->one();
-        $password = Yii::$app->request->post('passwd');       
-        
+        $password = Yii::$app->request->post('passwd');   
         if($records!=null){                 
             $id = Yii::$app->request->post("id");               
             $records->setAttribute('first_name',Yii::$app->request->post("first_name"));
@@ -68,13 +69,16 @@ public static function saveUser(){
     public function getRole(){
         return $this->hasOne(\backend\models\Roles::className(),['id'=>'role_id']);
     }
+    
     public function getRelationData() {
         $ARMethods = get_class_methods('\yii\db\ActiveRecord');
         $modelMethods = get_class_methods('\yii\base\Model');
         $reflection = new \ReflectionClass($this);
         $i = 0;
         $stack = [];
+        
         /* @var $method \ReflectionMethod */
+        
         foreach ($reflection->getMethods() as $method) {
             if (in_array($method->name, $ARMethods) || in_array($method->name, $modelMethods)) {
                 continue;
@@ -82,6 +86,8 @@ public static function saveUser(){
             if($method->name === 'bindModels')  {continue;}
             if($method->name === 'attachBehaviorInternal')  {continue;}
             if($method->name === 'getRelationData')  {continue;}
+            if($method->name ==='resetDependentRelations') {continue;}
+            if($method->name ==='setRelationDependencies') {continue;}
             try {
                 $rel = call_user_func(array($this,$method->name));
                 if($rel instanceof \yii\db\ActiveQuery){
@@ -96,4 +102,12 @@ public static function saveUser(){
         }
         return $stack;
     }
+    function getRelationships($name=""){        
+        $return_val=[];        
+        $forms = Relationships::find()->select('source_id')->where(['source_id'=>$this->form->name])->all();
+        if($forms!=null):
+            return Forms::find()->where(['IN','name',$forms])->all();
+        endif;
+        return $return_val;
+ }
 }

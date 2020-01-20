@@ -127,6 +127,31 @@ $this->registerJs( <<< EOT_JS
             )  
  })
   
+ $("#sel_check_page").click(function(){     
+     $(".rolep").each(function(){    
+                $(this).attr("checked","checked");
+     })
+ })
+ $("#sel_uncheck_page").click(function(){     
+     $(".rolep").each(function(){    
+                $(this).removeAttr("checked");
+     })
+ })               
+ $("#sel_check_widget").click(function(){     
+     $(".rolew").each(function(){    
+                $(this).attr("checked","checked");
+     })
+ })
+ $("#sel_uncheck_widget").click(function(){     
+     $(".rolew").each(function(){    
+                $(this).removeAttr("checked");
+     })
+ })               
+                
+                
+                
+                
+                
  $("#lnkFiles").click(function(){
    $.get(
                 '{$fileURL}',{user:$(this).attr("account_id")},
@@ -283,12 +308,22 @@ endif;
 <div id="roles" class="tab-pane fade in">
             <form action="index.php?r=events/index" method="post" id="frmRole">
         <table class="table">
-        <tr><td>Role Name<td><input name="name" id="name" value="<?=$role_rs["name"]?>" class="form-control" type="text" />
+        <tr><td width="20%">Role Name<td><input name="name" id="name" value="<?=$role_rs["name"]?>" class="form-control" type="text" />
         <tr><td>Parent Role<td><?=$role_parent_dropdown?>
         <tr><td>Access Type<td><?=\yii\helpers\Html::dropDownList("access_type",$access_type,['F'=>'Front End','B'=>'Back End'],['class'=>'form-control'])?></td>
         <tr><td>Default Menu(frontend)</td><td><?=$menu_list?></td>
         <tr><td>Home Page</td><td><?=$home_page_dropdown?></td>
+        <tr><td>Default Theme(frontend)</td><td><?=$theme_dropdown?></td>
         <tr><td>Description<td><textarea name="description" id="description" rows="3" cols="30" class="form-control"><?=$role_rs["description"]?></textarea>  
+        <?php
+        if(Yii::$app->request->get("actions")=="edit_roles"):
+        ?>
+        <tr><td valign="top">Pages </td><td><div class="pull-right"><a href='#' id='sel_check_page'>Check </a>/  <a href='#' id='sel_uncheck_page'>Uncheck All</a></div><br><div><?=$page_checkbox?></div></td>
+        <tr><td valign="top">Widgets</td><td><div class="pull-right"><a href='#' id='sel_check_widget'>Check </a> / <a href='#' id='sel_uncheck_widget'>Uncheck All</a></div><br><div><?=$page_custom_widget?></div></td>
+                
+        <?php
+        endif;
+        ?>
         
         <tr><td colspan="2"><button type="submit" id="btnSubmitRole" class="btn btn-success">Save</button> <button type="button" id="btnNew" class="btn btn-primary">New</button> <input type="hidden" name="processor" value="true" /><input type="hidden" name="role_id" value="<?=$role_rs["id"]?>" />
             

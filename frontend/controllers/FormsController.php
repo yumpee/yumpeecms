@@ -65,8 +65,7 @@ use frontend\models\Themes;
 use yii\helpers\FileHelper;
 use yii\db\Expression;
 
-class FormsController extends Controller{
-    
+class FormsController extends Controller{    
 	public static function allowedDomains()
 {
 	if(ContentBuilder::getSetting("allow_multiple_domains")=="Yes"):
@@ -74,7 +73,6 @@ class FormsController extends Controller{
 	endif;
     
 }
-
 /**
  * @inheritdoc
  */
@@ -140,7 +138,14 @@ public function behaviors()
                     return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/account/login',['form'=>$form,'page'=>$article]);
                     
        endif;
+       if($article['require_login']=="Y"):
+        if(strpos($article['permissions'],Yii::$app->user->identity->role_id) === false && $article['url']==str_replace("/","",$page_url)):
+            return "<center>You do not have permissions to view this page. Consult the Administrator</center>";
+            exit;
+        endif;
+       endif;
         
+       
         if(ContentBuilder::getTemplateRouteByURL($page_url)=="forms/display"):
             
             $form = Forms::find()->where(['id'=>$article->form_id])->one();
@@ -264,7 +269,12 @@ public function behaviors()
                     
        endif;
        //////////////////////////////////LOGIN taken care off in the above section //////////////////////////////////////////////////////
-       
+       if($article['require_login']=="Y"):
+        if(strpos($article['permissions'],Yii::$app->user->identity->role_id) === false && $article['url']==str_replace("/","",$page_url)):
+            return "<center>You do not have permissions to view this page. Consult the Administrator</center>";
+            exit;
+        endif;
+       endif;
        
        if(ContentBuilder::getTemplateRouteByURL($page_url)=="forms/view"):
            //we get the form ID used for this template
@@ -641,17 +651,26 @@ public function behaviors()
             //we implement the relations parameter here if call decides to be relational data specific
             $relation_with=[];
             $qr = new FormSubmit();
-            $relations = $qr->getRelationData();            
+            $relations = $qr->getRelationData(); 
             if(Yii::$app->request->get('relations')=="all"):
-                foreach($relations as $a):                
-                    //array_push($relation_with,$a['name']);
+                foreach($relations as $a):
                     $query->with($a['name']);
                 endforeach;
             else:
-                $relations = explode(",",Yii::$app->request->get('relations'));
+                $relations_str = explode(",",Yii::$app->request->get('relations'));
                 $relation_with=[];
-                foreach($relations as $a):  
-                    $query->with($a);
+                foreach($relations_str as $a):  
+                    $found_rel=0;
+                    foreach($relations as $b):
+                        if($b['name']==$a):
+                            $found_rel=1;
+                        endif;
+                    endforeach;
+                    if($found_rel >0):
+                        $query->with($a);
+                    else:
+                        $relation_with = array_merge($relation_with,$qr->getRelationships($a));
+                    endif;
                 endforeach;
             endif;
             if(Yii::$app->request->get('search-field')!=null):
@@ -706,23 +725,24 @@ public function behaviors()
         if(Yii::$app->request->get('return-type')=="count"):
             return \yii\helpers\Json::encode($query->count());
         endif;
-	
-        
-        
+	        
         if(Yii::$app->request->get('return-type')=="json"):
             $data = $query->all();
             return \yii\helpers\Json::encode($data);
+        endif;
+        if(Yii::$app->request->get('return-type')=="xml"):
+            $data = $query->all();
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
+            return $data;
         endif;
                 $page['records'] = $query->all();
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):
                         //we handle the loading of twig template if it is turned on
                         $themes = new Themes();
-							$theme_id=$themes->getDataTheme();
-							if($theme_id=="0"):
-								$theme_id = ContentBuilder::getSetting("current_theme");
-							endif;
-							
-                        //$render = 
+			$theme_id=$themes->getDataTheme();
+			if($theme_id=="0"):
+                            $theme_id = ContentBuilder::getSetting("current_theme");
+			endif;
                         //since we may get the widget we want to use to display the result
                         $metadata['saveURL'] = \Yii::$app->getUrlManager()->createUrl('ajaxform/save');
                         $metadata['param'] = Yii::$app->request->csrfParam;
@@ -737,7 +757,33 @@ public function behaviors()
                             else:
                                 $content= $twig->render($codebase['filename'],['page'=>$page,'app'=>Yii::$app,'metadata'=>$metadata]);
                             endif;
-                            
+                            //we apply formatters here
+                            if(Yii::$app->request->get('formatter')!=null):
+                                $random = rand(1000,100000);
+                                    $session = md5(date('YmdHis')).$random;
+                                    $directory = Yii::getAlias('@uploads/uploads/').$session;
+                                    if (!is_dir($directory)) :
+                                        FileHelper::createDirectory($directory);
+                                    endif;
+                                if(Yii::$app->request->get('formatter')=="pdf"):                                     
+                                    $filename = md5(date("Hims"));
+                                    $filename_html = $filename.".html";
+                                    $filename = $filename.".pdf";
+                                    file_put_contents($directory.DIRECTORY_SEPARATOR.$filename_html,$content);                                                                
+                                    $return['download_link']=ContentBuilder::getSetting("website_image_url").DIRECTORY_SEPARATOR.$session.DIRECTORY_SEPARATOR.$filename;
+                                    $return['data'] = $this->renderPartial('@frontend/views/layouts/html',['data'=>$content]);                                
+                                    Yii::$app->html2pdf->convertFile($directory.DIRECTORY_SEPARATOR.$filename_html)->saveAs($directory.DIRECTORY_SEPARATOR.$filename);
+                                    return \yii\helpers\Json::encode($return);
+                                endif;
+                                if(Yii::$app->request->get('formatter')=="csv"):                                     
+                                    $filename = md5(date("Hims"));
+                                    $filename_csv = $filename.".csv";                                    
+                                    file_put_contents($directory.DIRECTORY_SEPARATOR.$filename_csv,$content);                                                                
+                                    $return['download_link']=ContentBuilder::getSetting("website_image_url").DIRECTORY_SEPARATOR.$session.DIRECTORY_SEPARATOR.$filename_csv;
+                                    $return['data'] = $this->renderPartial('@frontend/views/layouts/html',['data'=>$content]);   
+                                    return \yii\helpers\Json::encode($return);
+                                endif;
+                            endif;
                             return $this->renderPartial('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
                     endif;
@@ -749,7 +795,7 @@ public function behaviors()
     public function actionSaveForm(){
 
         if (Yii::$app->request->isAjax && Yii::$app->request->post()) {
-                Yii::$app->response->format = Response::FORMAT_JSON;
+                Yii::$app->response->format = Response::FORMAT_JSON;                
                 if(Yii::$app->request->post("form_type")=="form-article"):
                         if(Yii::$app->user->isGuest):
                                 $record=null;
@@ -1034,8 +1080,13 @@ public function behaviors()
                                 
                             }
                     
-                    if(Yii::$app->request->post("return-type")=="json"):
-                        return Yii::$app->api->sendSuccessResponse(["id"=>$my_last_insert_id]);
+                    if(Yii::$app->request->post("return-type")=="json"):                        
+                        return json_encode(["id"=>$my_last_insert_id]);      
+                    endif;
+                    if(Yii::$app->request->post("return-type")=="xml"):  
+                        $return =["id"=>$my_last_insert_id];
+                        \Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
+                        return $return;     
                     endif;
                     return "Profile Saved";
                 endif;
@@ -1165,7 +1216,7 @@ public function behaviors()
                         if(Yii::$app->user->isGuest):
                                 $record=null;
                                 $usrname="";
-                            else:
+                        else:
                                 //we need to check here what the form submission limit is for this form entry
                                 //$record = FormSubmit::find()->where(['id'=>Yii::$app->request->post("id")])->andWhere('usrname="'.Yii::$app->user->identity->username.'"')->one();
                                 $record = FormSubmit::find()->where(['id'=>Yii::$app->request->post("id")])->one();
@@ -1186,7 +1237,6 @@ public function behaviors()
                         $form = Forms::find()->where(['id'=>Yii::$app->request->post("form_id")])->one();
                         if($record==null):
                             //check if person can create records
-                            
                             $form_submit = new FormSubmit();
                             if($form->published=="Y"):
                                 $form_submit->setAttribute('published',"1");
@@ -1200,13 +1250,11 @@ public function behaviors()
                             $form_submit->setAttribute("ip_address",Yii::$app->getRequest()->getUserIP());
                             $form_submit->setAttribute("url",$usrname.md5(Yii::$app->getRequest()->getUserIP().date('YmdHiis')));
                             if(Yii::$app->request->post("yumpee_ignore_save")=="true"):
-                                //lets ignore the save
                                 $id="0";
                             else:
                                 $form_submit->save();
                                 $id = $form_submit->id;
                             endif;
-                            
                         else:
                             //check if this person can update a record using role permissions
                             if(Yii::$app->user->isGuest):
@@ -1558,10 +1606,13 @@ public function behaviors()
                                 
                             endif;
                 endif;
-                if(Yii::$app->request->post("return-type")=="json"):
-                    //if the form requests a json return after submission
-                    $return = ["id"=>$id];
-                    return Yii::$app->api->sendSuccessResponse($return);
+                if(Yii::$app->request->post("return-type")=="json"):                    
+                    return json_encode(["id"=>$id]);                    
+                endif;
+                if(Yii::$app->request->post("return-type")=="xml"):
+                    $return=["id"=>$id];
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
+                    return $return;
                 endif;
                 return "Form saved successfully ";                
         }
@@ -1603,6 +1654,11 @@ public static function actionFeedback(){
     if(Yii::$app->request->get('return-type')=="json"):
             $data = $query->all();
             return \yii\helpers\Json::encode($data);
+    endif;
+    if (Yii::$app->request->get('return-type')=="xml"):
+        $data = $query->all();
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
+        return $data;
     endif;
     $page['records'] = $query->all();
                     if(ContentBuilder::getSetting("twig_template")=="Yes"):

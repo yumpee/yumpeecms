@@ -39,6 +39,8 @@ use backend\models\Forms;
 use frontend\models\Domains;
 use frontend\models\Settings;
 use frontend\models\Themes;
+use yii\db\Expression;
+
 
 class BlogController extends Controller{
 public static function allowedDomains()
@@ -72,11 +74,16 @@ public function behaviors()
     public function actionIndex(){
      $page =[];
      $news_url =  ContentBuilder::getActionURL(Yii::$app->request->getAbsoluteUrl());
-     //we check to see what page is being called
-            if (strpos($news_url, '?') !== false):
-                list($news_url,$search)= explode("?",$news_url);
-            endif;
+     if (strpos($news_url, '?') !== false):
+           list($news_url,$search)= explode("?",$news_url);
+     endif;      
      if(ContentBuilder::getTemplateRouteByURL($news_url)!="blog/index"):
+                    $b= str_replace(ContentBuilder::getSetting("home_url")."/","",Yii::$app->request->getAbsoluteUrl());
+                    $pos = strpos($b, "/");
+                    $news_url= substr($b,$pos + 1);
+                    if (strpos($news_url, '?') !== false):
+                            list($news_url,$search)= explode("?",$news_url);
+                    endif;
                     $article = Articles::find()->where(['url'=>$news_url])->one();
                             //if it requires log in and we are not logged in then redirect to login page
                             if(($article['require_login']=="Y")&&(Yii::$app->user->isGuest)):       
@@ -209,6 +216,7 @@ public function behaviors()
                     $settings = new Settings();
                     return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer,['page'=>$article,'blogger'=>$user_profile,'header_image'=>$header_image,'settings'=>$settings]); 
       else:
+          
           $pagination=[];
           $pagination['total_page_count']=0;
           $pagination['active_page']=1;
@@ -252,7 +260,8 @@ public function behaviors()
                             return $this->render('@frontend/views/layouts/html',['data'=>$content]);
                         endif;
            endif;
-          return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer,['page'=>$page,'records'=>$records,'pagination'=>$pagination]);  
+           $settings = new Settings();
+          return $this->render('@frontend/themes/'.ContentBuilder::getThemeFolder().'/views/'.$renderer,['page'=>$page,'records'=>$records,'pagination'=>$pagination,'settings'=>$settings]);  
       endif;
     }
     public function actionCategory(){
@@ -335,6 +344,7 @@ public function behaviors()
       
     }
     public function actionSearch(){
+        
         /* 
          * This routine is used to search articles within the system. If the return-type is set as json, then the result is just returned
          * If however the return_type is not set, it renders the result based on the theme's view renderer
@@ -390,6 +400,7 @@ public function behaviors()
         $page=[];
         $page['title']="";        
          //if route is set then check to be sure it exists
+        
         if(Yii::$app->request->get('route')!=null):
                 list($v,$p)=explode("=",Yii::$app->request->get('route'));
                 if($v=="index"):                                        
@@ -651,9 +662,9 @@ public function behaviors()
             endif;
         else:
             if(Yii::$app->request->get('search-field')!=null):
-                $query->with('details','file','author','author.displayImage')->asArray();
+                $query->with('details','file','author','author.displayImage','displayImage')->asArray();
             else:
-                $query->with('details','file','author','author.displayImage')->asArray();
+                $query->with('details','file','author','author.displayImage','displayImage')->asArray();
             endif;
         endif;
         

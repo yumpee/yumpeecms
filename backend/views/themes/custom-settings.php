@@ -23,9 +23,10 @@
 
  */
 $custom_name="";
-$custom_id="0";
+//$custom_id="0";
 $customURL = \Yii::$app->getUrlManager()->createUrl('themes/custom-save');
 $deleteCustomURL =  \Yii::$app->getUrlManager()->createUrl('themes/delete-custom');
+$importURL = \Yii::$app->getUrlManager()->createUrl('themes/import-theme');
 
 $this->registerJs( <<< EOT_JS
 $(document).on('click', '#btnSubmitCustom',
@@ -57,14 +58,28 @@ $('.delete_custom').click(function (element) {
  $(document).on('click', '#btnNew',
        function(ev) {   
         location.href='?r=themes/manage-settings&actions=edit&id={$theme_id}';
+  });
         
-        
-  });  
+ $(document).on('click', '#btnImportSave',
+       function(ev) {   
+        if(!confirm("Are you sure you want to import settings. This will overwrite existing settings if it exists in this theme")){
+            return;
+        }
+        $.post(
+            '{$importURL}',$( "#frmImport" ).serialize(),
+            function(data) {
+                alert(data);
+                location.href='?r=themes/manage-settings&actions=edit&id={$theme_id}';
+            }
+        )
+        ev.preventDefault();
+});
+ 
 EOT_JS
 );         
 ?>
 <div class="container-fluid">
-
+    <p align="right"> <a href="#" id="lnkImport" data-toggle="modal" data-target="#modalThemes"><i class="fa fa-file"></i> Import Settings</a>
         <form action="index.php?r=settings/index" method="post" id="frmCustom">
     <table class="table">
         <tr><td>Setting Name<td><input name="setting_name" id="setting_name" value="<?=$custom_rs['setting_name']?>" class="form-control" type="text" />
@@ -98,3 +113,29 @@ EOT_JS
 
     
 </div>
+
+<div id="modalThemes" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+    <form id="frmImport" method="post">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Import Theme settings</h4>
+      </div>
+      <div class="modal-body">
+        <p>Select the theme to import settings from.</p>
+        <?= \yii\helpers\Html::dropDownList("target_theme","0",$theme_list,['class'=>'form-control'])?>
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-primary" type="button" id="btnImportSave">Import</button> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="hidden" name="current_theme" value="<?=$theme_id?>" />
+      </div>
+    </form>
+    </div>
+
+  </div>
+</div>
+
+

@@ -459,7 +459,7 @@ endif;
         ]
 ]);?>
                 
-        <tr><td>URL<td><input name="url" id="url" value="<?=$rs['url']?>" class="form-control"type="text" />       
+        <tr><td>URL<td><input maxlength="50" name="url" id="url" value="<?=$rs['url']?>" class="form-control"type="text" />       
         <tr><td>Lead Content<td><textarea name="lead_content" id="lead_content" class="form-control"rows="7" cols="40"><?=$rs['lead_content']?></textarea>
         <tr><td>Body Content  <td><textarea name="body_content" id="body_content"  class="form-control"rows="7" cols="40"><?=$rs['body_content']?></textarea>
         <tr><td>Published<td><?=$published?>   &nbsp;&nbsp;&nbsp;Include Author Info <?=$published_by_stat?>        
@@ -476,7 +476,7 @@ endif;
                     <?php
                         foreach($selected_tags as $rec):
                     ?>
-                        <span id="<?=$rec['id']?>"><?=$rec['name']?> <a href='#' onClick="javascript:remTag('<?=$rec['id']?>');return false">Remove</a><br /></span>
+                    <span id="<?=$rec['id']?>"><?=$rec['name']?> <a href='#' onClick="javascript:remTag('<?=$rec['id']?>');return false">Remove</a></span><br>
                     <?php
                         endforeach;
                     ?>

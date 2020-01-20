@@ -88,6 +88,7 @@ class Menus extends \yii\db\ActiveRecord
             MenuPage::deleteAll(['profile'=>$menu_profile]);
         endif;
         for($i=0;$i < count($arr_act_menu);$i++){
+            echo $arr_act_menu[$i]."-";
             $order_count= $order_count + 10;
             if($menu_profile!=null):
                     $menu_page = Pages::find()->where(['menu_title'=>$arr_act_menu[$i]])->one();
@@ -97,7 +98,15 @@ class Menus extends \yii\db\ActiveRecord
                         $c->setAttribute('profile',$menu_profile);
                         $c->setAttribute('sort_order',$order_count);
                         $c->save();
-                    
+                    else:
+                        $menu_page = Pages::find()->where(['LIKE','menu_title',$arr_act_menu[$i]])->one();
+                        if($menu_page!=null):
+                            $c = new MenuPage();
+                            $c->setAttribute('menu_id',$menu_page['id']);
+                            $c->setAttribute('profile',$menu_profile);
+                            $c->setAttribute('sort_order',$order_count);
+                            $c->save();
+                        endif;
                     endif;
                 else:            
                     Yii::$app->db->createCommand()->update('tbl_page',[  

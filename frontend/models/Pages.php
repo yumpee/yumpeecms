@@ -28,7 +28,8 @@ use backend\models\Settings;
 
 class Pages extends \backend\models\Pages
 {
-    private $fields = array('description','meta_description','title','alternate_header_content');
+    private $fields = array('description','meta_description','title','alternate_header_content','url');
+    
     public function behaviors() {        
         return [
                    
@@ -38,6 +39,15 @@ class Pages extends \backend\models\Pages
             
         ];
     }
+    public function rules()
+    {
+        return [
+            [['id', 'url'], 'required'],
+            [['id','no_of_views','thumbnail_image_id','display_image_id'],'safe'],
+            
+        ];
+    }
+    
 	public function getBlocks(){
         return $this->hasMany(\frontend\models\Blocks::className(),['id'=>'block_id'])->viaTable('tbl_block_page',['page_id'=>'id']);
     }	
@@ -54,6 +64,7 @@ class Pages extends \backend\models\Pages
             if($this->published=="N"):
                 return false;
             endif;
+            
             if($this->require_login=="Y"):
                 if(Yii::$app->user->isGuest):
                     //throw new \yii\web\HttpException(404, 'You do not have sufficient rights to view this page. Consult with your administrator.');

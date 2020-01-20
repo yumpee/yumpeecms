@@ -178,18 +178,18 @@ public function actionSave(){
                             $model->save();                            
                     endif;
                 endfor;
-                $db_arr=array("category","blog_index","articles_id","url","id","processor","tag_array","date","title","featured_media");
+                $db_arr=array("category","blog_index","articles_id","url","id","processor","tag_array","date","title","featured_media","published","published_by_stat","render_template","sort_order","require_login","article_type","lead_content","body_content");
                         $id = Yii::$app->request->post("id");
                         foreach($_POST as $key => $value)
                         {
                                 //if there are more fields in this form, we should extend the information and store in the data model
                                 $a = ArticleDetails::deleteAll(['article_id'=>$id,'param'=>$key]);
-                                if($value<>"" && !in_array($key,$db_arr)):                                    
+                                if($value<>"" && !in_array($key,$db_arr) && $value!=null):                                    
                                     $profile_data = new ArticleDetails();
                                     $profile_data->setAttribute("article_id",$id);
                                     $profile_data->setAttribute("param",$key);
                                     $profile_data->setAttribute("param_val",$value);
-                                    $profile_data->save(false);
+                                    //$profile_data->save(false);
                                 endif;
                         }
             endif;

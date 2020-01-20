@@ -49,9 +49,17 @@ class Settings extends \yii\db\ActiveRecord{
         return $this->find()->where(['setting_name'=>'website_short_name'])->one()->setting_value;
     }
     public function getLogo(){
+        $logo = CustomSettings::find()->where(['setting_name'=>'website_logo'])->one();
+        if($logo!=null):
+            return $logo->setting_value;
+        endif;
         return $this->find()->where(['setting_name'=>'website_logo'])->one()->setting_value;
     }
     public function getLogoDetails(){
+        $logo = CustomSettings::find()->where(['setting_name'=>'website_logo'])->one();
+        if($logo!=null):
+            return Media::find()->where(['id'=>$logo->setting_value])->one();
+        endif;
         $id = $this->find()->where(['setting_name'=>'website_logo'])->one()->setting_value;
         return Media::find()->where(['id'=>$id])->one();
     }
@@ -59,6 +67,10 @@ class Settings extends \yii\db\ActiveRecord{
         if ($this->find()->where(['setting_name'=>'website_logo'])->one()->setting_value!=""):
             return true;
         else:
+            $logo = CustomSettings::find()->where(['setting_name'=>'website_logo'])->one();
+            if($logo!=null):
+                return true;
+            endif;
             return false;
         endif;
     }

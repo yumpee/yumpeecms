@@ -38,6 +38,14 @@ class Pages extends \yii\db\ActiveRecord
     {
         return 'tbl_page';
     }
+    public function rules()
+    {
+        return [
+            [['id', 'url'], 'required'],
+            [['id','no_of_views','thumbnail_image_id','display_image_id'],'safe'],
+            
+        ];
+    }
     public function getRoles(){
         return $this->hasOne(Roles::className(),['id'=>'role_id']);
     }
@@ -162,10 +170,7 @@ class Pages extends \yii\db\ActiveRecord
                     $c->setAttribute('page_id',$id);
                     $c->save();
                 }
-                
             }
-            
-        
         }else{ 
             
           $id = md5(date('Ymdis').rand(1000,100000));

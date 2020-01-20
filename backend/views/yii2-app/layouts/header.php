@@ -18,7 +18,7 @@ if(isset(Yii::$app->user->identity->displayImage->path)):
     $display_image_path=Yii::$app->user->identity->displayImage->path;
 endif;
 ?>
-<link href="http://www.yumpeecms.com/yp-admin/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="https://www.yumpeecms.com/yp-admin/css/jquery.dataTables.min.css" rel="stylesheet">
 <header class="main-header">
 
     <?= Html::a('<span class="logo-mini">Yumpee</span><span class="logo-lg">' . Yii::$app->name . '</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
@@ -28,10 +28,10 @@ endif;
         <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
             <span class="sr-only">Toggle navigation</span>
         </a>
-
+        <center><span id="yumpee_new_updates_available_remote"></span></center>
         <div class="navbar-custom-menu">
-
-            <ul class="nav navbar-nav">
+            
+            <ul class="nav navbar-nav">                
                 <li><input type="button" class="btn btn-default" value="Visit Website" onClick="javascript:window.open('<?=$my_header_home_url['setting_value']?>?yumpee_template_preview=on&theme_id=0','_blank')" />
                 <!-- Messages: style can be found in dropdown.less-->
                 
@@ -39,9 +39,20 @@ endif;
                 <li class="dropdown tasks-menu">
                     <a href="?r=install/index" class="dropdown-toggle"  title="Install Templates">
                         <i class="fa fa-download"></i>
-                        <!--<span class="label label-danger">9</span>-->
+                        
                     </a>
-                    <ul class="dropdown-menu">
+                </li>
+                <li class="dropdown tasks-menu">
+                    <a href="?r=package/index" class="dropdown-toggle"  title="Export Package">
+                        <i class="fa fa-upload"></i>
+                    </a>
+                </li>
+                <li class="dropdown tasks-menu" style="display:none">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Install Templates">
+                        <i class="fa fa-bullhorn"></i>
+                        <span class="label label-danger">9</span>
+                    </a>
+                    <ul class="dropdown-menu" id="yumpee_global_announce">                        
                         <li class="header">You have 9 tasks</li>
                         <li>
                             <!-- inner menu: contains the actual data -->
@@ -194,3 +205,4 @@ endif;
         </div>
     </nav>
 </header>
+

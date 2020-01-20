@@ -23,11 +23,11 @@
  */
 namespace app\components;
 use yii\web\UrlRuleInterface;
-use yii\base\Object;    
+use yii\base\BaseObject;    
 use frontend\components\ContentBuilder;
 
 
-class RouteManager extends Object implements URLRuleInterface
+class RouteManager extends BaseObject implements URLRuleInterface
 
 {
 	public function createUrl($manager, $route, $params){

@@ -29,6 +29,7 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\Helpers\ArrayHelper;
 use backend\models\Themes;
 use backend\models\Templates;
 use backend\models\Settings;
@@ -189,10 +190,10 @@ public function behaviors()
         return $this->render("import",$page);
     }
     public function actionTwig(){
-        return json_encode(Twig::find()->select(['id','renderer'])->asArray()->where(['theme_id'=>Yii::$app->request->get('source')])->andWhere('renderer_type IN ("I","W","V")')->orderBy('renderer')->all());
+        return json_encode(Twig::find()->select(['id','renderer','renderer_type'])->with('form','page','templates')->asArray()->where(['theme_id'=>Yii::$app->request->get('source')])->andWhere('renderer_type IN ("I","W","V","F","R","Z")')->orderBy(['renderer_type'=>SORT_ASC,'renderer'=>SORT_ASC])->all());
     }
     public function actionSaveImport(){
-        $model = Twig::find()->where(['theme_id'=>Yii::$app->request->post('source_theme')])->andWhere('renderer_type IN ("I","W","V")')->all();
+        $model = Twig::find()->where(['theme_id'=>Yii::$app->request->post('source_theme')])->andWhere('renderer_type IN ("I","W","V","F","R","Z")')->all();
         foreach($model as $program):
             if(Yii::$app->request->post("c".$program->id)=="on" && Yii::$app->request->post("target_theme")<>""):
                 $rec = Twig::find()->where(['renderer'=>$program->renderer])->andWhere('theme_id="'.Yii::$app->request->post("target_theme").'"')->one();
@@ -202,7 +203,11 @@ public function behaviors()
                         $new_insert->setAttribute("renderer",$program->renderer);
                         $new_insert->setAttribute("renderer_type",$program->renderer_type);
                         $new_insert->setAttribute("code",$program->code);
-                        $filename=md5(date("Hmdis").rand(1000,1000)).".twig";
+                        if(strpos($program->filename,'twig/')!==false):
+                            $filename = $program->filename;
+                        else:
+                            $filename=md5(date("Hmdis").rand(1000,100000)).".twig";
+                        endif;
                         $new_insert->setAttribute("filename",$filename);
                         $new_insert->save();
                     else:
@@ -210,12 +215,12 @@ public function behaviors()
                         $rec->setAttribute("renderer",$program->renderer);
                         $rec->setAttribute("renderer_type",$program->renderer_type);
                         $rec->setAttribute("code",$program->code);
+                        $rec->setAttribute("filename",$program->filename);                        
                         $rec->save();
                 endif;
             endif;
         endforeach;
         return "Import completed successfully";
-        
     }
     public function actionSettings(){
         $page['records'] = Themes::find()->orderBy('name')->all();
@@ -287,6 +292,8 @@ public function behaviors()
                         $settings = CustomSettings::find()->where(['theme_id'=>$theme_id])->all();
                         $form = Forms::find()->where(['id'=>Yii::$app->request->get("form_id")])->one();
                         $codebase=\frontend\models\Twig::find()->where(['theme_id'=>$theme_id,'renderer'=>$renderer,'renderer_type'=>'Z'])->one();
+                        $theme_list = Themes::find()->orderBy('name')->all();
+                        $page['theme_list'] = ArrayHelper::map($theme_list, 'id', 'name');
                         
                         if(($codebase!=null)&& ($codebase['code']<>"")):
                             $loader = new \frontend\models\Twig();
@@ -330,6 +337,19 @@ public function behaviors()
         $a = CustomSettings::findOne($id);
         $a->delete();
         echo "Record successfully deleted";
+    }
+    public function actionImportTheme(){
+        $settings = CustomSettings::find()->where(['theme_id'=>Yii::$app->request->post("target_theme")])->all();
+        foreach($settings as $setting):
+            $a = new CustomSettings();
+            $id = md5(date("Hmisd").rand(10000,1000000));
+            $a->setAttribute("id",$id);
+            $a->setAttribute("setting_name",$setting["setting_name"]);
+            $a->setAttribute("setting_value",$setting["setting_value"]);
+            $a->setAttribute("theme_id",Yii::$app->request->post("current_theme"));
+            $a->save();
+        endforeach;
+        echo "Setting import completed";
     }
  
 }
